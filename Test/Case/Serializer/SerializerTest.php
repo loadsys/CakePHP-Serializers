@@ -42,6 +42,7 @@ class SerializerTest extends CakeTestCase {
 	public function testToJsonConvertsSingleRecordToJsonString() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller);	
+		$serializer->attributes = array('id', 'title', 'body');
 		$data = array('Post' => array(
 			'id' => 1,
 			'title' => 'Test Title',
@@ -55,6 +56,7 @@ class SerializerTest extends CakeTestCase {
 	public function testToJsonConvertsMultipleRecordsToJsonString() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller);	
+		$serializer->attributes = array('id', 'title', 'body');
 		$data = array(
 			array('Post' => array(
 				'id' => 1,
@@ -78,35 +80,34 @@ class SerializerTest extends CakeTestCase {
 	public function testToJsonConvertsSingleRecordWithNoRoot() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller, array('root' => false));	
+		$serializer->attributes = array('title', 'body');
 		$data = array('Post' => array(
-			'id' => 1,
 			'title' => 'Test Title',
 			'body' => 'Content body'
 		));
 		$value = $serializer->toJson($data);
-		$expected = '{"id":1,"title":"Test Title","body":"Content body"}';
+		$expected = '{"title":"Test Title","body":"Content body"}';
 		$this->assertEquals($expected, $value);
 	}
 
 	public function testToJsonConvertsMultipleRecordsWithNoRoot() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller, array('root' => false));	
+		$serializer->attributes = array('id', 'title');
 		$data = array(
 			array('Post' => array(
 				'id' => 1,
-				'title' => 'Test Title',
-				'body' => 'Content body'
+				'title' => 'Test Title'
 			)),
 			array('Post' => array(
 				'id' => 2,
-				'title' => 'Other Title',
-				'body' => 'Content other'
+				'title' => 'Other Title'
 			))
 		);
 		$value = $serializer->toJson($data);
 		$expected  = '[';
-		$expected .= '{"id":1,"title":"Test Title","body":"Content body"},';
-		$expected .= '{"id":2,"title":"Other Title","body":"Content other"}';
+		$expected .= '{"id":1,"title":"Test Title"},';
+		$expected .= '{"id":2,"title":"Other Title"}';
 		$expected .= ']';
 		$this->assertEquals($expected, $value);
 	}
@@ -114,6 +115,7 @@ class SerializerTest extends CakeTestCase {
 	public function testToJsonConvertsRespectsCustomRootStrings() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller, array('root' => 'my_posts'));
+		$serializer->attributes = array('id', 'title', 'body');
 		$data = array('Post' => array(
 			'id' => 1,
 			'title' => 'Test Title',
@@ -127,6 +129,7 @@ class SerializerTest extends CakeTestCase {
 	public function testToJsonCanPrettyPrint() {
 		$this->controller->name = 'Posts';
 		$serializer = new Serializer($this->controller, array('pretty' => true));
+		$serializer->attributes = array('id', 'title', 'body');
 		$data = array('Post' => array(
 			'id' => 1,
 			'title' => 'Test Title',

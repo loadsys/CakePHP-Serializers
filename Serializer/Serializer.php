@@ -45,7 +45,14 @@ class Serializer extends Object {
 
 	public function serializeRecord($record) {
 		$dataKey = Inflector::classify(Inflector::singularize($this->name));
-		return $record[$dataKey];
+		$index = array_fill_keys($this->attributes, true);
+		$data = array_intersect_key($record[$dataKey], $index);
+		foreach ($this->attributes as $key) {
+			if (method_exists($this, $key)) {
+				$data[$key] = $this->{$key}($data);
+			}
+		}
+		return $data;
 	}
 
 	protected function inflectedRoot($isSingular) {
