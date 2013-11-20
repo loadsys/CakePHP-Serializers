@@ -30,8 +30,7 @@ class CakeSerializerView extends View {
 	 */
 	public function render($view = null, $layout = null) {
 		$render = '';
-		$checkRequest = new CheckRequest($this->_controller);
-		if ($checkRequest->isJSON()) {
+		if ($this->renderAsJSON()) {
 			$response->type('json');
 			// When $view is null, use controller->name for name and viewVars['data'] for data
 			// When $view is string use $view for name and viewVars['data'] for data
@@ -41,5 +40,34 @@ class CakeSerializerView extends View {
 			$render = parent::render($view, $layout);
 		}
 		return $render;
+	}
+
+	/**
+	 * @access protected
+	 * @return Boolean
+	 */
+	protected function renderAsJSON() {
+		if ($this->controllerRenderAsPropertyExists()) {
+			return $this->checkControllerRenderAs();
+		} else {
+			$analyzer = new AnalyzeRequest($this->request);
+			return $analyzer->isJSON();
+		}
+	}
+
+	/**
+	 * @access protected
+	 * @return Boolean
+	 */
+	protected function controllerRenderAsPropertyExists($type = 'json') {
+		return property_exists($this->_controller, 'renderAs');
+	}
+
+	/**
+	 * @access protected
+	 * @return Boolean
+	 */
+	protected function checkControllerRenderAs($type = 'json') {
+		return strtolower($this->_controller->renderAs) === $type;
 	}
 }
