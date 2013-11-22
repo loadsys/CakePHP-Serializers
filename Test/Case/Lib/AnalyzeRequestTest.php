@@ -2,7 +2,7 @@
 
 App::uses('AnalyzeRequest', 'CakeSerializers.Lib');
 
-class CheckRequestTest extends CakeTestCase {
+class AnalyzeRequestTest extends CakeTestCase {
 	public $analyzer;
 
 	public function setUp() {
