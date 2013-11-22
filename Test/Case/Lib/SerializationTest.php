@@ -4,7 +4,7 @@ App::uses('Serialization', 'CakeSerializers.Lib');
 App::uses('Serializer', 'CakeSerializers.Serializer');
 
 class TestPostSerializer extends Serializer {
-	public $attributes = array('title', 'body');
+	public $attributes = array('title', 'body', 'summary');
 }
 
 class SerializationTest extends CakeTestCase {

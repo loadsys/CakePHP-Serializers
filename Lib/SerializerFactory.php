@@ -32,12 +32,12 @@ class SerializerFactory {
 	 * @param Array $data
 	 * @return Serializer
 	 */
-	public function generate($data = array()) {
+	public function generate() {
 		App::uses($this->_className, 'Serializer');
 		if (!class_exists($this->_className)) {
 			$this->generateError();
 		}
-		return new $this->_className($data);
+		return new $this->_className();
 	}
 
 	/**

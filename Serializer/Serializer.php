@@ -3,98 +3,71 @@
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
 
+/**
+ * Serializer
+ */
 class Serializer extends Object {
+	/**
+	 * The key name used to find data on the supplied data array
+	 *
+	 * @access public
+	 * @var String $rootKey
+	 */
+	public $rootKey = false;
+
+	/**
+	 * List of attributes for this model to be serialized into the
+	 * array.
+	 *
+	 * @access public
+	 * @var Array $attributes
+	 */
 	public $attributes = array();
-	public $pretty = false;
 
-	protected $_inflectRoot = true;
-
-	public function __construct(Controller $controller, array $options = array()) {
-		$this->parseOptions($options + $this->parseController($controller));
+	/**
+	 * Generate the rootKey if it wasn't assigned in the class definition
+	 *
+	 * @access public
+	 */
+	public function __construct() {
+		if (!$this->rootKey) {
+			$this->rootKey = preg_replace('/Serializer$/', '', get_class($this));
+		}
 	}
 
-	public function toJson(array $data = array()) {
+	/**
+	 * Convert the supplied normalized data array to jsonapi format.
+	 *
+	 * @access public
+	 * @param Array $data
+	 * @return Array
+	 */
+	public function toArray(array $data = array()) {
 		if (empty($data)) {
-			return $this->encode($data);
+			return $data;
 		}
-
-		$compiled = array();
-		$isSingular = $this->isSingular($data);
-		if ($isSingular) {
-			$compiled = $this->serializeRecord($data);
-		} else {
-			foreach ($data as $record) {
-				$compiled[] = $this->serializeRecord($record);
-			}
+		$rows = array();
+		foreach ($data as $v) {
+			$rows[] = $this->serializeRecord($v);
 		}
-
-		if (!$this->root) {
-			$str = $this->encode($compiled);
-		} else {
-			$str = $this->encode(array($this->inflectedRoot($isSingular) => $compiled));
-		}
-		return $str;
+		$key = Inflector::tableize($this->rootKey);
+		return array($key => $rows);
 	}
 
-	public function encode($data = array()) {
-		if ($this->pretty && defined('JSON_PRETTY_PRINT')) {
-			return json_encode($data, JSON_PRETTY_PRINT);
-		}
-		return json_encode($data);
-	}
-
-	public function serializeRecord($record) {
-		$dataKey = Inflector::classify(Inflector::singularize($this->name));
+	/**
+	 * @access protected
+	 * @param Array $record
+	 * @return Array
+	 */
+	protected function serializeRecord($record) {
 		$index = array_fill_keys($this->attributes, true);
-		$data = array_intersect_key($record[$dataKey], $index);
+		$data = array_intersect_key($record[$this->rootKey], $index);
 		foreach ($this->attributes as $key) {
 			if (method_exists($this, $key)) {
 				$data[$key] = $this->{$key}($data);
 			}
 		}
 		return $data;
-	}
-
-	protected function inflectedRoot($isSingular) {
-		if (!$this->_inflectRoot) {
-			return $this->root;
-		}
-		if ($isSingular) {
-			return Inflector::singularize($this->root);
-		} else {
-			return Inflector::pluralize($this->root);
-		}
-	}
-
-	protected function parseController($controller) {
-		return array(
-			'name' => $controller->name
-		);
-	}
-
-	protected function parseOptions($options = array()) {
-		if (!isset($this->name)) {
-			$this->name = $options['name'];
-		}
-
-		if (!isset($this->root)) {
-			if (isset($options['root'])) {
-				$this->_inflectRoot = false;
-				$this->root = $options['root'];
-			} else {
-				$this->root = Inflector::underscore($options['name']);
-			}
-		} else {
-			$this->_inflectRoot = false;
-		}
-
-		if (isset($options['pretty'])) {
-			$this->pretty = (boolean) $options['pretty'];
-		}
-	}
-
-	protected function isSingular(array $data) {
-		return !is_numeric(key($data));
 	}
 }
 

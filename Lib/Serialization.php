@@ -1,6 +1,6 @@
 <?php
 
-App::uses('SerializerFactory', 'CakeSerializer.Lib');
+App::uses('SerializerFactory', 'CakeSerializers.Lib');
 
 /**
  * Serialization
@@ -38,6 +38,29 @@ class Serialization {
 	 * @return Array
 	 */
 	public function parse() {
-		return array();
+		$data = $this->normalizeData($this->_data);
+		$serializer = $this->factoryFor($this->_name)->generate();
+		return $serializer->toArray($data);
+	}
+
+	/**
+	 * @access protected
+	 * @param Array $data
+	 * @return Array
+	 */
+	protected function normalizeData($data) {
+		if (!is_int(key($data))) {
+			$data = array($data);
+		}
+		return $data;
+	}
+
+	/**
+	 * @access protected
+	 * @param String $name
+	 * @return Object
+	 */
+	protected function factoryFor($name) {
+		return new SerializerFactory($name);
 	}
 }

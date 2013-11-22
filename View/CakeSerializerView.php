@@ -1,7 +1,8 @@
 <?php
 
 App::uses('View', 'View');
-App::uses('CheckRequest', 'CakeSerializers.Lib');
+App::uses('AnalyzeRequest', 'CakeSerializers.Lib');
+App::uses('Serialization', 'CakeSerializers.Lib');
 
 class CakeSerializerView extends View {
 	/**
@@ -31,7 +32,7 @@ class CakeSerializerView extends View {
 	 */
 	public function render($view = null, $layout = null) {
 		if ($this->renderAsJSON()) {
-			$response->type('json');
+			$this->response->type('json');
 			list($name, $data) = $this->parseNameAndData($view);
 			$render = $this->toJSON($name, $data);
 		} else {
@@ -83,15 +84,13 @@ class CakeSerializerView extends View {
 	 * @return Boolean
 	 */
 	protected function parseNameAndData($arg = null) {
-		$name = $this->_controller->name;
+		$data = array();
 		if (isset($this->_controller->viewVars['data'])) {
-			$data = $this->controller->viewVars['data'];
+			$data = $this->_controller->viewVars['data'];
 		}
 		if (is_array($arg)) {
 			$data = $arg;
-		} else if (is_string($arg)) {
-			$name = $arg;
 		}
-		return array($name, $data);
+		return array($this->_controller->name, $data);
 	}
 }
