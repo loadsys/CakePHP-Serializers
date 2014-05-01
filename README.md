@@ -1,3 +1,5 @@
+### v0.1 - Use at your own risk
+
 # CakePHP-Serializers
 
 An object oriented solution to CakePHP model data serialization to JSON.
