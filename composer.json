@@ -1,0 +1,25 @@
+{
+  "name": "loadsys/cakephp_serializers",
+  "type": "cakephp-plugin",
+  "description": "A CakePHP Presenter/Decorator Plugin",
+  "keywords": ["cakephp","view","json","serializers"],
+  "license": "MIT",
+  "homepage": "https://github.com/loadsys/CakePHP-Serializers",
+  "authors": [
+    {
+      "name": "Joey Trapp",
+      "homepage": "https://github.com/joeytrapp"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/loadsys/CakePHP-Serializers/issues",
+    "source": "https://github.com/loadsys/CakePHP-Serializers"
+  },
+  "require": {
+    "php": ">=5.3.0",
+    "composer/installers": "*"
+  },
+  "extra": {
+    "installer-name": "Serializers"
+  }
+}
