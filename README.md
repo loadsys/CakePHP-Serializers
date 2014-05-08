@@ -38,14 +38,14 @@ CakePlugin::loadAll(array(
 
 ### Controller Setup ###
 
-Set the `$viewClass` property, either globally in your `Controller/AppController.php` or in specific
+Set a `$viewClass` property, either globally in your `Controller/AppController.php` or in specific
 controllers as needed:
 
 ``` php
 public $viewClass = 'Serializers.CakeSerializer';
 ```
 
-To force JSON rendering from all controller responses, set the `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
+To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
 
 ``` php
 // Serialize and return JSON:
@@ -57,7 +57,7 @@ public $renderAs = 'html';
 
 ### Serializer Setup ###
 
-Create a new directory at the `APP` level (Controller, Model, etc.) named 'Serializer. This
+Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. This
 directory will contain your specific model serialization classes. For example, if we have a `User`
 model with fields `id`, `first_name`, and `last_name` create the file
 `Serializer/UserSerializer.php`:
@@ -76,7 +76,6 @@ example:
 
 ``` php
 // Serializer/UserSerializer.php
-
 // Uppercase every first_name during serialization
 public function first_name($data) {
 	return strtoupper($data['first_name']);
@@ -97,7 +96,7 @@ public function index() {
 }
 ```
 
-The serializer will transform the `$data` to [json:api](http://jsonapi.org/) compliant JSON.
+The serializer will transform `$data` to [json:api](http://jsonapi.org/) compliant JSON.
 
 ## License
 
