@@ -1,8 +1,8 @@
 <?php
 
 App::uses('View', 'View');
-App::uses('AnalyzeRequest', 'CakeSerializers.Lib');
-App::uses('Serialization', 'CakeSerializers.Lib');
+App::uses('AnalyzeRequest', 'Serializers.Lib');
+App::uses('Serialization', 'Serializers.Lib');
 
 class CakeSerializerView extends View {
 	/**

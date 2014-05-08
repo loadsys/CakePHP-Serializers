@@ -1,6 +1,6 @@
 <?php
 
-App::uses('SerializerNaming', 'CakeSerializers.Lib');
+App::uses('SerializerNaming', 'Serializers.Lib');
 
 class SerializerNamingTest extends CakeTestCase {
 

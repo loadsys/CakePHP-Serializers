@@ -1,6 +1,6 @@
 <?php
 
-App::uses('Serializer', 'CakeSerializers.Serializer');
+App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 
 class RootKeySerializer extends Serializer {

@@ -1,7 +1,7 @@
 <?php
 
-App::uses('Serialization', 'CakeSerializers.Lib');
-App::uses('Serializer', 'CakeSerializers.Serializer');
+App::uses('Serialization', 'Serializers.Lib');
+App::uses('Serializer', 'Serializers.Serializer');
 
 class TestPostSerializer extends Serializer {
 	public $attributes = array('title', 'body', 'summary');

@@ -1,6 +1,6 @@
 <?php
 
-App::uses('AnalyzeRequest', 'CakeSerializers.Lib');
+App::uses('AnalyzeRequest', 'Serializers.Lib');
 
 class AnalyzeRequestTest extends CakeTestCase {
 	public $analyzer;

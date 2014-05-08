@@ -1,6 +1,6 @@
 <?php
 
-App::uses('SerializerFactory', 'CakeSerializers.Lib');
+App::uses('SerializerFactory', 'Serializers.Lib');
 
 /**
  * Serialization
