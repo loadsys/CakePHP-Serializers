@@ -1,7 +1,7 @@
 {
   "name": "loadsys/cakephp_serializers",
   "type": "cakephp-plugin",
-  "description": "A CakePHP Presenter/Decorator Plugin",
+  "description": "An object oriented solution to CakePHP model data serialization to JSON.",
   "keywords": ["cakephp","view","json","serializers"],
   "license": "MIT",
   "homepage": "https://github.com/loadsys/CakePHP-Serializers",
