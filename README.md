@@ -10,7 +10,7 @@ An object oriented solution to CakePHP model data serialization to JSON.
 ### Git ###
 
 ``` bash
-git clone git@github.com:loadsys/CakePHP-GiftWrap.git Plugin/GiftWrap
+git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
 ```
 
 ### Composer ###
