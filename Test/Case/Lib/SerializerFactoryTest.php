@@ -1,8 +1,13 @@
 <?php
 
 App::uses('SerializerFactory', 'Serializers.Lib');
+App::uses('Model', 'Model');
 
 class TestCommentSerializer {}
+
+class TestTag extends Model {
+	public $useTable = false;
+}
 
 class SerializerFactoryTest extends CakeTestCase {
 	public function testLooksUpConventionallyNamedClasses() {
@@ -10,14 +15,23 @@ class SerializerFactoryTest extends CakeTestCase {
 		$this->assertTrue($factory->generate() instanceof TestCommentSerializer);
 	}
 
-	public function testThrowsExceptionWhenSerializerDoesNotExist() {
-		$factory = new SerializerFactory('MissingComment');
-		try {
-			$factory->generate();
-		} catch (Exception $e) {
-			$this->assertRegExp('/Could not find class MissingCommentSerializer/', $e->getMessage());
-			return;
-		}
-		$this->assertTrue(false, 'The exception was not thrown for missing class');
+	public function testGetsDefaultInstanceWhenClassNotDefined() {
+		$testTagSchema = array(
+			'id' => array(),
+			'tag' => array(),
+			'created' => array(),
+			'modified' => array(),
+		);
+		$TestTag = $this->getMockForModel('TestTag', array(
+			'schema',
+		));
+		$TestTag->expects($this->any())
+			->method('schema')
+			->will($this->returnValue($testTagSchema));
+		ClassRegistry::addObject('TestTag', $TestTag);
+		$factory = new SerializerFactory('TestTag');
+		$serializer = $factory->generate();
+		$this->assertTrue($serializer instanceof Serializer);
+		$this->assertEquals(array_keys($testTagSchema), $serializer->attributes);
 	}
 }
