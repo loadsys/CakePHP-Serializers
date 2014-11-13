@@ -2,20 +2,20 @@
 
 App::uses('SerializerFactory', 'Serializers.Lib');
 
-class TestPostSerializer {}
+class TestCommentSerializer {}
 
 class SerializerFactoryTest extends CakeTestCase {
 	public function testLooksUpConventionallyNamedClasses() {
-		$factory = new SerializerFactory('TestPost');
-		$this->assertTrue($factory->generate() instanceof TestPostSerializer);
+		$factory = new SerializerFactory('TestComment');
+		$this->assertTrue($factory->generate() instanceof TestCommentSerializer);
 	}
 
 	public function testThrowsExceptionWhenSerializerDoesNotExist() {
-		$factory = new SerializerFactory('MissingPost');
+		$factory = new SerializerFactory('MissingComment');
 		try {
 			$factory->generate();
 		} catch (Exception $e) {
-			$this->assertRegExp('/Could not find class MissingPostSerializer/', $e->getMessage());
+			$this->assertRegExp('/Could not find class MissingCommentSerializer/', $e->getMessage());
 			return;
 		}
 		$this->assertTrue(false, 'The exception was not thrown for missing class');
