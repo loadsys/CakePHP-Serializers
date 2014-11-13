@@ -19,13 +19,22 @@ class Serializer extends Object {
 	public $rootKey = false;
 
 	/**
-	 * List of attributes for this model to be serialized into the
+	 * List of required attributes for this model to be serialized into the
 	 * array.
 	 *
 	 * @access public
 	 * @var Array $attributes
 	 */
 	public $attributes = array();
+
+	/**
+	 * List of optional attributes for this model to be serialized into the
+	 * array.
+	 *
+	 * @access public
+	 * @var Array $attributes
+	 */
+	public $optional = array();
 
 	/**
 	 * Generate the rootKey if it wasn't assigned in the class definition
@@ -75,19 +84,29 @@ class Serializer extends Object {
 	 */
 	protected function serializeRecord($record) {
 		$required = $this->attributes;
-		$requiredCheck = array_diff($required, array_keys($record[$this->rootKey]));
-
+		$keys = array_keys($record[$this->rootKey]);
+		$requiredCheck = array_diff($required, $keys);
 		if (!empty($requiredCheck)) {
 			$missing = join(', ', $requiredCheck);
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-
-		$index = array_fill_keys($this->attributes, true);
+		// TODO: Add tests for optional keys
+		$optional  = $this->optional;
+		if (!is_array($optional)) {
+			$optional = array();
+		}
+		$attrs = array_merge($keys, $optional);
+		$index = array_fill_keys($attrs, true);
 		$data = array_intersect_key($record[$this->rootKey], $index);
-		foreach ($this->attributes as $key) {
+		foreach ($attrs as $key) {
+			// TODO: Add logic to skip keys that are capitalized
 			if (method_exists($this, $key)) {
-				$data[$key] = $this->{$key}($data);
+				try {
+					$data[$key] = $this->{$key}($data);
+				} catch (SerializerIgnoreException $e) {
+					unset($data[$key]);
+				}
 			}
 		}
 		return $this->afterSerialize($data);
