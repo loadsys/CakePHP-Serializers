@@ -3,6 +3,9 @@
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
 
+class SerializerMissingRequiredException extends Exception {}
+class SerializerIgnoreException extends Exception {}
+
 /**
  * Serializer
  */
@@ -71,6 +74,15 @@ class Serializer extends Object {
 	 * @return Array
 	 */
 	protected function serializeRecord($record) {
+		$required = $this->attributes;
+		$requiredCheck = array_diff($required, array_keys($record[$this->rootKey]));
+
+		if (!empty($requiredCheck)) {
+			$missing = join(', ', $requiredCheck);
+			$msg = "The following keys were missing from $this->rootKey: $missing";
+			throw new SerializerMissingRequiredException($msg);
+		}
+
 		$index = array_fill_keys($this->attributes, true);
 		$data = array_intersect_key($record[$this->rootKey], $index);
 		foreach ($this->attributes as $key) {

@@ -39,5 +39,17 @@ class SerializerTest extends CakeTestCase {
 		$expected = array("afters" => array("after serialize"));
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
+
+	public function testMissingRequiredAttribute() {
+		$data = array(
+			array('User' => array('first_name' => 'John'))
+		);
+		$serializer = new UserSerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from User: last_name"
+		);
+		$serializer->toArray($data);
+	}
 }
 
