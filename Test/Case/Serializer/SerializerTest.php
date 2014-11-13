@@ -10,6 +10,12 @@ class UserSerializer extends Serializer {
 	public $attributes = array('first_name', 'last_name');
 }
 
+class AfterSerializer extends Serializer {
+	public function afterSerialize($data) {
+		return "after serialize";
+	}
+}
+
 class SerializerTest extends CakeTestCase {
 	public function testSerializerRootKeyGeneration() {
 		$serializer = new RootKeySerializer();
@@ -24,6 +30,13 @@ class SerializerTest extends CakeTestCase {
 		$expected = array('users' => array(
 			array('first_name' => 'John', 'last_name' => 'Doe')
 		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testSerializerAfterSerializeCallback() {
+		$serializer = new AfterSerializer();
+		$data = array(array("After" => array()));
+		$expected = array("afters" => array("after serialize"));
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
 }
