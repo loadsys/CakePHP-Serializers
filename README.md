@@ -55,11 +55,18 @@ public $renderAs = 'json';
 public $renderAs = 'html';
 ```
 
-### Serializer Setup ###
+### Default Serializer Setup ###
+
+There will be a default Serializer Class created for every Model. This Serializer will
+require every attribute in the Model Schema to be passed to it for output. If all
+you want to do is to Serialize the output of every field in a Model with no data
+manipulation and all fields required, this is all you need.
+
+### Custom Serializer Setup ###
 
 Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. This
 directory will contain your specific model serialization classes. For example, if we have a `User`
-model with fields `id`, `first_name`, and `last_name` create the file
+model with required fields `id`, `first_name`, and `last_name` create the file
 `Serializer/UserSerializer.php`:
 
 ``` php
@@ -71,16 +78,64 @@ class UserSerializer extends Serializer {
 }
 ```
 
+This serializer will throw a `SerializerMissingRequiredException` if the data passed
+to the serializer does not include all of these properties.
+
 If you need to do any formatting or data manipulation, create a method named after a field. For
 example:
 
 ``` php
 // Serializer/UserSerializer.php
 // Uppercase every first_name during serialization
-public function first_name($data) {
+public function first_name($data, $record) {
 	return strtoupper($data['first_name']);
 }
 ```
+
+If you have attributes that you wish to have as optional attributes, ie. attributes
+that are passed to the output only when provided to the Serializer, you can setup
+an array of optional properties.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	public $optional = array('email');
+}
+```
+
+If `email` is passed to the Serializer, then `email` will be Serialized and passed
+to the output.
+
+You can also create methods to process optional attributes.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	public $optional = array('email');
+
+	public function email($data, $record) {
+		if(!array_key_exists('email', $data)) {
+			throw new SerializerIgnoreException();
+		}
+
+		return strtoupper($data['email']);
+	}
+}
+```
+
+If `email` exists in the data, then it will be upper cased when returned.
+
+If `email` does not exist in the data, then it will be ignored and no data will
+be returned for that key. The base Serializer Class will catch Exceptions of type
+`SerializerIgnoreException` and unset the data array for that key.
 
 ### Controller Usage ###
 
@@ -97,6 +152,20 @@ public function index() {
 ```
 
 The serializer will transform `$data` to [json:api](http://jsonapi.org/) compliant JSON.
+
+## Contributing ##
+
+### Reporting Issues ###
+
+Please use [GitHub Isuses](https://github.com/loadsys/CakePHP-Serializers/issues) for listing any known defects or issues
+
+### Development ###
+
+When developing this plugin, please fork and issue a PR for any new development.
+
+The Complete Test Suite for the Plugin can be run via this command:
+
+`./lib/Cake/Console/cake test Serializers AllSerializers`
 
 ## License
 
