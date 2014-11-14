@@ -39,6 +39,7 @@ class SerializerFactory {
 			$modelName = preg_replace('/Serializer$/', '', $this->_className);
 			$model = ClassRegistry::init($modelName);
 			$serializer = new Serializer();
+			$serializer->rootKey = $modelName;
 			$serializer->attributes = array_keys($model->schema());
 			return $serializer;
 		}
