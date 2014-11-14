@@ -5,9 +5,10 @@ php:
   - 5.5
 
 env:
-  - CAKE_VERSION=2.4.10
-  - CAKE_VERSION=2.5.6
-  - CAKE_VERSION=master
+  - CAKE_VERSION=2.3.10 DB=mysql
+  - CAKE_VERSION=2.4.10 DB=mysql
+  - CAKE_VERSION=2.5.6 DB=mysql
+  - CAKE_VERSION=master DB=mysql
 
 install:
   - git clone git://github.com/cakephp/cakephp ../cakephp && cd ../cakephp && git checkout $CAKE_VERSION
@@ -17,6 +18,62 @@ install:
   - sh -c "ln -s ~/.composer/vendor/phpunit/phpunit/PHPUnit ../cakephp/vendors/PHPUnit"
 
 before_script:
+  - phpenv rehash
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE cakephp_test;' -U postgres; fi"
+  - set +H
+  - echo "<?php
+    class DATABASE_CONFIG {
+    private \$identities = array(
+      'mysql' => array(
+        'datasource' => 'Database/Mysql',
+        'host' => '0.0.0.0',
+        'login' => 'travis'
+      ),
+      'pgsql' => array(
+        'datasource' => 'Database/Postgres',
+        'host' => '127.0.0.1',
+        'login' => 'postgres',
+        'database' => 'cakephp_test',
+        'schema' => array(
+          'default' => 'public',
+          'test' => 'public'
+        )
+      )
+    );
+    public \$default = array(
+      'persistent' => false,
+      'host' => '',
+      'login' => '',
+      'password' => '',
+      'database' => 'cakephp_test',
+      'prefix' => ''
+    );
+    public \$test = array(
+      'persistent' => false,
+      'host' => '',
+      'login' => '',
+      'password' => '',
+      'database' => 'cakephp_test',
+      'prefix' => ''
+    );
+    public function __construct() {
+      \$db = 'mysql';
+      if (!empty(\$_SERVER['DB'])) {
+        \$db = \$_SERVER['DB'];
+      }
+      foreach (array('default', 'test') as \$source) {
+        \$config = array_merge(\$this->{\$source}, \$this->identities[\$db]);
+        if (is_array(\$config['database'])) {
+          \$config['database'] = \$config['database'][\$source];
+        }
+        if (!empty(\$config['schema']) && is_array(\$config['schema'])) {
+          \$config['schema'] = \$config['schema'][\$source];
+        }
+        \$this->{\$source} = \$config;
+      }
+    }
+    }" > ../cakephp/app/Config/database.php
 
 script:
   - ./lib/Cake/Console/cake test Serializers AllSerializers --stderr
