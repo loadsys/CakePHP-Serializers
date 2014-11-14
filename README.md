@@ -2,6 +2,8 @@
 
 # CakePHP-Serializers
 
+[![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master)](https://travis-ci.org/loadsys/CakePHP-Serializers)
+
 An object oriented solution to CakePHP model data serialization to JSON.
 
 ## Installation
