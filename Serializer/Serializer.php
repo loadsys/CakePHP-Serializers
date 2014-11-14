@@ -60,7 +60,10 @@ class Serializer extends Object {
 		}
 		$rows = array();
 		foreach ($data as $v) {
-			$rows[] = $this->serializeRecord($v);
+			// ensure there is some data being passed to serialize record
+			if (!empty($v)) {
+				$rows[] = $this->serializeRecord($v);
+			}
 		}
 		$key = Inflector::tableize($this->rootKey);
 		return array($key => $rows);
@@ -84,6 +87,10 @@ class Serializer extends Object {
 	 * @return Array
 	 */
 	protected function serializeRecord($record) {
+		// if there is no data return nothing
+		if (empty($record)) {
+			return;
+		}
 		$required = $this->required;
 		$keys = array_keys($record[$this->rootKey]);
 		$requiredCheck = array_diff($required, $keys);
