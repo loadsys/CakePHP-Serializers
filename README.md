@@ -1,33 +1,33 @@
-### v0.1 - Use at your own risk
-
-# CakePHP-Serializers
+# CakePHP-Serializers #
 
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 
 An object oriented solution to CakePHP model data serialization to JSON.
 
-## Installation
+This is close to production ready however there may be edge
+cases not yet observed.
 
-
-### Git ###
-
-``` bash
-git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
-```
+## Installation ##
 
 ### Composer ###
 
 * Add to your `composer.json` file
 
-``` php
+```php
 "require": {
   "loadsys/cakephp_serializers": "dev-master"
 }
 ```
 
+### Git ###
+
+```bash
+git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
+```
+
 Load the plugin and be sure that bootstrap is set to true:
 
-``` php
+```php
 // Config/boostrap.php
 CakePlugin::load('Serializers', array('bootstrap' => true));
 // or
@@ -36,14 +36,14 @@ CakePlugin::loadAll(array(
 ));
 ```
 
-## Usage
+## Usage ##
 
 ### Controller Setup ###
 
 Set a `$viewClass` property, either globally in your `Controller/AppController.php` or in specific
 controllers as needed:
 
-``` php
+```php
 public $viewClass = 'Serializers.CakeSerializer';
 ```
 
@@ -66,6 +66,8 @@ manipulation and all fields required, this is all you need.
 
 ### Custom Serializer Setup ###
 
+#### Basic Custom Serializer Classes ####
+
 Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. This
 directory will contain your specific model serialization classes. For example, if we have a `User`
 model with required fields `id`, `first_name`, and `last_name` create the file
@@ -83,16 +85,29 @@ class UserSerializer extends Serializer {
 This serializer will throw a `SerializerMissingRequiredException` if the data passed
 to the serializer does not include all of these properties.
 
+#### Format Return of Data ####
+
 If you need to do any formatting or data manipulation, create a method named after a field. For
 example:
 
 ``` php
 // Serializer/UserSerializer.php
-// Uppercase every first_name during serialization
-public function first_name($data, $record) {
-	return strtoupper($data['first_name']);
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	// $data is the pre-serialized data record for the $data[User] from the controller
+	// $record is the pre-serialized record for the $data from the controller
+	public function first_name($data, $record) {
+		return strtoupper($data['first_name']);
+	}
 }
 ```
+
+This will return the `first_name` as upper case.
+
+#### Optional Attributes for Serializers  ####
 
 If you have attributes that you wish to have as optional attributes, ie. attributes
 that are passed to the output only when provided to the Serializer, you can setup
@@ -112,7 +127,11 @@ class UserSerializer extends Serializer {
 If `email` is passed to the Serializer, then `email` will be Serialized and passed
 to the output.
 
-You can also create methods to process optional attributes.
+#### Optional Methods for Serializers  ####
+
+You can also create methods to process required and optional attributes. The
+method for an optional attribute will always get called even if the attribute
+is not supplied.
 
 ``` php
 // Serializer/UserSerializer.php
@@ -123,6 +142,8 @@ class UserSerializer extends Serializer {
 
 	public $optional = array('email');
 
+	// $data is the pre-serialized data record for the $data[User] from the controller
+	// $record is the pre-serialized record for the $data from the controller
 	public function email($data, $record) {
 		if(!array_key_exists('email', $data)) {
 			throw new SerializerIgnoreException();
@@ -138,6 +159,28 @@ If `email` exists in the data, then it will be upper cased when returned.
 If `email` does not exist in the data, then it will be ignored and no data will
 be returned for that key. The base Serializer Class will catch Exceptions of type
 `SerializerIgnoreException` and unset the data array for that key.
+
+#### AfterSerializer Callbacks ####
+
+There is an afterSerialize callback setup if you wish to do some amount of
+post processing after all the data has been serialized.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	public $optional = array('email');
+
+	// $json is the seralized json data
+	// $data is the pre-serialized data record for the User
+	public afterSerialize($json, $record) {
+
+	}
+}
+```
 
 ### Controller Usage ###
 
