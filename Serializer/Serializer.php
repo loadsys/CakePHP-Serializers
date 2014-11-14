@@ -92,17 +92,23 @@ class Serializer extends Object {
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-		$optional  = $this->optional;
-		if (!is_array($optional)) {
-			$optional = array();
+		$originalOptionals  = $this->optional;
+		if (!is_array($originalOptionals)) {
+			$originalOptionals = array();
 		}
-		$optional = array_intersect($optional, $keys);
-		$attrs = array_unique(array_merge($required, $optional));
+		$optinals = array_intersect($originalOptionals, $keys);
+		$attrs = array_unique(array_merge($required, $optinals));
 		$index = array_fill_keys($attrs, true);
 		$initialData = array();
 		foreach ($record[$this->rootKey] as $key => $value) {
-			if (!ctype_upper($key[0]) && in_array($key, $index)) {
+			if (!ctype_upper($key[0]) && in_array($key, $attrs) ) {
 				$initialData[$key] = $value;
+			}
+		}
+		$others = array_diff($originalOptionals, $attrs);
+		foreach ($others as $key) {
+			if (method_exists($this, $key)) {
+				array_push($attrs, $key);
 			}
 		}
 		$data = array_intersect_key($initialData, $index);

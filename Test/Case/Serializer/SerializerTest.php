@@ -20,11 +20,29 @@ class OptionalSerializer extends Serializer {
 	public $optional = array('summary', 'published');
 
 	public function body($data, $record) {
-		return strtoupper($data['body']);
+		return 'BODY';
 	}
 
 	public function summary($data, $record) {
-		return strtoupper($data['summary']);
+		return 'SUMMARY';
+	}
+}
+
+class TestMethodOptionalSerializer extends Serializer {
+	public $attributes = array('title', 'body');
+	public $optional = array('summary', 'published', 'tags', 'created');
+
+	public function tags($data, $record) {
+		return 'Tags';
+	}
+}
+
+class TestIgnoreOptionalSerializer extends Serializer {
+	public $attributes = array('title', 'body');
+	public $optional = array('created');
+
+	public function created($data, $record) {
+		throw new SerializerIgnoreException();
 	}
 }
 
@@ -90,7 +108,6 @@ class SerializerTest extends CakeTestCase {
 			array('Optional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
-				'published' => true
 			))
 		);
 		$serializer = new OptionalSerializer();
@@ -98,7 +115,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
-				'published' => true
+				'summary' => 'SUMMARY',
 			)
 		));
 		$this->assertEquals($expected, $serializer->toArray($data));
@@ -118,6 +135,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
+				'summary' => 'SUMMARY',
 				'published' => true
 			)
 		));
@@ -140,7 +158,46 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
+				'summary' => 'SUMMARY',
 				'published' => true
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testNotProvidedDataWithMethodOptionalAttribute() {
+		$data = array(
+			array('TestMethodOptional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+			))
+		);
+		$serializer = new TestMethodOptionalSerializer();
+		$expected = array('test_method_optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+				'tags' => 'Tags',
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testIgnoreOptionalAttribute() {
+		$data = array(
+			array('TestIgnoreOptional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'created' => '2014-07-07',
+			))
+		);
+		$serializer = new TestIgnoreOptionalSerializer();
+		$expected = array('test_ignore_optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'Body',
 			)
 		));
 		$this->assertEquals($expected, $serializer->toArray($data));
