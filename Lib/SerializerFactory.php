@@ -1,6 +1,7 @@
 <?php
 
 App::uses('SerializerNaming', 'Serializers.Lib');
+App::uses('Serializer', 'Serializers.Serializer');
 
 /**
  * SerializerFactory
@@ -35,19 +36,13 @@ class SerializerFactory {
 	public function generate() {
 		App::uses($this->_className, 'Serializer');
 		if (!class_exists($this->_className)) {
-			$this->generateError();
+			$modelName = preg_replace('/Serializer$/', '', $this->_className);
+			$model = ClassRegistry::init($modelName);
+			$serializer = new Serializer();
+			$serializer->rootKey = $modelName;
+			$serializer->required = array_keys($model->schema());
+			return $serializer;
 		}
 		return new $this->_className();
-	}
-
-	/**
-	 * @access protected
-	 * @throws LogicException
-	 */
-	protected function generateError() {
-		$c = $this->_className;
-		$msg  = "Could not find class %s. Create `class %s extends Serializer` ";
-		$msg .= "in APP/Serializer/%s.php.";
-		throw new LogicException(sprintf($msg, $c, $c, $c));
 	}
 }
