@@ -11,7 +11,7 @@ class UserSerializer extends Serializer {
 }
 
 class AfterSerializer extends Serializer {
-	public function afterSerialize($data) {
+	public function afterSerialize($json, $record) {
 		return "after serialize";
 	}
 }

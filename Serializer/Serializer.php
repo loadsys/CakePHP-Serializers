@@ -70,11 +70,12 @@ class Serializer extends Object {
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
-	 * @param  multi  $data serialized record
+	 * @param  multi  $json serialized record data
+	 * @param  multi  $data raw record data
 	 * @return multi
 	 */
-	public function afterSerialize($data) {
-		return $data;
+	public function afterSerialize($json, $record) {
+		return $json;
 	}
 
 	/**
@@ -109,7 +110,7 @@ class Serializer extends Object {
 				}
 			}
 		}
-		return $this->afterSerialize($data);
+		return $this->afterSerialize($data, $record);
 	}
 }
 
