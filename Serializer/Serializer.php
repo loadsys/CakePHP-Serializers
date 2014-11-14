@@ -97,11 +97,16 @@ class Serializer extends Object {
 			$optional = array();
 		}
 		$optional = array_intersect($optional, $keys);
-		$attrs = array_unique(array_merge($keys, $optional));
+		$attrs = array_unique(array_merge($required, $optional));
 		$index = array_fill_keys($attrs, true);
-		$data = array_intersect_key($record[$this->rootKey], $index);
+		$initialData = array();
+		foreach ($record[$this->rootKey] as $key => $value) {
+			if (!ctype_upper($key[0]) && in_array($key, $index)) {
+				$initialData[$key] = $value;
+			}
+		}
+		$data = array_intersect_key($initialData, $index);
 		foreach ($attrs as $key) {
-			// TODO: Add logic to skip keys that are capitalized
 			if (method_exists($this, $key)) {
 				try {
 					$data[$key] = $this->{$key}($data, $record);

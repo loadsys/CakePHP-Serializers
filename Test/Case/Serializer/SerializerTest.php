@@ -103,5 +103,47 @@ class SerializerTest extends CakeTestCase {
 		));
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
+
+	public function testNonProvidedAttributes() {
+		$data = array(
+			array('Optional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+				'tags' => 'tag1,tag2,tag3',
+			))
+		);
+		$serializer = new OptionalSerializer();
+		$expected = array('optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'published' => true
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testCamelCasedNonProvidedAttributes() {
+		$data = array(
+			array('Optional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+				'Tag' => array(
+					'name' => 'tag1',
+				),
+			))
+		);
+		$serializer = new OptionalSerializer();
+		$expected = array('optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'published' => true
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
 }
 
