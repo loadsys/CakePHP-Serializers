@@ -3,8 +3,7 @@
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 
-class RootKeySerializer extends Serializer {
-}
+class RootKeySerializer extends Serializer {}
 
 class UserSerializer extends Serializer {
 	public $attributes = array('first_name', 'last_name');
@@ -13,6 +12,19 @@ class UserSerializer extends Serializer {
 class AfterSerializer extends Serializer {
 	public function afterSerialize($json, $record) {
 		return "after serialize";
+	}
+}
+
+class OptionalSerializer extends Serializer {
+	public $attributes = array('title', 'body');
+	public $optional = array('summary', 'published');
+
+	public function body($data, $record) {
+		return strtoupper($data['body']);
+	}
+
+	public function summary($data, $record) {
+		return strtoupper($data['summary']);
 	}
 }
 
@@ -50,6 +62,46 @@ class SerializerTest extends CakeTestCase {
 			"The following keys were missing from User: last_name"
 		);
 		$serializer->toArray($data);
+	}
+
+	public function testOptionalIncludedAttributes() {
+		$data = array(
+			array('Optional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'summary' => 'Summary',
+				'published' => true
+			))
+		);
+		$serializer = new OptionalSerializer();
+		$expected = array('optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'summary' => 'SUMMARY',
+				'published' => true
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testOptionalExcludedAttributes() {
+		$data = array(
+			array('Optional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true
+			))
+		);
+		$serializer = new OptionalSerializer();
+		$expected = array('optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'published' => true
+			)
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
 	}
 }
 

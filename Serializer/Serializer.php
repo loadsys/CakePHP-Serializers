@@ -92,19 +92,19 @@ class Serializer extends Object {
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-		// TODO: Add tests for optional keys
 		$optional  = $this->optional;
 		if (!is_array($optional)) {
 			$optional = array();
 		}
-		$attrs = array_merge($keys, $optional);
+		$optional = array_intersect($optional, $keys);
+		$attrs = array_unique(array_merge($keys, $optional));
 		$index = array_fill_keys($attrs, true);
 		$data = array_intersect_key($record[$this->rootKey], $index);
 		foreach ($attrs as $key) {
 			// TODO: Add logic to skip keys that are capitalized
 			if (method_exists($this, $key)) {
 				try {
-					$data[$key] = $this->{$key}($data);
+					$data[$key] = $this->{$key}($data, $record);
 				} catch (SerializerIgnoreException $e) {
 					unset($data[$key]);
 				}
