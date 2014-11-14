@@ -3,20 +3,20 @@
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 
-class RootKeySerializer extends Serializer {}
+class TestRootKeySerializer extends Serializer {}
 
-class UserSerializer extends Serializer {
-	public $attributes = array('first_name', 'last_name');
+class TestUserSerializer extends Serializer {
+	public $required = array('first_name', 'last_name');
 }
 
-class AfterSerializer extends Serializer {
+class TestAfterSerializer extends Serializer {
 	public function afterSerialize($json, $record) {
 		return "after serialize";
 	}
 }
 
-class OptionalSerializer extends Serializer {
-	public $attributes = array('title', 'body');
+class TestOptionalSerializer extends Serializer {
+	public $required = array('title', 'body');
 	public $optional = array('summary', 'published');
 
 	public function body($data, $record) {
@@ -29,7 +29,7 @@ class OptionalSerializer extends Serializer {
 }
 
 class TestMethodOptionalSerializer extends Serializer {
-	public $attributes = array('title', 'body');
+	public $required = array('title', 'body');
 	public $optional = array('summary', 'published', 'tags', 'created');
 
 	public function tags($data, $record) {
@@ -38,7 +38,7 @@ class TestMethodOptionalSerializer extends Serializer {
 }
 
 class TestIgnoreOptionalSerializer extends Serializer {
-	public $attributes = array('title', 'body');
+	public $required = array('title', 'body');
 	public $optional = array('created');
 
 	public function created($data, $record) {
@@ -48,51 +48,51 @@ class TestIgnoreOptionalSerializer extends Serializer {
 
 class SerializerTest extends CakeTestCase {
 	public function testSerializerRootKeyGeneration() {
-		$serializer = new RootKeySerializer();
-		$this->assertEquals('RootKey', $serializer->rootKey);
+		$serializer = new TestRootKeySerializer();
+		$this->assertEquals('TestRootKey', $serializer->rootKey);
 	}
 
 	public function testSerializerUsesAttributesInAttributesArray() {
 		$data = array(
-			array('User' => array('first_name' => 'John', 'last_name' => 'Doe'))
+			array('TestUser' => array('first_name' => 'John', 'last_name' => 'Doe'))
 		);
-		$serializer = new UserSerializer();
-		$expected = array('users' => array(
+		$serializer = new TestUserSerializer();
+		$expected = array('test_users' => array(
 			array('first_name' => 'John', 'last_name' => 'Doe')
 		));
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
 
 	public function testSerializerAfterSerializeCallback() {
-		$serializer = new AfterSerializer();
-		$data = array(array("After" => array()));
-		$expected = array("afters" => array("after serialize"));
+		$serializer = new TestAfterSerializer();
+		$data = array(array("TestAfter" => array()));
+		$expected = array("test_afters" => array("after serialize"));
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
 
 	public function testMissingRequiredAttribute() {
 		$data = array(
-			array('User' => array('first_name' => 'John'))
+			array('TestUser' => array('first_name' => 'John'))
 		);
-		$serializer = new UserSerializer();
+		$serializer = new TestUserSerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
-			"The following keys were missing from User: last_name"
+			"The following keys were missing from TestUser: last_name"
 		);
 		$serializer->toArray($data);
 	}
 
 	public function testOptionalIncludedAttributes() {
 		$data = array(
-			array('Optional' => array(
+			array('TestOptional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 				'summary' => 'Summary',
 				'published' => true
 			))
 		);
-		$serializer = new OptionalSerializer();
-		$expected = array('optionals' => array(
+		$serializer = new TestOptionalSerializer();
+		$expected = array('test_optionals' => array(
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
@@ -105,13 +105,13 @@ class SerializerTest extends CakeTestCase {
 
 	public function testOptionalExcludedAttributes() {
 		$data = array(
-			array('Optional' => array(
+			array('TestOptional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 			))
 		);
-		$serializer = new OptionalSerializer();
-		$expected = array('optionals' => array(
+		$serializer = new TestOptionalSerializer();
+		$expected = array('test_optionals' => array(
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
@@ -123,15 +123,15 @@ class SerializerTest extends CakeTestCase {
 
 	public function testNonProvidedAttributes() {
 		$data = array(
-			array('Optional' => array(
+			array('TestOptional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 				'published' => true,
 				'tags' => 'tag1,tag2,tag3',
 			))
 		);
-		$serializer = new OptionalSerializer();
-		$expected = array('optionals' => array(
+		$serializer = new TestOptionalSerializer();
+		$expected = array('test_optionals' => array(
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',
@@ -144,7 +144,7 @@ class SerializerTest extends CakeTestCase {
 
 	public function testCamelCasedNonProvidedAttributes() {
 		$data = array(
-			array('Optional' => array(
+			array('TestOptional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 				'published' => true,
@@ -153,8 +153,8 @@ class SerializerTest extends CakeTestCase {
 				),
 			))
 		);
-		$serializer = new OptionalSerializer();
-		$expected = array('optionals' => array(
+		$serializer = new TestOptionalSerializer();
+		$expected = array('test_optionals' => array(
 			array(
 				'title' => 'Title',
 				'body' => 'BODY',

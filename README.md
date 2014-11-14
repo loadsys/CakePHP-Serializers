@@ -67,7 +67,7 @@ model with fields `id`, `first_name`, and `last_name` create the file
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
-	public $attributes = array('id', 'first_name', 'last_name');
+	public $required = array('id', 'first_name', 'last_name');
 }
 ```
 

@@ -40,7 +40,7 @@ class SerializerFactory {
 			$model = ClassRegistry::init($modelName);
 			$serializer = new Serializer();
 			$serializer->rootKey = $modelName;
-			$serializer->attributes = array_keys($model->schema());
+			$serializer->required = array_keys($model->schema());
 			return $serializer;
 		}
 		return new $this->_className();

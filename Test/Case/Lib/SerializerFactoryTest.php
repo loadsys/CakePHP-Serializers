@@ -32,7 +32,7 @@ class SerializerFactoryTest extends CakeTestCase {
 		$factory = new SerializerFactory('TestTag');
 		$serializer = $factory->generate();
 		$this->assertTrue($serializer instanceof Serializer);
-		$this->assertEquals(array_keys($testTagSchema), $serializer->attributes);
+		$this->assertEquals(array_keys($testTagSchema), $serializer->required);
 		$this->assertEquals('TestTag', $serializer->rootKey);
 	}
 }

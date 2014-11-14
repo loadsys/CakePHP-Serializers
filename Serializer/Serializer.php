@@ -19,20 +19,20 @@ class Serializer extends Object {
 	public $rootKey = false;
 
 	/**
-	 * List of required attributes for this model to be serialized into the
+	 * List of required required for this model to be serialized into the
 	 * array.
 	 *
 	 * @access public
-	 * @var Array $attributes
+	 * @var Array $required
 	 */
-	public $attributes = array();
+	public $required = array();
 
 	/**
-	 * List of optional attributes for this model to be serialized into the
+	 * List of optional required for this model to be serialized into the
 	 * array.
 	 *
 	 * @access public
-	 * @var Array $attributes
+	 * @var Array $required
 	 */
 	public $optional = array();
 
@@ -84,7 +84,7 @@ class Serializer extends Object {
 	 * @return Array
 	 */
 	protected function serializeRecord($record) {
-		$required = $this->attributes;
+		$required = $this->required;
 		$keys = array_keys($record[$this->rootKey]);
 		$requiredCheck = array_diff($required, $keys);
 		if (!empty($requiredCheck)) {
