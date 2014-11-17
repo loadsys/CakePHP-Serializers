@@ -63,6 +63,24 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->toArray($data));
 	}
 
+	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
+		$data = array(
+		);
+		$serializer = new TestUserSerializer();
+		$expected = array();
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
+	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
+		$data = array(
+			'TestUser' => array()
+		);
+		$serializer = new TestUserSerializer();
+		$expected = array('test_users' => array(
+		));
+		$this->assertEquals($expected, $serializer->toArray($data));
+	}
+
 	public function testSerializerAfterSerializeCallback() {
 		$serializer = new TestAfterSerializer();
 		$data = array(array("TestAfter" => array()));
