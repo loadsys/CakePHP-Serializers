@@ -19,11 +19,11 @@ class TestOptionalSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('summary', 'published');
 
-	public function body($data, $record) {
+	public function serialize_body($data, $record) {
 		return 'BODY';
 	}
 
-	public function summary($data, $record) {
+	public function serialize_summary($data, $record) {
 		return 'SUMMARY';
 	}
 }
@@ -32,7 +32,7 @@ class TestMethodOptionalSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('summary', 'published', 'tags', 'created');
 
-	public function tags($data, $record) {
+	public function serialize_tags($data, $record) {
 		return 'Tags';
 	}
 }
@@ -41,7 +41,7 @@ class TestIgnoreOptionalSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('created');
 
-	public function created($data, $record) {
+	public function serialize_created($data, $record) {
 		throw new SerializerIgnoreException();
 	}
 }

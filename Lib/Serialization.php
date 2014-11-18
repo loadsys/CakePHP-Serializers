@@ -45,7 +45,7 @@ class Serialization {
 
 	public function deparse() {
 		$serializer = $this->factoryFor($this->_name)->generate();
-		return $serializer->fromJsonApi($data);
+		return $serializer->fromJsonApi($this->_data);
 	}
 
 	/**

@@ -2,6 +2,7 @@
 
 App::uses('SerializerNaming', 'Serializers.Lib');
 App::uses('Serializer', 'Serializers.Serializer');
+App::uses('ClassRegistry', 'Utility');
 
 /**
  * SerializerFactory

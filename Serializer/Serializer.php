@@ -6,6 +6,9 @@ App::uses('Inflector', 'Utility');
 class SerializerMissingRequiredException extends Exception {}
 class SerializerIgnoreException extends Exception {}
 
+class DeserializerMissingRequiredException extends Exception {}
+class DeserializerIgnoreException extends Exception {}
+
 /**
  * Serializer
  */
@@ -69,7 +72,22 @@ class Serializer extends Object {
 		return array($key => $rows);
 	}
 
-	public function fromJsonApi(array $data = array()) {
+	public function fromJsonApi($serializedData = array()) {
+		if (empty($serializedData)) {
+			return $serializedData;
+		}
+
+		$rootKeysInSerializedData = get_object_vars($serializedData);
+		$key = Inflector::tableize($this->rootKey);
+
+		if (!array_key_exists($key, (array)$rootKeysInSerializedData)) {
+			$msg = "The controller name: $key was not included in the passed in JSON body of the request.";
+			throw new DeserializerMissingRequiredException($msg);
+		}
+
+		$dataAsArray[$this->rootKey] = $this->deserializeRecord($serializedData->{$key});
+
+		return $dataAsArray;
 	}
 
 	/**
@@ -82,6 +100,18 @@ class Serializer extends Object {
 	 */
 	public function afterSerialize($json, $record) {
 		return $json;
+	}
+
+	/**
+	 * Callback method called after automatic deserialization. Whatever is returned
+	 * from this method will ultimately be used as the Controller->data for cake
+	 *
+	 * @param  multi  $data deserialized record data
+	 * @param  multi  $json json record data
+	 * @return multi
+	 */
+	public function afterDeserialize($data, $json) {
+		return $data;
 	}
 
 	/**
@@ -117,21 +147,45 @@ class Serializer extends Object {
 		}
 		$others = array_diff($originalOptionals, $attrs);
 		foreach ($others as $key) {
-			if (method_exists($this, $key)) {
+			$methodName = "serialize_{$key}";
+			if (method_exists($this, $methodName)) {
 				array_push($attrs, $key);
 			}
 		}
 		$data = array_intersect_key($initialData, $index);
 		foreach ($attrs as $key) {
-			if (method_exists($this, $key)) {
+			$methodName = "serialize_{$key}";
+			if (method_exists($this, $methodName)) {
 				try {
-					$data[$key] = $this->{$key}($data, $record);
+					$data[$key] = $this->{$methodName}($data, $record);
 				} catch (SerializerIgnoreException $e) {
 					unset($data[$key]);
 				}
 			}
 		}
 		return $this->afterSerialize($data, $record);
+	}
+
+	/**
+	 * deserialize a json api record passed
+	 *
+	 * @param  object $record [description]
+	 * @return array
+	 */
+	protected function deserializeRecord(stdClass $record) {
+		$record = (array)$record;
+		$data = $record;
+		foreach($record as $key) {
+			$methodName = "deserialize_{$key}";
+			if (method_exists($this, $methodName)) {
+				try {
+					$data[$key] = $this->{$methodName}($data, $record);
+				} catch (DeserializerIgnoreException $e) {
+					unset($data[$key]);
+				}
+			}
+		}
+		return $this->afterDeserialize($data, $record);
 	}
 }
 
