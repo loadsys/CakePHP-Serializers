@@ -40,7 +40,12 @@ class Serialization {
 	public function parse() {
 		$data = $this->normalizeData($this->_data);
 		$serializer = $this->factoryFor($this->_name)->generate();
-		return $serializer->toArray($data);
+		return $serializer->toJsonApi($data);
+	}
+
+	public function deparse() {
+		$serializer = $this->factoryFor($this->_name)->generate();
+		return $serializer->fromJsonApi($data);
 	}
 
 	/**

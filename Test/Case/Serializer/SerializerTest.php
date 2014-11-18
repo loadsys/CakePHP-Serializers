@@ -60,7 +60,7 @@ class SerializerTest extends CakeTestCase {
 		$expected = array('test_users' => array(
 			array('first_name' => 'John', 'last_name' => 'Doe')
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
@@ -68,7 +68,7 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
@@ -78,14 +78,14 @@ class SerializerTest extends CakeTestCase {
 		$serializer = new TestUserSerializer();
 		$expected = array('test_users' => array(
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testSerializerAfterSerializeCallback() {
 		$serializer = new TestAfterSerializer();
 		$data = array(array("TestAfter" => array()));
 		$expected = array("test_afters" => array("after serialize"));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testMissingRequiredAttribute() {
@@ -97,7 +97,7 @@ class SerializerTest extends CakeTestCase {
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestUser: last_name"
 		);
-		$serializer->toArray($data);
+		$serializer->toJsonApi($data);
 	}
 
 	public function testOptionalIncludedAttributes() {
@@ -118,7 +118,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testOptionalExcludedAttributes() {
@@ -136,7 +136,7 @@ class SerializerTest extends CakeTestCase {
 				'summary' => 'SUMMARY',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testNonProvidedAttributes() {
@@ -157,7 +157,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testCamelCasedNonProvidedAttributes() {
@@ -180,7 +180,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testNotProvidedDataWithMethodOptionalAttribute() {
@@ -200,7 +200,7 @@ class SerializerTest extends CakeTestCase {
 				'tags' => 'Tags',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
 	public function testIgnoreOptionalAttribute() {
@@ -218,7 +218,7 @@ class SerializerTest extends CakeTestCase {
 				'body' => 'Body',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toArray($data));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 }
 

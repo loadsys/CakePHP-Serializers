@@ -54,7 +54,7 @@ class Serializer extends Object {
 	 * @param Array $data
 	 * @return Array
 	 */
-	public function toArray(array $data = array()) {
+	public function toJsonApi(array $data = array()) {
 		if (empty($data)) {
 			return $data;
 		}
@@ -67,6 +67,9 @@ class Serializer extends Object {
 		}
 		$key = Inflector::tableize($this->rootKey);
 		return array($key => $rows);
+	}
+
+	public function fromJsonApi(array $data = array()) {
 	}
 
 	/**
