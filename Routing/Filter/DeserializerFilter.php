@@ -1,9 +1,13 @@
 <?php
 /**
+ * DeserializerFilter - request filter to deserialize the json payload
+ * of a request before being passed onto the controller
  *
  * @package  Serializers.Routing.Filter
  */
 App::uses('DispatcherFilter', 'Routing');
+App::uses('Serialization', 'Serializers.Lib');
+App::uses('Inflector', 'Utility');
 
 class DeserializerUnkownObject extends Exception {}
 
@@ -19,17 +23,18 @@ class DeserializerFilter extends DispatcherFilter {
 	 *
 	 * We will process the request for the json data and de-serialize it
 	 *
-	 * @param  CakeEvent $event [description]
-	 * @return [type]           [description]
+	 * @param  CakeEvent $event the CakeEvent being triggered
+	 * @return void
 	 */
 	public function beforeDispatch(CakeEvent $event) {
 		// get the request data
 		$request = $event->data['request'];
-		$controllerRequested = $request->params['controller'];
+		$classifiedRootKey = Inflector::classify($request->params['controller']);
 		$data = $request->input('json_decode');
 
 		if (!empty($data)) {
-			$data = $this->_deserializeData($data, $controllerRequested);
+			$Serialization = new Serialization($classifiedRootKey, $data);
+			$data = $Serialization->deparse();
 		}
 
 		$request->data = $data;
