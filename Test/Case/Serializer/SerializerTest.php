@@ -9,9 +9,13 @@ class TestUserSerializer extends Serializer {
 	public $required = array('first_name', 'last_name');
 }
 
-class TestAfterSerializer extends Serializer {
+class TestCallbackSerializer extends Serializer {
 	public function afterSerialize($json, $record) {
 		return "after serialize";
+	}
+
+	public function afterDeserialize($data, $json) {
+		return "after deserialize";
 	}
 }
 
@@ -26,6 +30,14 @@ class TestOptionalSerializer extends Serializer {
 	public function serialize_summary($data, $record) {
 		return 'SUMMARY';
 	}
+
+	public function deserialize_body($data, $record) {
+		return 'BODY';
+	}
+
+	public function deserialize_summary($data, $record) {
+		return 'SUMMARY';
+	}
 }
 
 class TestMethodOptionalSerializer extends Serializer {
@@ -37,12 +49,16 @@ class TestMethodOptionalSerializer extends Serializer {
 	}
 }
 
-class TestIgnoreOptionalSerializer extends Serializer {
+class TestIgnoreSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('created');
 
 	public function serialize_created($data, $record) {
 		throw new SerializerIgnoreException();
+	}
+
+	public function deserialize_created($data, $record) {
+		throw new DeserializerIgnoreException();
 	}
 }
 
@@ -63,12 +79,29 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
+	public function testDeserializerUsesAttributesInAttributesArray() {
+		$expected = array('first_name' => 'John', 'last_name' => 'Doe');
+		$serializer = new TestUserSerializer();
+		$data = array('test_users' => array(
+			'first_name' => 'John', 'last_name' => 'Doe'
+		));
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+	}
+
 	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
 		$data = array(
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
+	}
+
+	public function testDeserializerUsesNoDataPassedToTheSerializerArray() {
+		$data = array(
+		);
+		$serializer = new TestUserSerializer();
+		$expected = array();
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
 	}
 
 	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
@@ -81,11 +114,28 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
+	public function testDeserializerUsesEmptyDataPassedToTheSerializerArray() {
+		$data = array(
+		);
+		$serializer = new TestUserSerializer();
+		$expected = array();
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+	}
+
 	public function testSerializerAfterSerializeCallback() {
-		$serializer = new TestAfterSerializer();
-		$data = array(array("TestAfter" => array()));
-		$expected = array("test_afters" => array("after serialize"));
+		$serializer = new TestCallbackSerializer();
+		$data = array(array("TestCallback" => array()));
+		$expected = array("test_callbacks" => array("after serialize"));
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
+	}
+
+	public function testDeserializerAfterDeserializeCallback() {
+		$serializer = new TestCallbackSerializer();
+		$data = array('test_callbacks' => array(
+			'first_name' => 'John', 'last_name' => 'Doe'
+		));
+		$expected = "after deserialize";
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
 	}
 
 	public function testMissingRequiredAttribute() {
@@ -203,22 +253,55 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
 	}
 
-	public function testIgnoreOptionalAttribute() {
+	public function testDeserializeDataWithMethod() {
+		$expected = array(
+			'title' => 'Title',
+			'body' => 'BODY',
+			'summary' => 'SUMMARY',
+			'published' => true,
+		);
+		$data = array('test_optionals' => array(
+			'title' => 'Title',
+			'body' => 'Body',
+			'summary' => 'Summary',
+			'published' => true
+		));
+
+		$serializer = new TestOptionalSerializer();
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+	}
+
+	public function testSerializeIgnoreAttribute() {
 		$data = array(
-			array('TestIgnoreOptional' => array(
+			array('TestIgnore' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 				'created' => '2014-07-07',
 			))
 		);
-		$serializer = new TestIgnoreOptionalSerializer();
-		$expected = array('test_ignore_optionals' => array(
+		$serializer = new TestIgnoreSerializer();
+		$expected = array('test_ignores' => array(
 			array(
 				'title' => 'Title',
 				'body' => 'Body',
 			)
 		));
 		$this->assertEquals($expected, $serializer->toJsonApi($data));
+	}
+
+	public function testDeserializeIgnoreAttribute() {
+		$expected = array(
+			'title' => 'Title',
+			'body' => 'Body',
+		);
+		$data = array('test_ignores' => array(
+			'title' => 'Title',
+			'body' => 'Body',
+			'created' => '2014-07-07',
+		));
+
+		$serializer = new TestIgnoreSerializer();
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
 	}
 }
 

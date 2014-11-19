@@ -3,16 +3,14 @@
  * DeserializerFilter - request filter to deserialize the json payload
  * of a request before being passed onto the controller
  *
- * @package  Serializers.Routing.Filter
+ * @package  Serializers.Routing/Filter
  */
 App::uses('DispatcherFilter', 'Routing');
 App::uses('Serialization', 'Serializers.Lib');
 App::uses('Inflector', 'Utility');
 
-class DeserializerUnkownObject extends Exception {}
-
 /**
- *
+ * DeserializerFilter
  */
 class DeserializerFilter extends DispatcherFilter {
 
@@ -29,34 +27,40 @@ class DeserializerFilter extends DispatcherFilter {
 	public function beforeDispatch(CakeEvent $event) {
 		// get the request data
 		$request = $event->data['request'];
-		$classifiedRootKey = Inflector::classify($request->params['controller']);
 		$data = $request->input('json_decode');
+		$data = $this->__objectToArray($data);
+		$deserializedData = array();
 
-		if (!empty($data)) {
+		foreach ($data as $key => $dataForKey) {
+			$classifiedRootKey = Inflector::classify($key);
 			$Serialization = new Serialization($classifiedRootKey, $data);
-			$data = $Serialization->deparse();
+			$dataForKey = $Serialization->deparse();
+			$deserializedData[$classifiedRootKey] = $dataForKey;
 		}
 
-		$request->data = $data;
+		$request->data = $deserializedData;
 	}
 
 	/**
-	 * deseralize the response and turn it into something that cake expects
+	 * converts an object to an array
 	 *
-	 * @param  array  $data the serialized data
+	 * @param  object $obj the object to convert
 	 * @return array
 	 */
-	protected function _deserializeData($serializedData = array(), $controllerRequested) {
-		$serializedObjectProperties = get_object_vars($serializedData);
-
-		if (!array_key_exists($controllerRequested, (array)$serializedObjectProperties)) {
-			$msg = "The controller name: $controllerRequested was not included in the passed in JSON body of the request.";
-			throw new DeserializerUnkownObject($msg);
+	private function __objectToArray($obj) {
+		if (is_object($obj)) {
+			$obj = (array) $obj;
 		}
 
-		$dataAsArray = get_object_vars($serializedData->{$controllerRequested});
-		$dataAsArray['ResinProduct'] = $dataAsArray;
+		if (is_array($obj)) {
+			$new = array();
+			foreach($obj as $key => $val) {
+				$new[$key] = $this->__objectToArray($val);
+			}
+		} else {
+			$new = $obj;
+		}
 
-		return $dataAsArray;
+		return $new;
 	}
 }

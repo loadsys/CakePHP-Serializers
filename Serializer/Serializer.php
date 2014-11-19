@@ -6,7 +6,6 @@ App::uses('Inflector', 'Utility');
 class SerializerMissingRequiredException extends Exception {}
 class SerializerIgnoreException extends Exception {}
 
-class DeserializerMissingRequiredException extends Exception {}
 class DeserializerIgnoreException extends Exception {}
 
 /**
@@ -72,22 +71,25 @@ class Serializer extends Object {
 		return array($key => $rows);
 	}
 
-	public function fromJsonApi($serializedData = array()) {
+	/**
+	 * from jsonapi format to CakePHP array
+	 *
+	 * @param  array  $serializedData the serialized data in jsonapi format
+	 * @return array
+	 */
+	public function fromJsonApi(array $serializedData = array()) {
 		if (empty($serializedData)) {
 			return $serializedData;
 		}
 
-		$rootKeysInSerializedData = get_object_vars($serializedData);
-		$key = Inflector::tableize($this->rootKey);
+		$rootKeyTableized = Inflector::tableize($this->rootKey);
+		$deserializedData = array();
 
-		if (!array_key_exists($key, (array)$rootKeysInSerializedData)) {
-			$msg = "The controller name: $key was not included in the passed in JSON body of the request.";
-			throw new DeserializerMissingRequiredException($msg);
+		if(array_key_exists($rootKeyTableized, $serializedData)) {
+			$deserializedData = $this->deserializeRecord($serializedData[$rootKeyTableized]);
 		}
 
-		$dataAsArray[$this->rootKey] = $this->deserializeRecord($serializedData->{$key});
-
-		return $dataAsArray;
+		return $deserializedData;
 	}
 
 	/**
@@ -167,15 +169,14 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * deserialize a json api record passed
+	 * deserialize a jsonapi record array
 	 *
-	 * @param  object $record [description]
+	 * @param  array $record the record passed to the CakeAPI
 	 * @return array
 	 */
-	protected function deserializeRecord(stdClass $record) {
-		$record = (array)$record;
+	protected function deserializeRecord(array $record = array()) {
 		$data = $record;
-		foreach($record as $key) {
+		foreach($record as $key => $value) {
 			$methodName = "deserialize_{$key}";
 			if (method_exists($this, $methodName)) {
 				try {
@@ -185,6 +186,7 @@ class Serializer extends Object {
 				}
 			}
 		}
+
 		return $this->afterDeserialize($data, $record);
 	}
 }
