@@ -1,17 +1,35 @@
 <?php
-
+/**
+ * Serializers and Deserializes data to and from jsonapi format
+ *
+ * @package  Serializers.Serializer
+ */
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
 
-class SerializerMissingRequiredException extends Exception {}
-class SerializerIgnoreException extends Exception {}
+/**
+ * Custom exception when the Serializer is missing a required attribute
+ */
+class SerializerMissingRequiredException extends Exception {
+}
 
-class DeserializerIgnoreException extends Exception {}
+/**
+ * Custom exception when the Serializer is set to ignore an attribute
+ */
+class SerializerIgnoreException extends Exception {
+}
+
+/**
+ * Custom exception when the Deserializer is set to ignore an attribute
+ */
+class DeserializerIgnoreException extends Exception {
+}
 
 /**
  * Serializer
  */
 class Serializer extends Object {
+
 	/**
 	 * The key name used to find data on the supplied data array
 	 *
@@ -56,7 +74,7 @@ class Serializer extends Object {
 	 * @param Array $data
 	 * @return Array
 	 */
-	public function toJsonApi(array $data = array()) {
+	public function toJsonApi($data = array()) {
 		if (empty($data)) {
 			return $data;
 		}
@@ -77,7 +95,7 @@ class Serializer extends Object {
 	 * @param  array  $serializedData the serialized data in jsonapi format
 	 * @return array
 	 */
-	public function fromJsonApi(array $serializedData = array()) {
+	public function fromJsonApi($serializedData = array()) {
 		if (empty($serializedData)) {
 			return $serializedData;
 		}
@@ -85,7 +103,7 @@ class Serializer extends Object {
 		$rootKeyTableized = Inflector::tableize($this->rootKey);
 		$deserializedData = array();
 
-		if(array_key_exists($rootKeyTableized, $serializedData)) {
+		if (array_key_exists($rootKeyTableized, $serializedData)) {
 			$deserializedData = $this->deserializeRecord($serializedData[$rootKeyTableized]);
 		}
 
@@ -117,7 +135,9 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * @access protected
+	 * Serializes a CakePHP data array into a jsonapi format array
+	 *
+	 * @throws SerializerMissingRequiredException If a required attribute is missing
 	 * @param Array $record
 	 * @return Array
 	 */
@@ -134,7 +154,7 @@ class Serializer extends Object {
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-		$originalOptionals  = $this->optional;
+		$originalOptionals = $this->optional;
 		if (!is_array($originalOptionals)) {
 			$originalOptionals = array();
 		}
@@ -176,7 +196,7 @@ class Serializer extends Object {
 	 */
 	protected function deserializeRecord(array $record = array()) {
 		$data = $record;
-		foreach($record as $key => $value) {
+		foreach ($record as $key => $value) {
 			$methodName = "deserialize_{$key}";
 			if (method_exists($this, $methodName)) {
 				try {

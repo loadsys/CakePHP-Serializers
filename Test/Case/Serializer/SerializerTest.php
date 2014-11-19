@@ -19,6 +19,11 @@ class TestCallbackSerializer extends Serializer {
 	}
 }
 
+class TestBadOptionalSerializer extends Serializer {
+	public $required = array('title', 'body');
+	public $optional = 'notanarray';
+}
+
 class TestOptionalSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('summary', 'published');
@@ -148,6 +153,39 @@ class SerializerTest extends CakeTestCase {
 			"The following keys were missing from TestUser: last_name"
 		);
 		$serializer->toJsonApi($data);
+	}
+
+	public function testBadOptionalAttributes() {
+		$data = array(
+			array('TestBadOptional' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+			))
+		);
+		$serializer = new TestBadOptionalSerializer();
+		$expected = array('test_bad_optionals' => array(
+			array(
+				'title' => 'Title',
+				'body' => 'Body',
+			)
+		));
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
+	}
+
+	public function testSerializeNoData() {
+		$data = null;
+		$expected = null;
+
+		$serializer = new TestRootKeySerializer();
+		$this->assertEquals($expected, $serializer->toJsonApi($data));
+	}
+
+	public function testDeserializeNoData() {
+		$data = null;
+		$expected = null;
+
+		$serializer = new TestRootKeySerializer();
+		$this->assertEquals($expected, $serializer->fromJsonApi($data));
 	}
 
 	public function testOptionalIncludedAttributes() {
