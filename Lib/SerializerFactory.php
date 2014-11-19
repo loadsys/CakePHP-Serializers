@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Generates a new instance of the Serializer Class
+ *
+ * @package  Serializers.Lib
+ */
 App::uses('SerializerNaming', 'Serializers.Lib');
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('ClassRegistry', 'Utility');
@@ -8,8 +12,10 @@ App::uses('ClassRegistry', 'Utility');
  * SerializerFactory
  */
 class SerializerFactory {
+
 	/**
-	 * @access protected
+	 * the class name to generate a Serializer instance
+	 *
 	 * @var String $_className
 	 */
 	protected $_className = null;

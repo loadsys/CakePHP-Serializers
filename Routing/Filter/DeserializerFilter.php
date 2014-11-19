@@ -49,12 +49,12 @@ class DeserializerFilter extends DispatcherFilter {
 	 */
 	private function __objectToArray($obj) {
 		if (is_object($obj)) {
-			$obj = (array) $obj;
+			$obj = (array)$obj;
 		}
 
 		if (is_array($obj)) {
 			$new = array();
-			foreach($obj as $key => $val) {
+			foreach ($obj as $key => $val) {
 				$new[$key] = $this->__objectToArray($val);
 			}
 		} else {

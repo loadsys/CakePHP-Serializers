@@ -1,16 +1,22 @@
 <?php
-
+/**
+ * Name a Serializer class
+ *
+ * @package  Serializers.Lib
+ */
 App::uses('Inflector', 'Utility');
 
 /**
  * SerializerNaming
  */
 class SerializerNaming {
+
 	/**
-	 * @access protected
+	 * the suffix used for naming a Serializer class
+	 *
 	 * @var String $suffix
 	 */
-	protected $suffix = 'Serializer';
+	protected $_suffix = 'Serializer';
 
 	/**
 	 * Convert a supplied string to a conventionally named Serializer class.
@@ -19,7 +25,7 @@ class SerializerNaming {
 	 * @return String
 	 */
 	public function classify($name = null) {
-		return Inflector::classify($this->stripSuffix($name)) . $this->suffix;
+		return Inflector::classify($this->stripSuffix($name)) . $this->_suffix;
 	}
 
 	/**
@@ -27,6 +33,6 @@ class SerializerNaming {
 	 * @return String
 	 */
 	protected function stripSuffix($name) {
-		return preg_replace("/{$this->suffix}$/", '', $name);
+		return preg_replace("/{$this->_suffix}$/", '', $name);
 	}
 }

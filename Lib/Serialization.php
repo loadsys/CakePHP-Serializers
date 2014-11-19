@@ -1,25 +1,32 @@
 <?php
-
+/**
+ * Parses and Deparses JsonAPI complaint data arrays
+ *
+ * @package  Serializers.Lib
+ */
 App::uses('SerializerFactory', 'Serializers.Lib');
 
 /**
  * Serialization
  */
 class Serialization {
+
 	/**
-	 * @access protected
+	 * the name of the root object being serialized/deserialized
+	 *
 	 * @var String $_name
 	 */
 	protected $_name = '';
 
 	/**
-	 * @access protected
+	 * the data being serialzied/deserialized
+	 *
 	 * @var Array $_data
 	 */
 	protected $_data = array();
 
 	/**
-	 * Fill me in.
+	 * Construct a new instance of Serialization passing the name and the data
 	 *
 	 * @access public
 	 * @param String $name
