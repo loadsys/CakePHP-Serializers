@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 
-An object oriented solution to CakePHP model data serialization to JSON.
+An object oriented solution to CakePHP model data serialization to JSON and the
+corresponding deserialization of a JSON payload to CakePHP data arrays.
 
 This is close to production ready however there may be edge
 cases not yet observed.
@@ -34,6 +35,26 @@ CakePlugin::load('Serializers', array('bootstrap' => true));
 CakePlugin::loadAll(array(
 	'Serializers' => array('bootstrap' => true),
 ));
+```
+
+To deserialize data in an HTTP request a few other changes are required:
+
+```php
+// Config/boostrap.php
+Configure::write('Dispatcher.filters', array(
+	'Serializers.DeserializerFilter',
+));
+```
+
+Note for deserializing data and setup your CakePHP controller to respond to REST
+HTTP requests you will also need to add:
+
+```php
+// Config/routes.php
+Router::mapResources(array(
+	'{controller_name}',
+));
+Router::parseExtensions('json');
 ```
 
 ## Usage ##
@@ -85,10 +106,10 @@ class UserSerializer extends Serializer {
 This serializer will throw a `SerializerMissingRequiredException` if the data passed
 to the serializer does not include all of these properties.
 
-#### Format Return of Data ####
+#### Format Return of Data - Serializing ####
 
-If you need to do any formatting or data manipulation, create a method named after a field. For
-example:
+If you need to do any formatting or data manipulation when serializing data,
+create a method named after a field with the prefix `serialize_`. For example:
 
 ``` php
 // Serializer/UserSerializer.php
@@ -99,13 +120,35 @@ class UserSerializer extends Serializer {
 
 	// $data is the pre-serialized data record for the $data[User] from the controller
 	// $record is the pre-serialized record for the $data from the controller
-	public function first_name($data, $record) {
+	public function serialize_first_name($data, $record) {
 		return strtoupper($data['first_name']);
 	}
 }
 ```
 
-This will return the `first_name` as upper case.
+This will return the `first_name` as upper case when serializing data.
+
+#### Format Return of Data - Deserializing ####
+
+If you need to do any formatting or data manipulation when deserializing data,
+create a method named after a field with the prefix `deserialize_`. For example:
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	// $data is the deserialized data record that will be set to the data CakeRequest property
+	// $record is the pre-deserialized record for the {"users":} from the HTTP request
+	public function sdeerialize_first_name($data, $record) {
+		return strtoupper($data['first_name']);
+	}
+}
+```
+
+This will return the `first_name` as upper case when serializing data.
 
 #### Optional Attributes for Serializers  ####
 
@@ -182,7 +225,29 @@ class UserSerializer extends Serializer {
 }
 ```
 
-### Controller Usage ###
+#### AfterDeserializer Callbacks ####
+
+There is an afterDeserialize callback setup if you wish to do some amount of
+post processing after all the data has been deserialized.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	public $optional = array('email');
+
+	// $data deserialized record data
+	// $json json record data
+	public afterDeserialize($data, $json) {
+
+	}
+}
+```
+
+### Controller Usage Serializing ###
 
 Simply perform a model find/paginate and set the results to a variable named `$data`.
 
@@ -197,6 +262,12 @@ public function index() {
 ```
 
 The serializer will transform `$data` to [json:api](http://jsonapi.org/) compliant JSON.
+
+### Controller Usage Deserializing ###
+
+The serializer will transform the JSON payload of an HTTP request from
+[json:api](http://jsonapi.org/) compliant JSON to the `Controller->request->data`
+property and as a standard CakePHP array.
 
 ## Contributing ##
 
