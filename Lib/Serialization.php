@@ -34,7 +34,6 @@ class Serialization {
 	 * With the name and data supplied on construction, convert the data to
 	 * jsonapi compliant array that can be encoded as json.
 	 *
-	 * @access public
 	 * @return Array
 	 */
 	public function parse() {
@@ -43,6 +42,12 @@ class Serialization {
 		return $serializer->toJsonApi($data);
 	}
 
+	/**
+	 * With the name and data supplied on construction, convert the data from
+	 * jsonapi compliant array to a CakePHP standard array
+	 *
+	 * @return Array
+	 */
 	public function deparse() {
 		$serializer = $this->factoryFor($this->_name)->generate();
 		return $serializer->fromJsonApi($this->_data);
