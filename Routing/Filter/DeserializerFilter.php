@@ -28,6 +28,11 @@ class DeserializerFilter extends DispatcherFilter {
 		// get the request data
 		$request = $event->data['request'];
 		$data = $request->input('json_decode');
+
+		if (empty($data)) {
+			$data = array();
+		}
+
 		$data = $this->objectToArray($data);
 		$deserializedData = array();
 
