@@ -1,19 +1,22 @@
 <?php
-
 /**
  * AnalyzeRequest
+ *
+ * @package  Serializers.Lib
  */
 class AnalyzeRequest {
+
 	/**
-	 * @access protected
+	 * the request being processed
+	 *
 	 * @var Object $_request
 	 */
 	protected $_request;
 
 	/**
-	 * Fill me in.
+	 * construct a new instance of the AnalyzeRequest class, set the passed in
+	 * request to the _request property
 	 *
-	 * @access public
 	 * @param CakeRequest $request
 	 */
 	public function __construct($request) {
@@ -44,7 +47,7 @@ class AnalyzeRequest {
 	 * @return Boolean
 	 */
 	protected function accepts() {
-		$accepts = (array) $this->_request->accepts();
+		$accepts = (array)$this->_request->accepts();
 		return array_reduce($accepts, function($prev, $i) {
 			return $prev ? $prev : preg_match('/^application\/.*json$/i', trim($i));
 		}, false);

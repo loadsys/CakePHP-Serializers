@@ -18,7 +18,7 @@ class SerializationTest extends CakeTestCase {
 			array('title' => 'Title1', 'body' => 'Body1', 'summary' => 'Summary',)
 		));
 		$serialization = new Serialization('TestPost', $data);
-		$this->assertEquals($expected, $serialization->parse());
+		$this->assertEquals($expected, $serialization->serialize());
 	}
 
 	public function testParsesListOfRecords() {
@@ -39,6 +39,19 @@ class SerializationTest extends CakeTestCase {
 			array('title' => 'Title2', 'body' => 'Body2', 'summary' => 'Summary',)
 		));
 		$serialization = new Serialization('TestPost', $data);
-		$this->assertEquals($expected, $serialization->parse());
+		$this->assertEquals($expected, $serialization->serialize());
+	}
+
+	public function testDeparseSingleListOfRecords() {
+		$data = array('test_posts' => array(
+			'title' => 'Title1', 'body' => 'Body1', 'summary' => 'Summary'
+		));
+		$expected = array(
+			'title' => 'Title1',
+			'body' => 'Body1',
+			'summary' => 'Summary',
+		);
+		$serialization = new Serialization('TestPost', $data);
+		$this->assertEquals($expected, $serialization->deserialize());
 	}
 }

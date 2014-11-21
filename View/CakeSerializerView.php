@@ -1,10 +1,18 @@
 <?php
-
+/**
+ * Custom view class for rending serialized data
+ *
+ * @package  Serializers.View
+ */
 App::uses('View', 'View');
 App::uses('AnalyzeRequest', 'Serializers.Lib');
 App::uses('Serialization', 'Serializers.Lib');
 
+/**
+ * CakeSerializerView class
+ */
 class CakeSerializerView extends View {
+
 	/**
 	 * @access protected
 	 * @var Controller $_controller
@@ -47,7 +55,7 @@ class CakeSerializerView extends View {
 	 */
 	protected function toJSON($name, $data) {
 		$serialization = new Serialization($name, $data);
-		return json_encode($serialization->parse());
+		return json_encode($serialization->serialize());
 	}
 
 	/**

@@ -1,15 +1,35 @@
 <?php
-
+/**
+ * Serializers and Deserializes data to and from jsonapi format
+ *
+ * @package  Serializers.Serializer
+ */
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
 
-class SerializerMissingRequiredException extends Exception {}
-class SerializerIgnoreException extends Exception {}
+/**
+ * Custom exception when the Serializer is missing a required attribute
+ */
+class SerializerMissingRequiredException extends Exception {
+}
+
+/**
+ * Custom exception when the Serializer is set to ignore an attribute
+ */
+class SerializerIgnoreException extends Exception {
+}
+
+/**
+ * Custom exception when the Deserializer is set to ignore an attribute
+ */
+class DeserializerIgnoreException extends Exception {
+}
 
 /**
  * Serializer
  */
 class Serializer extends Object {
+
 	/**
 	 * The key name used to find data on the supplied data array
 	 *
@@ -54,7 +74,7 @@ class Serializer extends Object {
 	 * @param Array $data
 	 * @return Array
 	 */
-	public function toArray(array $data = array()) {
+	public function serialize($data = array()) {
 		if (empty($data)) {
 			return $data;
 		}
@@ -70,6 +90,27 @@ class Serializer extends Object {
 	}
 
 	/**
+	 * from jsonapi format to CakePHP array
+	 *
+	 * @param  array  $serializedData the serialized data in jsonapi format
+	 * @return array
+	 */
+	public function deserialize($serializedData = array()) {
+		if (empty($serializedData)) {
+			return $serializedData;
+		}
+
+		$rootKeyTableized = Inflector::tableize($this->rootKey);
+		$deserializedData = array();
+
+		if (array_key_exists($rootKeyTableized, $serializedData)) {
+			$deserializedData = $this->deserializeRecord($serializedData[$rootKeyTableized]);
+		}
+
+		return $deserializedData;
+	}
+
+	/**
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
@@ -82,7 +123,21 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * @access protected
+	 * Callback method called after automatic deserialization. Whatever is returned
+	 * from this method will ultimately be used as the Controller->data for cake
+	 *
+	 * @param  multi  $data deserialized record data
+	 * @param  multi  $json json record data
+	 * @return multi
+	 */
+	public function afterDeserialize($data, $json) {
+		return $data;
+	}
+
+	/**
+	 * Serializes a CakePHP data array into a jsonapi format array
+	 *
+	 * @throws SerializerMissingRequiredException If a required attribute is missing
 	 * @param Array $record
 	 * @return Array
 	 */
@@ -99,7 +154,7 @@ class Serializer extends Object {
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-		$originalOptionals  = $this->optional;
+		$originalOptionals = $this->optional;
 		if (!is_array($originalOptionals)) {
 			$originalOptionals = array();
 		}
@@ -114,21 +169,45 @@ class Serializer extends Object {
 		}
 		$others = array_diff($originalOptionals, $attrs);
 		foreach ($others as $key) {
-			if (method_exists($this, $key)) {
+			$methodName = "serialize_{$key}";
+			if (method_exists($this, $methodName)) {
 				array_push($attrs, $key);
 			}
 		}
 		$data = array_intersect_key($initialData, $index);
 		foreach ($attrs as $key) {
-			if (method_exists($this, $key)) {
+			$methodName = "serialize_{$key}";
+			if (method_exists($this, $methodName)) {
 				try {
-					$data[$key] = $this->{$key}($data, $record);
+					$data[$key] = $this->{$methodName}($data, $record);
 				} catch (SerializerIgnoreException $e) {
 					unset($data[$key]);
 				}
 			}
 		}
 		return $this->afterSerialize($data, $record);
+	}
+
+	/**
+	 * deserialize a jsonapi record array
+	 *
+	 * @param  array $record the record passed to the CakeAPI
+	 * @return array
+	 */
+	protected function deserializeRecord(array $record = array()) {
+		$data = $record;
+		foreach ($record as $key => $value) {
+			$methodName = "deserialize_{$key}";
+			if (method_exists($this, $methodName)) {
+				try {
+					$data[$key] = $this->{$methodName}($data, $record);
+				} catch (DeserializerIgnoreException $e) {
+					unset($data[$key]);
+				}
+			}
+		}
+
+		return $this->afterDeserialize($data, $record);
 	}
 }
 
