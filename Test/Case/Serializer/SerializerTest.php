@@ -81,7 +81,7 @@ class SerializerTest extends CakeTestCase {
 		$expected = array('test_users' => array(
 			array('first_name' => 'John', 'last_name' => 'Doe')
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializerUsesAttributesInAttributesArray() {
@@ -90,7 +90,7 @@ class SerializerTest extends CakeTestCase {
 		$data = array('test_users' => array(
 			'first_name' => 'John', 'last_name' => 'Doe'
 		));
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
@@ -98,7 +98,7 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializerUsesNoDataPassedToTheSerializerArray() {
@@ -106,7 +106,7 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
@@ -116,7 +116,7 @@ class SerializerTest extends CakeTestCase {
 		$serializer = new TestUserSerializer();
 		$expected = array('test_users' => array(
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializerUsesEmptyDataPassedToTheSerializerArray() {
@@ -124,14 +124,14 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializerAfterSerializeCallback() {
 		$serializer = new TestCallbackSerializer();
 		$data = array(array("TestCallback" => array()));
 		$expected = array("test_callbacks" => array("after serialize"));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializerAfterDeserializeCallback() {
@@ -140,7 +140,7 @@ class SerializerTest extends CakeTestCase {
 			'first_name' => 'John', 'last_name' => 'Doe'
 		));
 		$expected = "after deserialize";
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testMissingRequiredAttribute() {
@@ -152,7 +152,7 @@ class SerializerTest extends CakeTestCase {
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestUser: last_name"
 		);
-		$serializer->toJsonApi($data);
+		$serializer->serialize($data);
 	}
 
 	public function testBadOptionalAttributes() {
@@ -169,7 +169,7 @@ class SerializerTest extends CakeTestCase {
 				'body' => 'Body',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testSerializeNoData() {
@@ -177,7 +177,7 @@ class SerializerTest extends CakeTestCase {
 		$expected = null;
 
 		$serializer = new TestRootKeySerializer();
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializeNoData() {
@@ -185,7 +185,7 @@ class SerializerTest extends CakeTestCase {
 		$expected = null;
 
 		$serializer = new TestRootKeySerializer();
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testOptionalIncludedAttributes() {
@@ -206,7 +206,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testOptionalExcludedAttributes() {
@@ -224,7 +224,7 @@ class SerializerTest extends CakeTestCase {
 				'summary' => 'SUMMARY',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testNonProvidedAttributes() {
@@ -245,7 +245,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testCamelCasedNonProvidedAttributes() {
@@ -268,7 +268,7 @@ class SerializerTest extends CakeTestCase {
 				'published' => true
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testNotProvidedDataWithMethodOptionalAttribute() {
@@ -288,7 +288,7 @@ class SerializerTest extends CakeTestCase {
 				'tags' => 'Tags',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializeDataWithMethod() {
@@ -306,7 +306,7 @@ class SerializerTest extends CakeTestCase {
 		));
 
 		$serializer = new TestOptionalSerializer();
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializeIgnoreAttribute() {
@@ -324,7 +324,7 @@ class SerializerTest extends CakeTestCase {
 				'body' => 'Body',
 			)
 		));
-		$this->assertEquals($expected, $serializer->toJsonApi($data));
+		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	public function testDeserializeIgnoreAttribute() {
@@ -339,7 +339,7 @@ class SerializerTest extends CakeTestCase {
 		));
 
 		$serializer = new TestIgnoreSerializer();
-		$this->assertEquals($expected, $serializer->fromJsonApi($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 }
 

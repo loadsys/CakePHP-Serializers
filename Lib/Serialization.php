@@ -43,10 +43,10 @@ class Serialization {
 	 *
 	 * @return Array
 	 */
-	public function parse() {
+	public function serialize() {
 		$data = $this->normalizeData($this->_data);
 		$serializer = $this->factoryFor($this->_name)->generate();
-		return $serializer->toJsonApi($data);
+		return $serializer->serialize($data);
 	}
 
 	/**
@@ -55,9 +55,9 @@ class Serialization {
 	 *
 	 * @return Array
 	 */
-	public function deparse() {
+	public function deserialize() {
 		$serializer = $this->factoryFor($this->_name)->generate();
-		return $serializer->fromJsonApi($this->_data);
+		return $serializer->deserialize($this->_data);
 	}
 
 	/**

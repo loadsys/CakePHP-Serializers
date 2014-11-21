@@ -55,7 +55,7 @@ class CakeSerializerView extends View {
 	 */
 	protected function toJSON($name, $data) {
 		$serialization = new Serialization($name, $data);
-		return json_encode($serialization->parse());
+		return json_encode($serialization->serialize());
 	}
 
 	/**

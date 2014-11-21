@@ -28,13 +28,13 @@ class DeserializerFilter extends DispatcherFilter {
 		// get the request data
 		$request = $event->data['request'];
 		$data = $request->input('json_decode');
-		$data = $this->__objectToArray($data);
+		$data = $this->objectToArray($data);
 		$deserializedData = array();
 
 		foreach ($data as $key => $dataForKey) {
 			$classifiedRootKey = Inflector::classify($key);
 			$Serialization = new Serialization($classifiedRootKey, $data);
-			$dataForKey = $Serialization->deparse();
+			$dataForKey = $Serialization->deserialize();
 			$deserializedData[$classifiedRootKey] = $dataForKey;
 		}
 
@@ -47,7 +47,7 @@ class DeserializerFilter extends DispatcherFilter {
 	 * @param  object $obj the object to convert
 	 * @return array
 	 */
-	private function __objectToArray($obj) {
+	private function objectToArray($obj) {
 		if (is_object($obj)) {
 			$obj = (array)$obj;
 		}
@@ -55,7 +55,7 @@ class DeserializerFilter extends DispatcherFilter {
 		if (is_array($obj)) {
 			$new = array();
 			foreach ($obj as $key => $val) {
-				$new[$key] = $this->__objectToArray($val);
+				$new[$key] = $this->objectToArray($val);
 			}
 		} else {
 			$new = $obj;

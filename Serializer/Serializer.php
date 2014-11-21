@@ -74,7 +74,7 @@ class Serializer extends Object {
 	 * @param Array $data
 	 * @return Array
 	 */
-	public function toJsonApi($data = array()) {
+	public function serialize($data = array()) {
 		if (empty($data)) {
 			return $data;
 		}
@@ -95,7 +95,7 @@ class Serializer extends Object {
 	 * @param  array  $serializedData the serialized data in jsonapi format
 	 * @return array
 	 */
-	public function fromJsonApi($serializedData = array()) {
+	public function deserialize($serializedData = array()) {
 		if (empty($serializedData)) {
 			return $serializedData;
 		}
