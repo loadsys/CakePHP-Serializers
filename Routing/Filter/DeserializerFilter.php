@@ -8,6 +8,7 @@
 App::uses('DispatcherFilter', 'Routing');
 App::uses('Serialization', 'Serializers.Lib');
 App::uses('Inflector', 'Utility');
+App::uses('Hash', 'Utility');
 
 /**
  * DeserializerFilter
@@ -43,7 +44,7 @@ class DeserializerFilter extends DispatcherFilter {
 			$deserializedData[$classifiedRootKey] = $dataForKey;
 		}
 
-		$request->data = $deserializedData;
+		$request->data = Hash::merge($request->data, $deserializedData);
 	}
 
 	/**
