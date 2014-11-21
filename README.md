@@ -8,6 +8,66 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This is close to production ready however there may be edge
 cases not yet observed.
 
+## Basics ##
+
+The basic concept for this plugin is to serialize data when rendering a view:
+
+```php
+$data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
+	)
+);
+```
+
+into:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+	]
+}
+```
+
+And to perform the reverse, by deserializing data passed in the request body:
+
+```javascript
+{
+	"users": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	}
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
+	)
+);
+```
+
 ## Installation ##
 
 ### Composer ###
@@ -25,6 +85,8 @@ cases not yet observed.
 ```bash
 git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
 ```
+
+### Setup ###
 
 Load the plugin and be sure that bootstrap is set to true:
 
@@ -142,7 +204,7 @@ class UserSerializer extends Serializer {
 
 	// $data is the deserialized data record that will be set to the data CakeRequest property
 	// $record is the pre-deserialized record for the {"users":} from the HTTP request
-	public function sdeerialize_first_name($data, $record) {
+	public function deserialize_first_name($data, $record) {
 		return strtoupper($data['first_name']);
 	}
 }
