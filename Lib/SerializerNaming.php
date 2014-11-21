@@ -16,7 +16,7 @@ class SerializerNaming {
 	 *
 	 * @var String $suffix
 	 */
-	protected $_suffix = 'Serializer';
+	protected $suffix = 'Serializer';
 
 	/**
 	 * Convert a supplied string to a conventionally named Serializer class.
@@ -25,7 +25,7 @@ class SerializerNaming {
 	 * @return String
 	 */
 	public function classify($name = null) {
-		return Inflector::classify($this->stripSuffix($name)) . $this->_suffix;
+		return Inflector::classify($this->stripSuffix($name)) . $this->suffix;
 	}
 
 	/**
@@ -33,6 +33,6 @@ class SerializerNaming {
 	 * @return String
 	 */
 	protected function stripSuffix($name) {
-		return preg_replace("/{$this->_suffix}$/", '', $name);
+		return preg_replace("/{$this->suffix}$/", '', $name);
 	}
 }

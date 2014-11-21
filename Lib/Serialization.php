@@ -16,14 +16,14 @@ class Serialization {
 	 *
 	 * @var String $_name
 	 */
-	protected $_name = '';
+	protected $name = '';
 
 	/**
 	 * the data being serialzied/deserialized
 	 *
 	 * @var Array $_data
 	 */
-	protected $_data = array();
+	protected $data = array();
 
 	/**
 	 * Construct a new instance of Serialization passing the name and the data
@@ -33,8 +33,8 @@ class Serialization {
 	 * @param Array $data
 	 */
 	public function __construct($name, $data = array()) {
-		$this->_name = $name;
-		$this->_data = $data;
+		$this->name = $name;
+		$this->data = $data;
 	}
 
 	/**
@@ -44,8 +44,8 @@ class Serialization {
 	 * @return Array
 	 */
 	public function serialize() {
-		$data = $this->normalizeData($this->_data);
-		$serializer = $this->factoryFor($this->_name)->generate();
+		$data = $this->normalizeData($this->data);
+		$serializer = $this->factoryFor($this->name)->generate();
 		return $serializer->serialize($data);
 	}
 
@@ -56,8 +56,8 @@ class Serialization {
 	 * @return Array
 	 */
 	public function deserialize() {
-		$serializer = $this->factoryFor($this->_name)->generate();
-		return $serializer->deserialize($this->_data);
+		$serializer = $this->factoryFor($this->name)->generate();
+		return $serializer->deserialize($this->data);
 	}
 
 	/**
