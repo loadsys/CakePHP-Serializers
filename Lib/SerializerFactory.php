@@ -16,9 +16,9 @@ class SerializerFactory {
 	/**
 	 * the class name to generate a Serializer instance
 	 *
-	 * @var String $_className
+	 * @var String $className
 	 */
-	protected $_className = null;
+	protected $className = null;
 
 	/**
 	 * New SerializerFactories take the name of the class that they can create
@@ -30,7 +30,7 @@ class SerializerFactory {
 	 */
 	public function __construct($className = null) {
 		$naming = new SerializerNaming;
-		$this->_className = $naming->classify($className);
+		$this->className = $naming->classify($className);
 	}
 
 	/**
@@ -41,15 +41,15 @@ class SerializerFactory {
 	 * @return Serializer
 	 */
 	public function generate() {
-		App::uses($this->_className, 'Serializer');
-		if (!class_exists($this->_className)) {
-			$modelName = preg_replace('/Serializer$/', '', $this->_className);
+		App::uses($this->className, 'Serializer');
+		if (!class_exists($this->className)) {
+			$modelName = preg_replace('/Serializer$/', '', $this->className);
 			$model = ClassRegistry::init($modelName);
 			$serializer = new Serializer();
 			$serializer->rootKey = $modelName;
 			$serializer->required = array_keys($model->schema());
 			return $serializer;
 		}
-		return new $this->_className();
+		return new $this->className();
 	}
 }
