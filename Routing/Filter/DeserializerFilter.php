@@ -28,13 +28,11 @@ class DeserializerFilter extends DispatcherFilter {
 	public function beforeDispatch(CakeEvent $event) {
 		// get the request data
 		$request = $event->data['request'];
-		$data = $request->input('json_decode');
+		$data = $request->input('json_decode', true);
 
 		if (empty($data)) {
 			$data = array();
 		}
-
-		$data = $this->objectToArray($data);
 		$deserializedData = array();
 
 		foreach ($data as $key => $dataForKey) {
@@ -45,28 +43,5 @@ class DeserializerFilter extends DispatcherFilter {
 		}
 
 		$request->data = Hash::merge($request->data, $deserializedData);
-	}
-
-	/**
-	 * converts an object to an array
-	 *
-	 * @param  object $obj the object to convert
-	 * @return array
-	 */
-	private function objectToArray($obj) {
-		if (is_object($obj)) {
-			$obj = (array)$obj;
-		}
-
-		if (is_array($obj)) {
-			$new = array();
-			foreach ($obj as $key => $val) {
-				$new[$key] = $this->objectToArray($val);
-			}
-		} else {
-			$new = $obj;
-		}
-
-		return $new;
 	}
 }
