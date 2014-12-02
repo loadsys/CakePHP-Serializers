@@ -39,9 +39,10 @@ class DeserializerFilter extends DispatcherFilter {
 			$classifiedRootKey = Inflector::classify($key);
 			$Serialization = new Serialization($classifiedRootKey, $data);
 			$dataForKey = $Serialization->deserialize();
-			$deserializedData[$classifiedRootKey] = $dataForKey;
+			$deserializedData = $dataForKey;
 		}
 
 		$request->data = Hash::merge($request->data, $deserializedData);
 	}
+
 }

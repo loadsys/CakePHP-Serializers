@@ -6,6 +6,7 @@
  */
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
+App::uses('Serialization', 'Serializers.Lib');
 
 /**
  * Custom exception when the Serializer is missing a required attribute
@@ -195,15 +196,22 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	protected function deserializeRecord(array $record = array()) {
-		$data = $record;
+		$data[$this->rootKey] = $record;
 		foreach ($record as $key => $value) {
 			$methodName = "deserialize_{$key}";
 			if (method_exists($this, $methodName)) {
 				try {
-					$data[$key] = $this->{$methodName}($data, $record);
+					$data[$this->rootKey][$key] = $this->{$methodName}($data, $record);
 				} catch (DeserializerIgnoreException $e) {
-					unset($data[$key]);
+					unset($data[$this->rootKey][$key]);
 				}
+			} elseif (is_array($value)) {
+				$classifiedRootKey = Inflector::classify($key);
+				$Serialization = new Serialization($classifiedRootKey, $record);
+				$subModelData = $Serialization->deserialize();
+				$data[$this->rootKey][$classifiedRootKey] = $subModelData[$classifiedRootKey];
+				// unset the no longer needed non classified root key here
+				unset($data[$this->rootKey][$key]);
 			}
 		}
 

@@ -9,6 +9,10 @@ class TestUserSerializer extends Serializer {
 	public $required = array('first_name', 'last_name');
 }
 
+class TestSecondLevelUserSerializer extends Serializer {
+	public $required = array('first_name', 'last_name');
+}
+
 class TestCallbackSerializer extends Serializer {
 	public function afterSerialize($json, $record) {
 		return "after serialize";
@@ -85,7 +89,12 @@ class SerializerTest extends CakeTestCase {
 	}
 
 	public function testDeserializerUsesAttributesInAttributesArray() {
-		$expected = array('first_name' => 'John', 'last_name' => 'Doe');
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+		);
 		$serializer = new TestUserSerializer();
 		$data = array('test_users' => array(
 			'first_name' => 'John', 'last_name' => 'Doe'
@@ -293,10 +302,12 @@ class SerializerTest extends CakeTestCase {
 
 	public function testDeserializeDataWithMethod() {
 		$expected = array(
-			'title' => 'Title',
-			'body' => 'BODY',
-			'summary' => 'SUMMARY',
-			'published' => true,
+			'TestOptional' => array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'summary' => 'SUMMARY',
+				'published' => true,
+			),
 		);
 		$data = array('test_optionals' => array(
 			'title' => 'Title',
@@ -329,8 +340,10 @@ class SerializerTest extends CakeTestCase {
 
 	public function testDeserializeIgnoreAttribute() {
 		$expected = array(
-			'title' => 'Title',
-			'body' => 'Body',
+			'TestIgnore' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+			),
 		);
 		$data = array('test_ignores' => array(
 			'title' => 'Title',
@@ -339,6 +352,31 @@ class SerializerTest extends CakeTestCase {
 		));
 
 		$serializer = new TestIgnoreSerializer();
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
+	public function testDeserializeSubModelRecordsAttribute() {
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Doe',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$data = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					'first_name' => 'Jane', 'last_name' => 'Doe',
+				),
+			)
+		);
 		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 }
