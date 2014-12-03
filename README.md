@@ -5,10 +5,14 @@
 An object oriented solution to CakePHP model data serialization to JSON and the
 corresponding deserialization of a JSON payload to CakePHP data arrays.
 
-This is close to production ready however there may be edge
-cases not yet observed.
+This plugin is designed to work with the Ember Data Spec for de/serialization of
+records: http://emberjs.com/guides/models/the-rest-adapter/
 
-## Basics ##
+This is currently not fully production ready - be warned bugs/issues may exist.
+
+## Examples ##
+
+### Simple Cases ###
 
 The basic concept for this plugin is to serialize data when rendering a view:
 
