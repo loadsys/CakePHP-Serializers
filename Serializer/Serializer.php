@@ -195,27 +195,43 @@ class Serializer extends Object {
 	 * @param  array $record the record passed to the CakeAPI
 	 * @return array
 	 */
-	protected function deserializeRecord(array $record = array()) {
-		$data[$this->rootKey] = $record;
-		foreach ($record as $key => $value) {
-			$methodName = "deserialize_{$key}";
+	protected function deserializeRecord(array $topLevelRecord = array()) {
+		$topLevelFinalData[$this->rootKey] = $topLevelRecord;
+
+		foreach ($topLevelRecord as $topLevelKey => $topLevelValue) {
+			$methodName = "deserialize_{$topLevelKey}";
 			if (method_exists($this, $methodName)) {
 				try {
-					$data[$this->rootKey][$key] = $this->{$methodName}($data, $record);
+					$topLevelFinalData[$this->rootKey][$topLevelKey] = $this->{$methodName}($topLevelFinalData, $topLevelRecord);
 				} catch (DeserializerIgnoreException $e) {
-					unset($data[$this->rootKey][$key]);
+					unset($topLevelFinalData[$this->rootKey][$topLevelKey]);
 				}
-			} elseif (is_array($value)) {
-				$classifiedRootKey = Inflector::classify($key);
-				$Serialization = new Serialization($classifiedRootKey, $record);
+			} elseif (
+				is_array($topLevelValue)
+				&& !is_int($topLevelKey)
+			) {
+				// this is a new sub model record
+				$classifiedRootKey = Inflector::classify($topLevelKey);
+				$Serialization = new Serialization($classifiedRootKey, $topLevelRecord);
 				$subModelData = $Serialization->deserialize();
-				$data[$this->rootKey][$classifiedRootKey] = $subModelData[$classifiedRootKey];
+				$topLevelFinalData[$this->rootKey][$classifiedRootKey] = $subModelData[$classifiedRootKey];
 				// unset the no longer needed non classified root key here
-				unset($data[$this->rootKey][$key]);
+				unset($topLevelFinalData[$this->rootKey][$topLevelKey]);
+			} elseif (
+				is_array($topLevelValue)
+				&& is_int($topLevelKey)
+			) {
+				// this is an array of data
+				foreach($topLevelValue as $subRecordKey => $subRecordValue) {
+					// this is a new sub model record
+					$classifiedSubModelKey = Inflector::classify($this->rootKey);
+					$Serialization = new Serialization($classifiedSubModelKey, $topLevelFinalData);
+					$subModelData = $Serialization->deserialize();
+				}
 			}
 		}
 
-		return $this->afterDeserialize($data, $record);
+		return $this->afterDeserialize($topLevelFinalData, $topLevelRecord);
 	}
 }
 

@@ -13,6 +13,14 @@ class TestSecondLevelUserSerializer extends Serializer {
 	public $required = array('first_name', 'last_name');
 }
 
+class TestSecondLevelUserWithMethodSerializer extends Serializer {
+	public $required = array('first_name', 'last_name');
+
+	public function deserialize_first_name($data, $record) {
+		return 'FIRST';
+	}
+}
+
 class TestCallbackSerializer extends Serializer {
 	public function afterSerialize($json, $record) {
 		return "after serialize";
@@ -355,7 +363,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
-	public function testDeserializeSubModelRecordsAttribute() {
+	public function testDeserializeSubModelRecords() {
 		$expected = array(
 			'TestUser' => array(
 				'first_name' => 'John',
@@ -375,9 +383,118 @@ class SerializerTest extends CakeTestCase {
 				'test_second_level_users' => array(
 					'first_name' => 'Jane', 'last_name' => 'Doe',
 				),
-			)
+			),
 		);
 		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
-}
 
+	public function testDeserializeSubModelRecordsWithAttributeMethod() {
+		$inputData = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_user_with_methods' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Doe',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUserWithMethod' => array(
+					'first_name' => 'FIRST',
+					'last_name' => 'Doe',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+	}
+
+
+	public function testDeserializeTwoSubModelRecords() {
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$data = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					0 => array(
+						'first_name' => 'Jane', 'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane', 'last_name' => 'Text',
+					),
+				),
+			),
+		);
+		$this->assertSame($expected, $serializer->deserialize($data));
+	}
+
+	public function testDeserializeThreeSubModelRecords() {
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$data = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$this->assertSame($expected, $serializer->deserialize($data));
+	}
+
+}
