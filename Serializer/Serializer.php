@@ -100,15 +100,10 @@ class Serializer extends Object {
 		if (empty($serializedData)) {
 			return $serializedData;
 		}
-
-		$rootKeyTableized = Inflector::tableize($this->rootKey);
 		$deserializedData = array();
 
-		if (array_key_exists($rootKeyTableized, $serializedData)) {
-			$deserializedData = $this->deserializeRecord($serializedData[$rootKeyTableized]);
-		}
-
-		return $deserializedData;
+		$deserializedData = $this->deserializeData($serializedData);
+		return $this->afterDeserialize($deserializedData, $serializedData);
 	}
 
 	/**
@@ -190,48 +185,60 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * deserialize a jsonapi record array
+	 * deserialize an array of data
 	 *
-	 * @param  array $record the record passed to the CakeAPI
+	 * @param  array  $serializedData stream of data from the request
+	 * @return void
+	 */
+	protected function deserializeData(array $serializedData = array()) {
+		$deserializedData = array();
+
+		foreach ($serializedData as $key => $record) {
+			// if the key for this record is an int, multiple records
+			$className = Inflector::classify($key);
+			$deserializedData[$className] = $this->deserializeRecord($className, $record);
+
+		}
+
+		return $deserializedData;
+	}
+
+	/**
+	 * deserialize a record
+	 *
+	 * @param  string $currentClassName the current class name being operated on
+	 * @param  array $currentRecord     the current record being operated on
 	 * @return array
 	 */
-	protected function deserializeRecord(array $topLevelRecord = array()) {
-		$topLevelFinalData[$this->rootKey] = $topLevelRecord;
+	protected function deserializeRecord($currentClassName, $currentRecord) {
+		$deserializedData = array();
 
-		foreach ($topLevelRecord as $topLevelKey => $topLevelValue) {
-			$methodName = "deserialize_{$topLevelKey}";
-			if (method_exists($this, $methodName)) {
-				try {
-					$topLevelFinalData[$this->rootKey][$topLevelKey] = $this->{$methodName}($topLevelFinalData, $topLevelRecord);
-				} catch (DeserializerIgnoreException $e) {
-					unset($topLevelFinalData[$this->rootKey][$topLevelKey]);
-				}
-			} elseif (
-				is_array($topLevelValue)
-				&& !is_int($topLevelKey)
-			) {
-				// this is a new sub model record
-				$classifiedRootKey = Inflector::classify($topLevelKey);
-				$Serialization = new Serialization($classifiedRootKey, $topLevelRecord);
-				$subModelData = $Serialization->deserialize();
-				$topLevelFinalData[$this->rootKey][$classifiedRootKey] = $subModelData[$classifiedRootKey];
-				// unset the no longer needed non classified root key here
-				unset($topLevelFinalData[$this->rootKey][$topLevelKey]);
-			} elseif (
-				is_array($topLevelValue)
-				&& is_int($topLevelKey)
-			) {
-				// this is an array of data
-				foreach($topLevelValue as $subRecordKey => $subRecordValue) {
-					// this is a new sub model record
-					$classifiedSubModelKey = Inflector::classify($this->rootKey);
-					$Serialization = new Serialization($classifiedSubModelKey, $topLevelFinalData);
-					$subModelData = $Serialization->deserialize();
+		foreach ($currentRecord as $key => $data) {
+			if (is_int($key)) {
+				$deserializedData[] = $this->deserializeRecord($currentClassName, $data);
+			} else {
+				$methodName = "deserialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					// if there exists a method for the current key process it
+					try {
+						$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
+					} catch (DeserializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} elseif (is_array($data)) {
+					$classifiedSubModelKey = Inflector::classify($key);
+					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
+					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
+					$deserializedData = $deserializedData + $subModelDeserializedData;
+				} else {
+					$deserializedData[$key] = $data;
 				}
 			}
 		}
 
-		return $this->afterDeserialize($topLevelFinalData, $topLevelRecord);
+		return $deserializedData;
 	}
 }
 

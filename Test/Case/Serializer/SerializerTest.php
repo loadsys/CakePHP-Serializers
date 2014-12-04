@@ -414,7 +414,6 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
 	}
 
-
 	public function testDeserializeTwoSubModelRecords() {
 		$expected = array(
 			'TestUser' => array(
@@ -448,7 +447,7 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$this->assertSame($expected, $serializer->deserialize($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testDeserializeThreeSubModelRecords() {
@@ -494,7 +493,133 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$this->assertSame($expected, $serializer->deserialize($data));
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
+	public function testDeserializeMultiplePrimaryRecords() {
+		$inputData = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'TestUser' => array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+	}
+
+	public function testDeserializeMultiplePrimaryRecordsWithSubRecords() {
+		$inputData = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'test_second_level_users' => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'TestUser' => array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'TestSecondLevelUser' => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+	}
+
+	public function testDeserializeMultiplePrimaryRecordsWithMultipleSubRecords() {
+		$inputData = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Smith',
+						),
+						1 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Text',
+						),
+						2 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Ipsum',
+						),
+					),
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'TestUser' => array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'TestSecondLevelUser' => array(
+						0 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Smith',
+						),
+						1 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Text',
+						),
+						2 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Ipsum',
+						),
+					),
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
 	}
 
 }
