@@ -14,29 +14,30 @@ App::uses('Serialization', 'Serializers.Lib');
 class CakeSerializerView extends View {
 
 	/**
-	 * @access protected
-	 * @var Controller $_controller
+	 * the Controller being operated on
+	 *
+	 * @var Controller
 	 */
-	protected $_controller;
+	protected $controller;
 
 	/**
-	 * Fill me in.
+	 * Construct a new instance of the View class assigning the Controller as a
+	 * property of this object
 	 *
-	 * @access public
-	 * @param Controller $controller
+	 * @param Controller $controller the Controller instance being operated on
 	 */
 	public function __construct(Controller $controller = null) {
 		parent::__construct($controller);
-		$this->_controller = $controller;
+		$this->controller = $controller;
 	}
 
 	/**
-	 * Fill me in.
+	 * Render the view, if it can be rendered as JSON do so, else call the parent
+	 * render method
 	 *
-	 * @access public
-	 * @param Mixed $view
-	 * @param Null $layout
-	 * @return String
+	 * @param mixed $view the view data
+	 * @param string $layout the layout to use
+	 * @return string
 	 */
 	public function render($view = null, $layout = null) {
 		if ($this->renderAsJSON()) {
@@ -51,7 +52,7 @@ class CakeSerializerView extends View {
 
 	/**
 	 * @access protected
-	 * @return String
+	 * @return string
 	 */
 	protected function toJSON($name, $data) {
 		$serialization = new Serialization($name, $data);
@@ -76,7 +77,7 @@ class CakeSerializerView extends View {
 	 * @return Boolean
 	 */
 	protected function controllerRenderAsPropertyExists($type = 'json') {
-		return property_exists($this->_controller, 'renderAs');
+		return property_exists($this->controller, 'renderAs');
 	}
 
 	/**
@@ -84,7 +85,7 @@ class CakeSerializerView extends View {
 	 * @return Boolean
 	 */
 	protected function checkControllerRenderAs($type = 'json') {
-		return strtolower($this->_controller->renderAs) === $type;
+		return strtolower($this->controller->renderAs) === $type;
 	}
 
 	/**
@@ -93,12 +94,12 @@ class CakeSerializerView extends View {
 	 */
 	protected function parseNameAndData($arg = null) {
 		$data = array();
-		if (isset($this->_controller->viewVars['data'])) {
-			$data = $this->_controller->viewVars['data'];
+		if (isset($this->controller->viewVars['data'])) {
+			$data = $this->controller->viewVars['data'];
 		}
 		if (is_array($arg)) {
 			$data = $arg;
 		}
-		return array($this->_controller->name, $data);
+		return array($this->controller->name, $data);
 	}
 }

@@ -25,8 +25,7 @@ class SerializerFactory {
 	 * in the constructor, but can create many instances of that class using the
 	 * generate method.
 	 *
-	 * @access public
-	 * @param String $className
+	 * @param string $className the name of the class to generate a Serializer
 	 */
 	public function __construct($className = null) {
 		$naming = new SerializerNaming;
@@ -36,8 +35,6 @@ class SerializerFactory {
 	/**
 	 * Creates a new instance if the serializer with the supplied data.
 	 *
-	 * @access public
-	 * @param Array $data
 	 * @return Serializer
 	 */
 	public function generate() {

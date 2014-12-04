@@ -71,9 +71,8 @@ class Serializer extends Object {
 	/**
 	 * Convert the supplied normalized data array to jsonapi format.
 	 *
-	 * @access public
-	 * @param Array $data
-	 * @return Array
+	 * @param array $data the data to serialize
+	 * @return array
 	 */
 	public function serialize($data = array()) {
 		if (empty($data)) {
@@ -93,7 +92,7 @@ class Serializer extends Object {
 	/**
 	 * from jsonapi format to CakePHP array
 	 *
-	 * @param  array  $serializedData the serialized data in jsonapi format
+	 * @param array $serializedData the serialized data in jsonapi format
 	 * @return array
 	 */
 	public function deserialize($serializedData = array()) {
@@ -110,8 +109,8 @@ class Serializer extends Object {
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
-	 * @param  multi  $json serialized record data
-	 * @param  multi  $data raw record data
+	 * @param multi $json serialized record data
+	 * @param multi $record raw record data
 	 * @return multi
 	 */
 	public function afterSerialize($json, $record) {
@@ -122,20 +121,20 @@ class Serializer extends Object {
 	 * Callback method called after automatic deserialization. Whatever is returned
 	 * from this method will ultimately be used as the Controller->data for cake
 	 *
-	 * @param  multi  $data deserialized record data
-	 * @param  multi  $json json record data
+	 * @param multi $deserializedData the deserialized data
+	 * @param multi $serializedData   the original un-deserialized data
 	 * @return multi
 	 */
-	public function afterDeserialize($data, $json) {
-		return $data;
+	public function afterDeserialize($deserializedData, $serializedData) {
+		return $deserializedData;
 	}
 
 	/**
 	 * Serializes a CakePHP data array into a jsonapi format array
 	 *
+	 * @param array $record the record being serialized
 	 * @throws SerializerMissingRequiredException If a required attribute is missing
-	 * @param Array $record
-	 * @return Array
+	 * @return array
 	 */
 	protected function serializeRecord($record) {
 		// if there is no data return nothing
@@ -185,10 +184,10 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * deserialize an array of data
+	 * deserialize an array of serialized data
 	 *
-	 * @param  array  $serializedData stream of data from the request
-	 * @return void
+	 * @param array $serializedData array of data from the request
+	 * @return array
 	 */
 	protected function deserializeData(array $serializedData = array()) {
 		$deserializedData = array();
@@ -197,7 +196,6 @@ class Serializer extends Object {
 			// if the key for this record is an int, multiple records
 			$className = Inflector::classify($key);
 			$deserializedData[$className] = $this->deserializeRecord($className, $record);
-
 		}
 
 		return $deserializedData;
@@ -206,8 +204,8 @@ class Serializer extends Object {
 	/**
 	 * deserialize a record
 	 *
-	 * @param  string $currentClassName the current class name being operated on
-	 * @param  array $currentRecord     the current record being operated on
+	 * @param string $currentClassName the current class name being operated on
+	 * @param array $currentRecord     the current record being operated on
 	 * @return array
 	 */
 	protected function deserializeRecord($currentClassName, $currentRecord) {
@@ -240,5 +238,5 @@ class Serializer extends Object {
 
 		return $deserializedData;
 	}
-}
 
+}

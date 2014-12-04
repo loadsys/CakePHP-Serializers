@@ -22,7 +22,7 @@ class DeserializerFilter extends DispatcherFilter {
 	 *
 	 * We will process the request for the json data and de-serialize it
 	 *
-	 * @param  CakeEvent $event the CakeEvent being triggered
+	 * @param CakeEvent $event the CakeEvent being triggered
 	 * @return void
 	 */
 	public function beforeDispatch(CakeEvent $event) {
