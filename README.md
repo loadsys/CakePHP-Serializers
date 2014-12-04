@@ -72,6 +72,123 @@ $this->request->data = array(
 );
 ```
 
+### Advanced Cases ###
+
+
+We can also deserialize both multiple records:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+	]
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+	)
+);
+```
+
+And deserialize sub model records, even if there are multiple records:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": {
+				"something": "blahh",
+			}
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": [
+				{
+					"something": "teasdf",
+				},
+				{
+					"something": "fgdfghdfg",
+				}
+			]
+		},
+	]
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				"something": "blahh",
+			),
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				0 => array(
+					"something": "teasdf",
+				),
+				1 => array(
+					"something": "fgdfghdfg",
+				),
+			),
+		),
+	)
+);
+```
+
 ## Installation ##
 
 ### Composer ###
