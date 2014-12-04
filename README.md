@@ -167,7 +167,7 @@ $this->request->data = array(
 			'last_name' => 'last',
 			'is_active' => true,
 			'SecondaryModel' => array(
-				"something": "blahh",
+				"something" => "blahh",
 			),
 		),
 		1 => array(
@@ -178,10 +178,10 @@ $this->request->data = array(
 			'is_active' => true,
 			'SecondaryModel' => array(
 				0 => array(
-					"something": "teasdf",
+					"something" => "teasdf",
 				),
 				1 => array(
-					"something": "fgdfghdfg",
+					"something" => "fgdfghdfg",
 				),
 			),
 		),

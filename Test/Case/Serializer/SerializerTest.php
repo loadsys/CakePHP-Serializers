@@ -1,86 +1,14 @@
 <?php
-
+/**
+ * Class to test the serialization methods
+ */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
-
-class TestRootKeySerializer extends Serializer {}
-
-class TestUserSerializer extends Serializer {
-	public $required = array('first_name', 'last_name');
-}
-
-class TestSecondLevelUserSerializer extends Serializer {
-	public $required = array('first_name', 'last_name');
-}
-
-class TestSecondLevelUserWithMethodSerializer extends Serializer {
-	public $required = array('first_name', 'last_name');
-
-	public function deserialize_first_name($data, $record) {
-		return 'FIRST';
-	}
-}
-
-class TestCallbackSerializer extends Serializer {
-	public function afterSerialize($json, $record) {
-		return "after serialize";
-	}
-
-	public function afterDeserialize($data, $json) {
-		return "after deserialize";
-	}
-}
-
-class TestBadOptionalSerializer extends Serializer {
-	public $required = array('title', 'body');
-	public $optional = 'notanarray';
-}
-
-class TestOptionalSerializer extends Serializer {
-	public $required = array('title', 'body');
-	public $optional = array('summary', 'published');
-
-	public function serialize_body($data, $record) {
-		return 'BODY';
-	}
-
-	public function serialize_summary($data, $record) {
-		return 'SUMMARY';
-	}
-
-	public function deserialize_body($data, $record) {
-		return 'BODY';
-	}
-
-	public function deserialize_summary($data, $record) {
-		return 'SUMMARY';
-	}
-}
-
-class TestMethodOptionalSerializer extends Serializer {
-	public $required = array('title', 'body');
-	public $optional = array('summary', 'published', 'tags', 'created');
-
-	public function serialize_tags($data, $record) {
-		return 'Tags';
-	}
-}
-
-class TestIgnoreSerializer extends Serializer {
-	public $required = array('title', 'body');
-	public $optional = array('created');
-
-	public function serialize_created($data, $record) {
-		throw new SerializerIgnoreException();
-	}
-
-	public function deserialize_created($data, $record) {
-		throw new DeserializerIgnoreException();
-	}
-}
+require_once( dirname(__FILE__) . '/serializer_test_classes.php');
 
 class SerializerTest extends CakeTestCase {
-	public function testSerializerRootKeyGeneration() {
+
+	public function testRootKeyGeneration() {
 		$serializer = new TestRootKeySerializer();
 		$this->assertEquals('TestRootKey', $serializer->rootKey);
 	}
@@ -96,34 +24,12 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testDeserializerUsesAttributesInAttributesArray() {
-		$expected = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => 'Doe',
-			),
-		);
-		$serializer = new TestUserSerializer();
-		$data = array('test_users' => array(
-			'first_name' => 'John', 'last_name' => 'Doe'
-		));
-		$this->assertEquals($expected, $serializer->deserialize($data));
-	}
-
 	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
 		$data = array(
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array();
 		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testDeserializerUsesNoDataPassedToTheSerializerArray() {
-		$data = array(
-		);
-		$serializer = new TestUserSerializer();
-		$expected = array();
-		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
@@ -136,28 +42,11 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testDeserializerUsesEmptyDataPassedToTheSerializerArray() {
-		$data = array(
-		);
-		$serializer = new TestUserSerializer();
-		$expected = array();
-		$this->assertEquals($expected, $serializer->deserialize($data));
-	}
-
 	public function testSerializerAfterSerializeCallback() {
 		$serializer = new TestCallbackSerializer();
 		$data = array(array("TestCallback" => array()));
 		$expected = array("test_callbacks" => array("after serialize"));
 		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testDeserializerAfterDeserializeCallback() {
-		$serializer = new TestCallbackSerializer();
-		$data = array('test_callbacks' => array(
-			'first_name' => 'John', 'last_name' => 'Doe'
-		));
-		$expected = "after deserialize";
-		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testMissingRequiredAttribute() {
@@ -197,15 +86,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testDeserializeNoData() {
-		$data = null;
-		$expected = null;
-
-		$serializer = new TestRootKeySerializer();
-		$this->assertEquals($expected, $serializer->deserialize($data));
-	}
-
-	public function testOptionalIncludedAttributes() {
+	public function testSerializeOptionalIncludedAttributes() {
 		$data = array(
 			array('TestOptional' => array(
 				'title' => 'Title',
@@ -226,7 +107,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testOptionalExcludedAttributes() {
+	public function testSerializeOptionalExcludedAttributes() {
 		$data = array(
 			array('TestOptional' => array(
 				'title' => 'Title',
@@ -244,7 +125,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testNonProvidedAttributes() {
+	public function testSerializeNonProvidedAttributes() {
 		$data = array(
 			array('TestOptional' => array(
 				'title' => 'Title',
@@ -265,7 +146,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testCamelCasedNonProvidedAttributes() {
+	public function testSerializeCamelCasedNonProvidedAttributes() {
 		$data = array(
 			array('TestOptional' => array(
 				'title' => 'Title',
@@ -288,7 +169,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testNotProvidedDataWithMethodOptionalAttribute() {
+	public function testSerializeNotProvidedDataWithMethodOptionalAttribute() {
 		$data = array(
 			array('TestMethodOptional' => array(
 				'title' => 'Title',
@@ -306,26 +187,6 @@ class SerializerTest extends CakeTestCase {
 			)
 		));
 		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testDeserializeDataWithMethod() {
-		$expected = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'BODY',
-				'summary' => 'SUMMARY',
-				'published' => true,
-			),
-		);
-		$data = array('test_optionals' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-			'summary' => 'Summary',
-			'published' => true
-		));
-
-		$serializer = new TestOptionalSerializer();
-		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
 	public function testSerializeIgnoreAttribute() {
@@ -346,25 +207,8 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
-	public function testDeserializeIgnoreAttribute() {
-		$expected = array(
-			'TestIgnore' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-			),
-		);
-		$data = array('test_ignores' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-			'created' => '2014-07-07',
-		));
-
-		$serializer = new TestIgnoreSerializer();
-		$this->assertEquals($expected, $serializer->deserialize($data));
-	}
-
-	public function testDeserializeSubModelRecords() {
-		$expected = array(
+	public function testSerializeSubModelRecords() {
+		$inputData = array(array(
 			'TestUser' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -373,9 +217,8 @@ class SerializerTest extends CakeTestCase {
 					'last_name' => 'Doe',
 				),
 			),
-		);
-		$serializer = new TestUserSerializer();
-		$data = array(
+		));
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				'first_name' => 'John',
@@ -385,11 +228,12 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$this->assertEquals($expected, $serializer->deserialize($data));
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeSubModelRecordsWithAttributeMethod() {
-		$inputData = array(
+	public function testSerializeSubModelRecordsWithAttributeMethod() {
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				'first_name' => 'John',
@@ -400,7 +244,7 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$expectedOutput = array(
+		$inputData = array(array(
 			'TestUser' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -409,13 +253,13 @@ class SerializerTest extends CakeTestCase {
 					'last_name' => 'Doe',
 				),
 			),
-		);
+		));
 		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeTwoSubModelRecords() {
-		$expected = array(
+	public function testSerializeTwoSubModelRecords() {
+		$inputData = array(array(
 			'TestUser' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -430,9 +274,8 @@ class SerializerTest extends CakeTestCase {
 					),
 				),
 			),
-		);
-		$serializer = new TestUserSerializer();
-		$data = array(
+		));
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				'first_name' => 'John',
@@ -447,11 +290,13 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$this->assertEquals($expected, $serializer->deserialize($data));
+
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeThreeSubModelRecords() {
-		$expected = array(
+	public function testSerializeThreeSubModelRecords() {
+		$inputData = array(array(
 			'TestUser' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -470,9 +315,8 @@ class SerializerTest extends CakeTestCase {
 					),
 				),
 			),
-		);
-		$serializer = new TestUserSerializer();
-		$data = array(
+		));
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				'first_name' => 'John',
@@ -493,11 +337,13 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$this->assertEquals($expected, $serializer->deserialize($data));
+
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeMultiplePrimaryRecords() {
-		$inputData = array(
+	public function testSerializeMultiplePrimaryRecords() {
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				0 => array(
@@ -510,7 +356,7 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$expectedOutput = array(
+		$inputData = array(array(
 			'TestUser' => array(
 				0 => array(
 					'first_name' => 'John',
@@ -521,13 +367,13 @@ class SerializerTest extends CakeTestCase {
 					'last_name' => 'Smith',
 				),
 			),
-		);
+		));
 		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeMultiplePrimaryRecordsWithSubRecords() {
-		$inputData = array(
+	public function testSerializeMultiplePrimaryRecordsWithSubRecords() {
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				0 => array(
@@ -544,7 +390,7 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$expectedOutput = array(
+		$inputData = array(array(
 			'TestUser' => array(
 				0 => array(
 					'first_name' => 'John',
@@ -559,13 +405,13 @@ class SerializerTest extends CakeTestCase {
 					'last_name' => 'Smith',
 				),
 			),
-		);
+		));
 		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testDeserializeMultiplePrimaryRecordsWithMultipleSubRecords() {
-		$inputData = array(
+	public function testSerializeMultiplePrimaryRecordsWithMultipleSubRecords() {
+		$expectedOutput = array(
 			'test_users' =>
 			array(
 				0 => array(
@@ -592,7 +438,7 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$expectedOutput = array(
+		$inputData = array(array(
 			'TestUser' => array(
 				0 => array(
 					'first_name' => 'John',
@@ -617,9 +463,9 @@ class SerializerTest extends CakeTestCase {
 					'last_name' => 'Smith',
 				),
 			),
-		);
+		));
 		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
 }
