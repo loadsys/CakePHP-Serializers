@@ -283,10 +283,16 @@ class UserSerializer extends Serializer {
 
 	public $optional = array('email');
 
-	// $json is the seralized json data
-	// $data is the pre-serialized data record for the User
-	public afterSerialize($json, $record) {
-
+	/**
+	 * Callback method called after automatic serialization. Whatever is returned
+	 * from this method will ultimately be used as the JSON response.
+	 *
+	 * @param multi $json serialized record data
+	 * @param multi $record raw record data
+	 * @return multi
+	 */
+	public function afterSerialize($json, $record) {
+		return $json;
 	}
 }
 ```
@@ -305,10 +311,16 @@ class UserSerializer extends Serializer {
 
 	public $optional = array('email');
 
-	// $data deserialized record data
-	// $json json record data
-	public afterDeserialize($data, $json) {
-
+	/**
+	 * Callback method called after automatic deserialization. Whatever is returned
+	 * from this method will ultimately be used as the Controller->data for cake
+	 *
+	 * @param  multi $deserializedData the deserialized data
+	 * @param  multi $serializedData   the original un-deserialized data
+	 * @return multi
+	 */
+	public function afterDeserialize($deserializedData, $serializedData) {
+		return $deserializedData;
 	}
 }
 ```
