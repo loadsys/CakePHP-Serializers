@@ -21,7 +21,7 @@ class SerializerNaming {
 	/**
 	 * Convert a supplied string to a conventionally named Serializer class.
 	 *
-	 * @param  string $name the name for the class to generate
+	 * @param string $name the name for the class to generate
 	 * @return string       the name converted as needed
 	 */
 	public function classify($name = null) {
@@ -31,7 +31,7 @@ class SerializerNaming {
 	/**
 	 * Removes a suffix from a provided name
 	 *
-	 * @param  string $name the name for the class to generate
+	 * @param string $name the name for the class to generate
 	 * @return string       the name with a possible suffix stripped
 	 */
 	protected function stripSuffix($name) {

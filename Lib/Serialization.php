@@ -28,9 +28,9 @@ class Serialization {
 	/**
 	 * Construct a new instance of Serialization passing the name and the data
 	 *
-	 * @access public
-	 * @param String $name
-	 * @param Array $data
+	 * @param string $name the class name of object being serialized
+	 * @param array $data the data to serialize
+	 * @return void
 	 */
 	public function __construct($name, $data = array()) {
 		$this->name = $name;
@@ -41,19 +41,18 @@ class Serialization {
 	 * With the name and data supplied on construction, convert the data to
 	 * jsonapi compliant array that can be encoded as json.
 	 *
-	 * @return Array
+	 * @return array
 	 */
 	public function serialize() {
-		$data = $this->normalizeData($this->data);
 		$serializer = $this->factoryFor($this->name)->generate();
-		return $serializer->serialize($data);
+		return $serializer->serialize($this->data);
 	}
 
 	/**
 	 * With the name and data supplied on construction, convert the data from
 	 * jsonapi compliant array to a CakePHP standard array
 	 *
-	 * @return Array
+	 * @return array
 	 */
 	public function deserialize() {
 		$serializer = $this->factoryFor($this->name)->generate();
@@ -61,20 +60,10 @@ class Serialization {
 	}
 
 	/**
-	 * @access protected
-	 * @param Array $data
-	 * @return Array
-	 */
-	protected function normalizeData($data) {
-		if (!is_int(key($data))) {
-			$data = array($data);
-		}
-		return $data;
-	}
-
-	/**
-	 * @access protected
-	 * @param String $name
+	 * return a new instance of the Serializer, using the SerializerFactory to
+	 * generate the instance
+	 *
+	 * @param string $name the name of the class to generate
 	 * @return Object
 	 */
 	protected function factoryFor($name) {

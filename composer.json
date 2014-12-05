@@ -2,13 +2,19 @@
   "name": "loadsys/cakephp_serializers",
   "type": "cakephp-plugin",
   "description": "An object oriented solution to CakePHP model data serialization to JSON.",
-  "keywords": ["cakephp","view","json","serializers"],
+  "keywords": ["cakephp","view","json","serializers","cakephp-plugin"],
   "license": "MIT",
   "homepage": "https://github.com/loadsys/CakePHP-Serializers",
   "authors": [
     {
       "name": "Joey Trapp",
       "homepage": "https://github.com/joeytrapp"
+    },
+    {
+      "name": "Justin Yost",
+      "homepage": "https://www.yostivanich.com/",
+      "email": "justin.yost@yostivanich.com",
+      "role": "Developer"
     }
   ],
   "support": {

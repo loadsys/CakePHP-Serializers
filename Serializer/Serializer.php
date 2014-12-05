@@ -6,6 +6,7 @@
  */
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
+App::uses('Serialization', 'Serializers.Lib');
 
 /**
  * Custom exception when the Serializer is missing a required attribute
@@ -70,144 +71,206 @@ class Serializer extends Object {
 	/**
 	 * Convert the supplied normalized data array to jsonapi format.
 	 *
-	 * @access public
-	 * @param Array $data
-	 * @return Array
-	 */
-	public function serialize($data = array()) {
-		if (empty($data)) {
-			return $data;
-		}
-		$rows = array();
-		foreach ($data as $v) {
-			// ensure there is some data being passed to serialize record
-			if (!empty($v)) {
-				$rows[] = $this->serializeRecord($v);
-			}
-		}
-		$key = Inflector::tableize($this->rootKey);
-		return array($key => $rows);
-	}
-
-	/**
-	 * from jsonapi format to CakePHP array
-	 *
-	 * @param  array  $serializedData the serialized data in jsonapi format
+	 * @param array $data the data to serialize
 	 * @return array
 	 */
-	public function deserialize($serializedData = array()) {
-		if (empty($serializedData)) {
-			return $serializedData;
+	public function serialize($unserializedData = array()) {
+		if (empty($unserializedData)) {
+			return $unserializedData;
 		}
 
-		$rootKeyTableized = Inflector::tableize($this->rootKey);
-		$deserializedData = array();
-
-		if (array_key_exists($rootKeyTableized, $serializedData)) {
-			$deserializedData = $this->deserializeRecord($serializedData[$rootKeyTableized]);
-		}
-
-		return $deserializedData;
+		$serializedData = array();
+		$serializedData = $this->serializeData($unserializedData);
+		return $this->afterSerialize($serializedData, $unserializedData);
 	}
 
 	/**
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
-	 * @param  multi  $json serialized record data
-	 * @param  multi  $data raw record data
+	 * @param multi $serializedData serialized record data
+	 * @param multi $unserializedData raw record data
 	 * @return multi
 	 */
-	public function afterSerialize($json, $record) {
-		return $json;
+	public function afterSerialize($serializedData, $unserializedData) {
+		return $serializedData;
+	}
+
+	/**
+	 * Serializes a CakePHP data array into a jsonapi format array
+	 *
+	 * @param array $unserializedData the unserialized data, typically set in a
+	 * Controller to the View
+	 * @return array
+	 */
+	protected function serializeData($unserializedData) {
+		$serializedData = array();
+
+		foreach ($unserializedData as $key => $record) {
+
+			$className = Inflector::classify($key);
+			$tableName = Inflector::tableize($key);
+
+			if (!empty($record)) {
+				$serializedData[$tableName] = $this->serializeRecord($className, $record);
+			} else {
+				$serializedData[$tableName] = array();
+			}
+		}
+		return $serializedData;
+	}
+
+	/**
+	 * validate that required attributes for a record are present
+	 *
+	 * @param  array $record the data for a record
+	 * @throws SerializerMissingRequiredException If a required attribute is
+	 * missing from record
+	 * @return void
+	 */
+	private function validateSerializedRequiredAttributes($record) {
+		$keysInRecord = array_keys($record);
+		$requiredCheck = array_diff($this->required, $keysInRecord);
+		if (!empty($requiredCheck)) {
+			$missing = join(', ', $requiredCheck);
+			$msg = "The following keys were missing from $this->rootKey: $missing";
+			throw new SerializerMissingRequiredException($msg);
+		}
+	}
+
+	/**
+	 * serialize a record
+	 *
+	 * @param  string $currentClassName the name of the class being operated on
+	 * @param  array $currentRecord    the current record being serialized
+	 * @return array
+	 */
+	protected function serializeRecord($currentClassName, $currentRecord) {
+		$serializedData = array();
+
+		foreach ($currentRecord as $key => $data) {
+			if (is_int($key)) {
+				$serializedData[] = $this->serializeRecord($currentClassName, $data);
+			} else {
+				$methodName = "serialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					$this->validateSerializedRequiredAttributes($currentRecord);
+					// if there exists a method for the current key process it
+					try {
+						$serializedData[$key] = $this->{$methodName}($serializedData, $currentRecord);
+					} catch (SerializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} elseif (is_array($data)) {
+					$classifiedSubModelKey = Inflector::classify($key);
+					$tabelizedSubModelKey = Inflector::tableize($key);
+					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
+					$subModelSerializedData = $Serialization->serialize($classifiedSubModelKey, $recordsToProcess);
+
+					if (is_array($subModelSerializedData)) {
+						$serializedData = $serializedData + $subModelSerializedData;
+					} else {
+						$serializedData[$tabelizedSubModelKey] = $subModelSerializedData;
+					}
+				} else {
+					if (
+						in_array($key, $this->required)
+						|| in_array($key, $this->optional)
+					) {
+						$this->validateSerializedRequiredAttributes($currentRecord);
+						$serializedData[$key] = $data;
+					}
+				}
+			}
+		}
+
+		return $serializedData;
+	}
+
+	/**
+	 * from jsonapi format to CakePHP array
+	 *
+	 * @param array $serializedData the serialized data in jsonapi format
+	 * @return array
+	 */
+	public function deserialize($serializedData = array()) {
+		if (empty($serializedData)) {
+			return $serializedData;
+		}
+		$deserializedData = array();
+
+		$deserializedData = $this->deserializeData($serializedData);
+		return $this->afterDeserialize($deserializedData, $serializedData);
 	}
 
 	/**
 	 * Callback method called after automatic deserialization. Whatever is returned
 	 * from this method will ultimately be used as the Controller->data for cake
 	 *
-	 * @param  multi  $data deserialized record data
-	 * @param  multi  $json json record data
+	 * @param multi $deserializedData the deserialized data
+	 * @param multi $serializedData   the original un-deserialized data
 	 * @return multi
 	 */
-	public function afterDeserialize($data, $json) {
-		return $data;
+	public function afterDeserialize($deserializedData, $serializedData) {
+		return $deserializedData;
 	}
 
 	/**
-	 * Serializes a CakePHP data array into a jsonapi format array
+	 * deserialize an array of serialized data
 	 *
-	 * @throws SerializerMissingRequiredException If a required attribute is missing
-	 * @param Array $record
-	 * @return Array
-	 */
-	protected function serializeRecord($record) {
-		// if there is no data return nothing
-		if (empty($record)) {
-			return;
-		}
-		$required = $this->required;
-		$keys = array_keys($record[$this->rootKey]);
-		$requiredCheck = array_diff($required, $keys);
-		if (!empty($requiredCheck)) {
-			$missing = join(', ', $requiredCheck);
-			$msg = "The following keys were missing from $this->rootKey: $missing";
-			throw new SerializerMissingRequiredException($msg);
-		}
-		$originalOptionals = $this->optional;
-		if (!is_array($originalOptionals)) {
-			$originalOptionals = array();
-		}
-		$optinals = array_intersect($originalOptionals, $keys);
-		$attrs = array_unique(array_merge($required, $optinals));
-		$index = array_fill_keys($attrs, true);
-		$initialData = array();
-		foreach ($record[$this->rootKey] as $key => $value) {
-			if (!ctype_upper($key[0]) && in_array($key, $attrs) ) {
-				$initialData[$key] = $value;
-			}
-		}
-		$others = array_diff($originalOptionals, $attrs);
-		foreach ($others as $key) {
-			$methodName = "serialize_{$key}";
-			if (method_exists($this, $methodName)) {
-				array_push($attrs, $key);
-			}
-		}
-		$data = array_intersect_key($initialData, $index);
-		foreach ($attrs as $key) {
-			$methodName = "serialize_{$key}";
-			if (method_exists($this, $methodName)) {
-				try {
-					$data[$key] = $this->{$methodName}($data, $record);
-				} catch (SerializerIgnoreException $e) {
-					unset($data[$key]);
-				}
-			}
-		}
-		return $this->afterSerialize($data, $record);
-	}
-
-	/**
-	 * deserialize a jsonapi record array
-	 *
-	 * @param  array $record the record passed to the CakeAPI
+	 * @param array $serializedData array of data from the request
 	 * @return array
 	 */
-	protected function deserializeRecord(array $record = array()) {
-		$data = $record;
-		foreach ($record as $key => $value) {
-			$methodName = "deserialize_{$key}";
-			if (method_exists($this, $methodName)) {
-				try {
-					$data[$key] = $this->{$methodName}($data, $record);
-				} catch (DeserializerIgnoreException $e) {
-					unset($data[$key]);
+	protected function deserializeData(array $serializedData = array()) {
+		$deserializedData = array();
+
+		foreach ($serializedData as $key => $record) {
+			// if the key for this record is an int, multiple records
+			$className = Inflector::classify($key);
+			$deserializedData[$className] = $this->deserializeRecord($className, $record);
+		}
+
+		return $deserializedData;
+	}
+
+	/**
+	 * deserialize a record
+	 *
+	 * @param string $currentClassName the current class name being operated on
+	 * @param array $currentRecord     the current record being operated on
+	 * @return array
+	 */
+	protected function deserializeRecord($currentClassName, $currentRecord) {
+		$deserializedData = array();
+
+		foreach ($currentRecord as $key => $data) {
+			if (is_int($key)) {
+				$deserializedData[] = $this->deserializeRecord($currentClassName, $data);
+			} else {
+				$methodName = "deserialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					// if there exists a method for the current key process it
+					try {
+						$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
+					} catch (DeserializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} elseif (is_array($data)) {
+					$classifiedSubModelKey = Inflector::classify($key);
+					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
+					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
+					$deserializedData = $deserializedData + $subModelDeserializedData;
+				} else {
+					$deserializedData[$key] = $data;
 				}
 			}
 		}
 
-		return $this->afterDeserialize($data, $record);
+		return $deserializedData;
 	}
-}
 
+}

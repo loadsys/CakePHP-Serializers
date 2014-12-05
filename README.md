@@ -5,10 +5,14 @@
 An object oriented solution to CakePHP model data serialization to JSON and the
 corresponding deserialization of a JSON payload to CakePHP data arrays.
 
-This is close to production ready however there may be edge
-cases not yet observed.
+This plugin is designed to work with the Ember Data Spec for de/serialization of
+records: http://emberjs.com/guides/models/the-rest-adapter/
 
-## Basics ##
+This is currently not fully production ready - be warned bugs/issues may exist.
+
+## Examples ##
+
+### Simple Cases ###
 
 The basic concept for this plugin is to serialize data when rendering a view:
 
@@ -64,6 +68,236 @@ $this->request->data = array(
 		'first_name' => 'first',
 		'last_name' => 'last',
 		'is_active' => true,
+	)
+);
+```
+
+### Advanced Cases ###
+
+We can serialize both multiple records:
+
+```php
+$data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+	)
+);
+```
+
+into:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+	]
+}
+```
+
+And serialize sub model records, even if there are multiple records:
+
+```php
+$data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				"something" => "blahh",
+			),
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				0 => array(
+					"something" => "teasdf",
+				),
+				1 => array(
+					"something" => "fgdfghdfg",
+				),
+			),
+		),
+	)
+);
+```
+
+into
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": {
+				"something": "blahh",
+			}
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": [
+				{
+					"something": "teasdf",
+				},
+				{
+					"something": "fgdfghdfg",
+				}
+			]
+		},
+	]
+}
+```
+
+The same with deserialize both multiple records:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+	]
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+	)
+);
+```
+
+And deserialize sub model records, even if there are multiple records:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": {
+				"something": "blahh",
+			}
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": [
+				{
+					"something": "teasdf",
+				},
+				{
+					"something": "fgdfghdfg",
+				}
+			]
+		},
+	]
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				"something" => "blahh",
+			),
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				0 => array(
+					"something" => "teasdf",
+				),
+				1 => array(
+					"something" => "fgdfghdfg",
+				),
+			),
+		),
 	)
 );
 ```
@@ -279,10 +513,16 @@ class UserSerializer extends Serializer {
 
 	public $optional = array('email');
 
-	// $json is the seralized json data
-	// $data is the pre-serialized data record for the User
-	public afterSerialize($json, $record) {
-
+	/**
+	 * Callback method called after automatic serialization. Whatever is returned
+	 * from this method will ultimately be used as the JSON response.
+	 *
+	 * @param multi $serializedData serialized record data
+	 * @param multi $unserializedData raw record data
+	 * @return multi
+	 */
+	public function afterSerialize($serializedData, $unserializedData) {
+		return $serializedData;
 	}
 }
 ```
@@ -301,10 +541,16 @@ class UserSerializer extends Serializer {
 
 	public $optional = array('email');
 
-	// $data deserialized record data
-	// $json json record data
-	public afterDeserialize($data, $json) {
-
+	/**
+	 * Callback method called after automatic deserialization. Whatever is returned
+	 * from this method will ultimately be used as the Controller->data for cake
+	 *
+	 * @param  multi $deserializedData the deserialized data
+	 * @param  multi $serializedData   the original un-deserialized data
+	 * @return multi
+	 */
+	public function afterDeserialize($deserializedData, $serializedData) {
+		return $deserializedData;
 	}
 }
 ```

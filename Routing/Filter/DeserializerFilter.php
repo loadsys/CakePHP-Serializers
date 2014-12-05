@@ -22,51 +22,27 @@ class DeserializerFilter extends DispatcherFilter {
 	 *
 	 * We will process the request for the json data and de-serialize it
 	 *
-	 * @param  CakeEvent $event the CakeEvent being triggered
+	 * @param CakeEvent $event the CakeEvent being triggered
 	 * @return void
 	 */
 	public function beforeDispatch(CakeEvent $event) {
 		// get the request data
 		$request = $event->data['request'];
-		$data = $request->input('json_decode');
+		$data = $request->input('json_decode', true);
 
 		if (empty($data)) {
 			$data = array();
 		}
-
-		$data = $this->objectToArray($data);
 		$deserializedData = array();
 
 		foreach ($data as $key => $dataForKey) {
 			$classifiedRootKey = Inflector::classify($key);
 			$Serialization = new Serialization($classifiedRootKey, $data);
 			$dataForKey = $Serialization->deserialize();
-			$deserializedData[$classifiedRootKey] = $dataForKey;
+			$deserializedData = $dataForKey;
 		}
 
 		$request->data = Hash::merge($request->data, $deserializedData);
 	}
 
-	/**
-	 * converts an object to an array
-	 *
-	 * @param  object $obj the object to convert
-	 * @return array
-	 */
-	private function objectToArray($obj) {
-		if (is_object($obj)) {
-			$obj = (array)$obj;
-		}
-
-		if (is_array($obj)) {
-			$new = array();
-			foreach ($obj as $key => $val) {
-				$new[$key] = $this->objectToArray($val);
-			}
-		} else {
-			$new = $obj;
-		}
-
-		return $new;
-	}
 }
