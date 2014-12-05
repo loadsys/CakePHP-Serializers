@@ -16,14 +16,18 @@ class TestSecondLevelUserWithMethodSerializer extends Serializer {
 	public function deserialize_first_name($data, $record) {
 		return 'FIRST';
 	}
+
+	public function serialize_first_name($data, $record) {
+		return 'FIRST';
+	}
 }
 
 class TestCallbackSerializer extends Serializer {
-	public function afterSerialize($json, $record) {
+	public function afterSerialize($serializedData, $unserializedData) {
 		return "after serialize";
 	}
 
-	public function afterDeserialize($data, $json) {
+	public function afterDeserialize($deserializedData, $serializedData) {
 		return "after deserialize";
 	}
 }

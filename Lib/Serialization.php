@@ -44,9 +44,8 @@ class Serialization {
 	 * @return array
 	 */
 	public function serialize() {
-		$data = $this->normalizeDataForSerialization($this->data);
 		$serializer = $this->factoryFor($this->name)->generate();
-		return $serializer->serialize($data);
+		return $serializer->serialize($this->data);
 	}
 
 	/**
@@ -58,19 +57,6 @@ class Serialization {
 	public function deserialize() {
 		$serializer = $this->factoryFor($this->name)->generate();
 		return $serializer->deserialize($this->data);
-	}
-
-	/**
-	 * normalize the data when serializing the data
-	 *
-	 * @param array $data the data to serialize
-	 * @return array
-	 */
-	protected function normalizeDataForSerialization($data) {
-		if (!is_int(key($data))) {
-			$data = array($data);
-		}
-		return $data;
 	}
 
 	/**

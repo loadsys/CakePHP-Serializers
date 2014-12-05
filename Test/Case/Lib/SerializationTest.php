@@ -14,30 +14,13 @@ class SerializationTest extends CakeTestCase {
 			'body' => 'Body1',
 			'summary' => 'Summary',
 		));
-		$expected = array('test_posts' => array(
-			array('title' => 'Title1', 'body' => 'Body1', 'summary' => 'Summary',)
-		));
-		$serialization = new Serialization('TestPost', $data);
-		$this->assertEquals($expected, $serialization->serialize());
-	}
-
-	public function testParsesListOfRecords() {
-		$data = array(
-			array('TestPost' => array(
+		$expected = array('test_posts' =>
+			array(
 				'title' => 'Title1',
 				'body' => 'Body1',
 				'summary' => 'Summary',
-			)),
-			array('TestPost' => array(
-				'title' => 'Title2',
-				'body' => 'Body2',
-				'summary' => 'Summary',
-			))
+			)
 		);
-		$expected = array('test_posts' => array(
-			array('title' => 'Title1', 'body' => 'Body1', 'summary' => 'Summary',),
-			array('title' => 'Title2', 'body' => 'Body2', 'summary' => 'Summary',)
-		));
 		$serialization = new Serialization('TestPost', $data);
 		$this->assertEquals($expected, $serialization->serialize());
 	}

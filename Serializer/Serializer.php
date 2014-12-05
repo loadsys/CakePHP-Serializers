@@ -74,68 +74,107 @@ class Serializer extends Object {
 	 * @param array $data the data to serialize
 	 * @return array
 	 */
-	public function serialize($data = array()) {
-		if (empty($data)) {
-			return $data;
+	public function serialize($unserializedData = array()) {
+		if (empty($unserializedData)) {
+			return $unserializedData;
 		}
-		$rows = array();
-		foreach ($data as $v) {
-			// ensure there is some data being passed to serialize record
-			if (!empty($v)) {
-				$rows[] = $this->serializeRecord($v);
-			}
-		}
-		$key = Inflector::tableize($this->rootKey);
-		return array($key => $rows);
-	}
 
-	/**
-	 * from jsonapi format to CakePHP array
-	 *
-	 * @param array $serializedData the serialized data in jsonapi format
-	 * @return array
-	 */
-	public function deserialize($serializedData = array()) {
-		if (empty($serializedData)) {
-			return $serializedData;
-		}
-		$deserializedData = array();
-
-		$deserializedData = $this->deserializeData($serializedData);
-		return $this->afterDeserialize($deserializedData, $serializedData);
+		$serializedData = array();
+		$serializedData = $this->serializeData($unserializedData);
+		return $this->afterSerialize($serializedData, $unserializedData);
 	}
 
 	/**
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
-	 * @param multi $json serialized record data
-	 * @param multi $record raw record data
+	 * @param multi $serializedData serialized record data
+	 * @param multi $unserializedData raw record data
 	 * @return multi
 	 */
-	public function afterSerialize($json, $record) {
-		return $json;
-	}
-
-	/**
-	 * Callback method called after automatic deserialization. Whatever is returned
-	 * from this method will ultimately be used as the Controller->data for cake
-	 *
-	 * @param multi $deserializedData the deserialized data
-	 * @param multi $serializedData   the original un-deserialized data
-	 * @return multi
-	 */
-	public function afterDeserialize($deserializedData, $serializedData) {
-		return $deserializedData;
+	public function afterSerialize($serializedData, $unserializedData) {
+		return $serializedData;
 	}
 
 	/**
 	 * Serializes a CakePHP data array into a jsonapi format array
 	 *
-	 * @param array $record the record being serialized
-	 * @throws SerializerMissingRequiredException If a required attribute is missing
-	 * @return array
+	 * @param array $unserializedData [description]
+	 * @return [type]                   [description]
 	 */
+	protected function serializeData($unserializedData) {
+		$serializedData = array();
+
+		foreach ($unserializedData as $key => $record) {
+
+			$className = Inflector::classify($key);
+			$tableName = Inflector::tableize($key);
+
+			if (!empty($record)) {
+				$serializedData[$tableName] = $this->serializeRecord($className, $record);
+			} else {
+				$serializedData[$tableName] = array();
+			}
+		}
+		return $serializedData;
+	}
+
+	private function validateSerializedRequiredAttributes($record) {
+		$keysInRecord = array_keys($record);
+		$requiredCheck = array_diff($this->required, $keysInRecord);
+		if (!empty($requiredCheck)) {
+			$missing = join(', ', $requiredCheck);
+			$msg = "The following keys were missing from $this->rootKey: $missing";
+			throw new SerializerMissingRequiredException($msg);
+		}
+	}
+
+	protected function serializeRecord($currentClassName, $currentRecord) {
+		$serializedData = array();
+
+		foreach ($currentRecord as $key => $data) {
+			if (is_int($key)) {
+				$serializedData[] = $this->serializeRecord($currentClassName, $data);
+			} else {
+				$methodName = "serialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					$this->validateSerializedRequiredAttributes($currentRecord);
+					// if there exists a method for the current key process it
+					try {
+						$serializedData[$key] = $this->{$methodName}($serializedData, $currentRecord);
+					} catch (SerializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} elseif (is_array($data)) {
+					$classifiedSubModelKey = Inflector::classify($key);
+					$tabelizedSubModelKey = Inflector::tableize($key);
+					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
+					$subModelSerializedData = $Serialization->serialize($classifiedSubModelKey, $recordsToProcess);
+
+					if (is_array($subModelSerializedData)) {
+						$serializedData = $serializedData + $subModelSerializedData;
+					} else {
+						$serializedData[$tabelizedSubModelKey] = $subModelSerializedData;
+					}
+				} else {
+					if (
+						in_array($key, $this->required)
+						|| in_array($key, $this->optional)
+					) {
+						$this->validateSerializedRequiredAttributes($currentRecord);
+						$serializedData[$key] = $data;
+					}
+				}
+			}
+		}
+
+		return $serializedData;
+	}
+
+	/**
+
 	protected function serializeRecord($record) {
 		// if there is no data return nothing
 		if (empty($record)) {
@@ -181,6 +220,36 @@ class Serializer extends Object {
 			}
 		}
 		return $this->afterSerialize($data, $record);
+	}
+
+	*/
+
+	/**
+	 * from jsonapi format to CakePHP array
+	 *
+	 * @param array $serializedData the serialized data in jsonapi format
+	 * @return array
+	 */
+	public function deserialize($serializedData = array()) {
+		if (empty($serializedData)) {
+			return $serializedData;
+		}
+		$deserializedData = array();
+
+		$deserializedData = $this->deserializeData($serializedData);
+		return $this->afterDeserialize($deserializedData, $serializedData);
+	}
+
+	/**
+	 * Callback method called after automatic deserialization. Whatever is returned
+	 * from this method will ultimately be used as the Controller->data for cake
+	 *
+	 * @param multi $deserializedData the deserialized data
+	 * @param multi $serializedData   the original un-deserialized data
+	 * @return multi
+	 */
+	public function afterDeserialize($deserializedData, $serializedData) {
+		return $deserializedData;
 	}
 
 	/**
