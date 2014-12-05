@@ -174,57 +174,6 @@ class Serializer extends Object {
 	}
 
 	/**
-
-	protected function serializeRecord($record) {
-		// if there is no data return nothing
-		if (empty($record)) {
-			return;
-		}
-		$required = $this->required;
-		$keys = array_keys($record[$this->rootKey]);
-		$requiredCheck = array_diff($required, $keys);
-		if (!empty($requiredCheck)) {
-			$missing = join(', ', $requiredCheck);
-			$msg = "The following keys were missing from $this->rootKey: $missing";
-			throw new SerializerMissingRequiredException($msg);
-		}
-		$originalOptionals = $this->optional;
-		if (!is_array($originalOptionals)) {
-			$originalOptionals = array();
-		}
-		$optinals = array_intersect($originalOptionals, $keys);
-		$attrs = array_unique(array_merge($required, $optinals));
-		$index = array_fill_keys($attrs, true);
-		$initialData = array();
-		foreach ($record[$this->rootKey] as $key => $value) {
-			if (!ctype_upper($key[0]) && in_array($key, $attrs) ) {
-				$initialData[$key] = $value;
-			}
-		}
-		$others = array_diff($originalOptionals, $attrs);
-		foreach ($others as $key) {
-			$methodName = "serialize_{$key}";
-			if (method_exists($this, $methodName)) {
-				array_push($attrs, $key);
-			}
-		}
-		$data = array_intersect_key($initialData, $index);
-		foreach ($attrs as $key) {
-			$methodName = "serialize_{$key}";
-			if (method_exists($this, $methodName)) {
-				try {
-					$data[$key] = $this->{$methodName}($data, $record);
-				} catch (SerializerIgnoreException $e) {
-					unset($data[$key]);
-				}
-			}
-		}
-		return $this->afterSerialize($data, $record);
-	}
-
-	*/
-
-	/**
 	 * from jsonapi format to CakePHP array
 	 *
 	 * @param array $serializedData the serialized data in jsonapi format
