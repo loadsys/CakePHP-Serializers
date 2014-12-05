@@ -79,10 +79,9 @@ class Serializer extends Object {
 			return $unserializedData;
 		}
 
-		$keys = array_keys($unserializedData);
 		$keysAreInts = true;
-		foreach ($keys as $keyValue) {
-			if (!is_int($keyValue)) {
+		foreach ($unserializedData as $key => $row) {
+			if (!is_int($key)) {
 				$keysAreInts = false;
 			}
 		}
@@ -91,12 +90,21 @@ class Serializer extends Object {
 
 		if ($keysAreInts) {
 			foreach ($unserializedData as $key => $row) {
-				$serializedDataForRow = $this->serializeData($row);
-				foreach($serializedDataForRow as $keyForSerializedData => $data) {
-					$serializedData[$keyForSerializedData][] = $data;
+				$className = Inflector::classify($this->rootKey);
+				$tableName = Inflector::tableize($this->rootKey);
+
+				$Serialization = new Serialization($className, $row);
+				$subModelSerializedData = $Serialization->serialize($className, $row);
+				if (is_array($subModelSerializedData)) {
+					foreach($subModelSerializedData as $keyForSerializedData => $serializedRecord) {
+						$serializedData[$keyForSerializedData][] = $serializedRecord;
+					}
+				} else {
+					$serializedData[$tableName] = $subModelSerializedData;
 				}
 			}
 		} else {
+			//debug($unserializedData);
 			$serializedData = $this->serializeData($unserializedData);
 		}
 
@@ -130,10 +138,22 @@ class Serializer extends Object {
 			$className = Inflector::classify($key);
 			$tableName = Inflector::tableize($key);
 
-			if (!empty($record)) {
-				$serializedData[$tableName] = $this->serializeRecord($className, $record);
+			if($className !== $this->rootKey) {
+				$recordsToProcess[$className] = $unserializedData[$key];
+				$Serialization = new Serialization($className, $recordsToProcess);
+				$subModelSerializedData = $Serialization->serialize($className, $recordsToProcess);
+
+				if (is_array($subModelSerializedData)) {
+					$serializedData = $serializedData + $subModelSerializedData;
+				} else {
+					$serializedData[$tableName] = $subModelSerializedData;
+				}
 			} else {
-				$serializedData[$tableName] = array();
+				if (!empty($record)) {
+					$serializedData[$tableName] = $this->serializeRecord($className, $record);
+				} else {
+					$serializedData[$tableName] = array();
+				}
 			}
 		}
 		return $serializedData;
