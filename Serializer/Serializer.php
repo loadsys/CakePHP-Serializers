@@ -99,8 +99,9 @@ class Serializer extends Object {
 	/**
 	 * Serializes a CakePHP data array into a jsonapi format array
 	 *
-	 * @param array $unserializedData [description]
-	 * @return [type]                   [description]
+	 * @param array $unserializedData the unserialized data, typically set in a
+	 * Controller to the View
+	 * @return array
 	 */
 	protected function serializeData($unserializedData) {
 		$serializedData = array();
@@ -119,6 +120,14 @@ class Serializer extends Object {
 		return $serializedData;
 	}
 
+	/**
+	 * validate that required attributes for a record are present
+	 *
+	 * @param  array $record the data for a record
+	 * @throws SerializerMissingRequiredException If a required attribute is
+	 * missing from record
+	 * @return void
+	 */
 	private function validateSerializedRequiredAttributes($record) {
 		$keysInRecord = array_keys($record);
 		$requiredCheck = array_diff($this->required, $keysInRecord);
@@ -129,6 +138,13 @@ class Serializer extends Object {
 		}
 	}
 
+	/**
+	 * serialize a record
+	 *
+	 * @param  string $currentClassName the name of the class being operated on
+	 * @param  array $currentRecord    the current record being serialized
+	 * @return array
+	 */
 	protected function serializeRecord($currentClassName, $currentRecord) {
 		$serializedData = array();
 
