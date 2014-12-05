@@ -74,8 +74,121 @@ $this->request->data = array(
 
 ### Advanced Cases ###
 
+We can serialize both multiple records:
 
-We can also deserialize both multiple records:
+```php
+$data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+		),
+	)
+);
+```
+
+into:
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+		},
+	]
+}
+```
+
+And serialize sub model records, even if there are multiple records:
+
+```php
+$data = array(
+	'User' => array(
+		0 => array(
+			'id' => 1,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				"something" => "blahh",
+			),
+		),
+		1 => array(
+			'id' => 2,
+			'username' => 'testusername',
+			'first_name' => 'first',
+			'last_name' => 'last',
+			'is_active' => true,
+			'SecondaryModel' => array(
+				0 => array(
+					"something" => "teasdf",
+				),
+				1 => array(
+					"something" => "fgdfghdfg",
+				),
+			),
+		),
+	)
+);
+```
+
+into
+
+```javascript
+{
+	"users": [
+		{
+			"id" => 1,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": {
+				"something": "blahh",
+			}
+		},
+		{
+			"id" => 2,
+			"username" => "testusername",
+			"first_name" => "first",
+			"last_name" => "last",
+			"is_active" => true,
+			"secondary_models": [
+				{
+					"something": "teasdf",
+				},
+				{
+					"something": "fgdfghdfg",
+				}
+			]
+		},
+	]
+}
+```
+
+The same with deserialize both multiple records:
 
 ```javascript
 {
@@ -404,12 +517,12 @@ class UserSerializer extends Serializer {
 	 * Callback method called after automatic serialization. Whatever is returned
 	 * from this method will ultimately be used as the JSON response.
 	 *
-	 * @param multi $json serialized record data
-	 * @param multi $record raw record data
+	 * @param multi $serializedData serialized record data
+	 * @param multi $unserializedData raw record data
 	 * @return multi
 	 */
-	public function afterSerialize($json, $record) {
-		return $json;
+	public function afterSerialize($serializedData, $unserializedData) {
+		return $serializedData;
 	}
 }
 ```
