@@ -447,4 +447,134 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
+	public function testSerializeMultiplePrimaryRecordsAsFromPaginate() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$inputData = array(
+			0 => array(
+				'TestUser' => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				)
+			),
+			1 => array(
+				'TestUser' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				)
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
+	public function testSerializeMultiplePrimaryRecordsWithSubRecordsAsFromPaginate() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'test_second_level_users' => array(
+						'first_name' => 'Someone',
+						'last_name' => 'THings',
+					),
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+					'test_second_level_users' => array(
+						'first_name' => 'Random',
+						'last_name' => 'Person',
+					),
+				),
+			),
+		);
+		$inputData = array(
+			0 => array(
+				'TestUser' => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+					'TestSecondLevelUser' => array(
+						'first_name' => 'Someone',
+						'last_name' => 'THings',
+					),
+				)
+			),
+			1 => array(
+				'TestUser' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+					'TestSecondLevelUser' => array(
+						'first_name' => 'Random',
+						'last_name' => 'Person',
+					),
+				)
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
+	public function testSerializeMultiplePrimaryRecordsWithMultipleTopLevelModelsAsFromPaginate() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+			'test_second_level_users' => array(
+				0 => array(
+					'first_name' => 'Someone',
+					'last_name' => 'THings',
+				),
+				1 => array(
+					'first_name' => 'Random',
+					'last_name' => 'Person',
+				),
+			),
+		);
+		$inputData = array(
+			0 => array(
+				'TestUser' => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				'TestSecondLevelUser' => array(
+					'first_name' => 'Someone',
+					'last_name' => 'THings',
+				),
+			),
+			1 => array(
+				'TestUser' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+				'TestSecondLevelUser' => array(
+					'first_name' => 'Random',
+					'last_name' => 'Person',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
 }

@@ -79,8 +79,27 @@ class Serializer extends Object {
 			return $unserializedData;
 		}
 
+		$keys = array_keys($unserializedData);
+		$keysAreInts = true;
+		foreach ($keys as $keyValue) {
+			if (!is_int($keyValue)) {
+				$keysAreInts = false;
+			}
+		}
+
 		$serializedData = array();
-		$serializedData = $this->serializeData($unserializedData);
+
+		if ($keysAreInts) {
+			foreach ($unserializedData as $key => $row) {
+				$serializedDataForRow = $this->serializeData($row);
+				foreach($serializedDataForRow as $keyForSerializedData => $data) {
+					$serializedData[$keyForSerializedData][] = $data;
+				}
+			}
+		} else {
+			$serializedData = $this->serializeData($unserializedData);
+		}
+
 		return $this->afterSerialize($serializedData, $unserializedData);
 	}
 
