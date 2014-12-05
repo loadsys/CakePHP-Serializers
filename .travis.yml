@@ -78,5 +78,16 @@ before_script:
 script:
   - ./lib/Cake/Console/cake test Serializers AllSerializers --stderr
 
+
+# After a Successful Build
+after_success:
+
+# After a Failed Build
+after_failure:
+
+# After every Build
+after_script:
+
+# Notifications Settings
 notifications:
   email: false
