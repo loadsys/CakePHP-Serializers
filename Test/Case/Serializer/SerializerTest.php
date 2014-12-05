@@ -447,6 +447,52 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
+	public function testSerializeSinglePrimaryRecordsWithMultipleSubRecords() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
 	public function testSerializeMultiplePrimaryRecordsAsFromPaginate() {
 		$expectedOutput = array(
 			'test_users' =>
@@ -575,6 +621,144 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
+	public function testSerializeMultiplePrimaryRecordsWithMultipleRecords() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'test_second_level_users' => array(
+				0 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+				2 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Ipsum',
+				),
+			),
+		);
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'TestSecondLevelUser' => array(
+				0 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+				2 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Ipsum',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
+	public function testMissingRequiredAttributeOnSecondaryModelRecord() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'TestSecondLevelUser' => array(
+				0 => array(
+					'last_name' => 'Smith',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+				2 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Ipsum',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSecondLevelUser: first_name"
+		);
+		$serializer->serialize($inputData);
+	}
+
+	public function testMissingRequiredAttributeOnSubModelRecord() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+					0 => array(
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSecondLevelUser: first_name"
+		);
+		$serializer->serialize($inputData);
+	}
+
+	public function testMissingRequiredAttributeOnSecondaryModelRecordWithASingleRecord() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'TestSecondLevelDifferentClass' => array(
+				'name' => 'Smith',
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSecondLevelDifferentClass: id"
+		);
+		$serializer->serialize($inputData);
+	}
+
+	public function testMissingRequiredAttributeOnSubModelRecordWithASingleRecord() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelDifferentClass' => array(
+					'name' => 'Smith',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSecondLevelDifferentClass: id"
+		);
+		$serializer->serialize($inputData);
 	}
 
 }

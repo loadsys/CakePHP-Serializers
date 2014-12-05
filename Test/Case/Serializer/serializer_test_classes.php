@@ -22,6 +22,10 @@ class TestSecondLevelUserWithMethodSerializer extends Serializer {
 	}
 }
 
+class TestSecondLevelDifferentClassSerializer extends Serializer {
+	public $required = array('id', 'name');
+}
+
 class TestCallbackSerializer extends Serializer {
 	public function afterSerialize($serializedData, $unserializedData) {
 		return "after serialize";
