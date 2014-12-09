@@ -68,6 +68,11 @@ class Serializer extends Object {
 		}
 	}
 
+	public function serializeModel($modelName, $dataForModel) {
+		$Serialization = new Serialization($modelName, $dataForModel);
+		return $Serialization->serialize($modelName, $dataForModel);
+	}
+
 	/**
 	 * Convert the supplied normalized data array to jsonapi format.
 	 *
@@ -79,36 +84,196 @@ class Serializer extends Object {
 			return $unserializedData;
 		}
 
-		$keysAreInts = true;
-		foreach ($unserializedData as $key => $row) {
-			if (!is_int($key)) {
-				$keysAreInts = false;
-			}
-		}
-
-		$serializedData = array();
-
-		if ($keysAreInts) {
-			foreach ($unserializedData as $key => $row) {
-				$className = Inflector::classify($this->rootKey);
-				$tableName = Inflector::tableize($this->rootKey);
-
-				$Serialization = new Serialization($className, $row);
-				$subModelSerializedData = $Serialization->serialize($className, $row);
-				if (is_array($subModelSerializedData)) {
-					foreach($subModelSerializedData as $keyForSerializedData => $serializedRecord) {
-						$serializedData[$keyForSerializedData][] = $serializedRecord;
-					}
-				} else {
-					$serializedData[$tableName] = $subModelSerializedData;
-				}
-			}
+		// Might be multiple hasMany records, or a single hasOne or belongsTo record.
+		if (isset($unserializedData[$this->rootKey]) && !empty($unserializedData[$this->rootKey])) {
+			$serializedData = $this->_convertAssociated($this->rootKey, $unserializedData);
+		} elseif (!isset($unserializedData[$this->rootKey])) {
+			$serializedData = $this->_convertMany($this->rootKey, $unserializedData);
 		} else {
-			//debug($unserializedData);
-			$serializedData = $this->serializeData($unserializedData);
+			$serializedData = array();
 		}
+
+		$serializedData = array(
+			Inflector::tableize($this->rootKey) => $serializedData,
+		);
 
 		return $this->afterSerialize($serializedData, $unserializedData);
+	}
+
+	/**
+	 * Convert data from a find('all') style query by converting each indexed result.
+	 *
+	 * @param	string	$modelName	The Model->alias name on which the find was performed.
+	 * @param	array	$data		Numerically indexed results from a find('all') query.
+	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function _convertMany($modelName, $data) {
+		if (empty($data)) {
+			return $data;
+		}
+
+		$jsonData = array();
+		foreach ($data as $index => $record) {
+			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
+			if (isset($record[$modelName])) {
+				$jsonData[$index] = $this->_convertAssociated($modelName, $record);
+			} else {
+				$jsonData[$index] = $this->_convertSingle($index, $record);
+			}
+		}
+
+		if (count($jsonData) === 1) {
+			$jsonData = array_pop($jsonData);
+		}
+
+		return $jsonData;
+	}
+
+	/**
+	 * Convert data from a find('first') style query. Transforms adjacent
+	 * [RelatedModel] keys into properties containing indexed arrays of
+	 * sub-records.
+	 *
+	 * Sample input:
+	 *
+	 * 	array(
+	 * 		'ResinLot' => array(
+	 * 			'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 			'resin_product_id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 			'name' => 'Lot 1',
+	 * 			'date_received' => '2014-10-17',
+	 * 			'ResinTest' => array('name' => 'whatever'),
+	 * 		),
+	 * 		'ResinProduct' => array(
+	 * 			'id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 			'name' => 'Product 1',
+	 * 		),
+	 * 	);
+	 *
+	 * Sample output:
+	 *
+	 * 	array(
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'resin_products' => array(
+	 * 			0 => array(
+	 * 				'id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 				'name' => 'Product 1',
+	 * 			),
+	 * 		),
+	 * 	);
+	 *
+	 *
+	 * @param	string	$modelName	The Model->alias name on which the find was performed.
+	 * @param	array	$data		A record as produced by a find('first') query.
+	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function _convertAssociated($primaryModel, $data) {
+		// Prime the record with the primary model's data.
+		$jsonData = $this->_convertSingle($primaryModel, $data[$primaryModel]);
+		unset($data[$primaryModel]);
+
+		// For all other top-level associations, add them as sub-keys to the primary.
+		foreach ($data as $modelName => $records) {
+			$jsonModelName = Inflector::tableize($modelName);
+
+			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
+			if (array_key_exists(0, $data[$modelName])) {
+				$jsonData = array_merge($jsonData, $this->_convertMany($modelName, $data[$modelName]));
+			} else {
+				$single = $this->_convertSingle($modelName, $data[$modelName]);
+				if (!empty($single)) {
+					$jsonData[$jsonModelName][] = $single;
+				} else {
+					$jsonData[$jsonModelName] = array(); // Just initialize the subkey.
+				}
+				if (count($jsonData[$jsonModelName])) {
+					$jsonData[$jsonModelName] = array_pop($jsonData[$jsonModelName]);
+				}
+			}
+		}
+
+		return $jsonData;
+	}
+
+	/**
+	 * Convert data from a single Cake model record.
+	 *
+	 * Sample input:
+	 *
+	 * 	array( // ResinLot
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'resin_product_id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'date_received' => '2014-10-17',
+	 * 		'ResinLotCertificate' => array(
+	 * 			0 => array(
+	 * 				'id' => 'abcde',
+	 * 				'value' => '42',
+	 * 		 	),
+	 * 		 ),
+	 * 	);
+	 *
+	 * Sample output:
+	 *
+	 * 	array(
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'resin_lot_certificates' => array(
+	 * 			0 => array(
+	 * 				'id' => 'abcde',
+	 * 				'value' => '42',
+	 * 			),
+	 * 	);
+	 *
+	 *
+	 * @param	string	$modelName	The Model->alias name on which the find was performed.
+	 * @param	array	$data		A record as produced by a find('first') query.
+	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function _convertSingle($modelName, $data) {
+		$jsonData = $this->convertFields($data);
+
+		// Process any nested arrays.
+		foreach ($data as $key => $value) {
+			if (is_array($value)) {
+				if (array_key_exists(0, $data[$key])) {
+					$jsonData = array_merge($jsonData, $this->_convertMany($key, $value));
+				} else {
+					$jsonData[Inflector::tableize($key)][] = $this->_convertSingle($key, $value);
+				}
+			}
+		}
+		foreach ($jsonData as $key => $val) {
+			if (is_array($val) && count($val) === 1 && array_key_exists(0, $val)) {
+				$jsonData[$key] = array_pop($val);
+			}
+		}
+
+		return $jsonData;
+	}
+
+	protected function convertFields($data) {
+		$this->validateSerializedRequiredAttributes($data);
+		$whitelistFields = array_merge($this->required, $this->optional);
+
+		$jsonData = array();
+		foreach ($whitelistFields as $key ) {
+			if (isset($data[$key])) {
+				$methodName = "serialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					try {
+						$jsonData[$key] = $this->{$methodName}($data, $data[$key]);
+					} catch (SerializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} else {
+					$jsonData[$key] = $data[$key];
+				}
+			}
+		}
+		return $jsonData;
 	}
 
 	/**
@@ -131,6 +296,8 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	protected function serializeData($unserializedData) {
+
+		/*
 		$serializedData = array();
 
 		foreach ($unserializedData as $key => $record) {
@@ -157,6 +324,7 @@ class Serializer extends Object {
 			}
 		}
 		return $serializedData;
+		*/
 	}
 
 	/**
@@ -185,6 +353,7 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	protected function serializeRecord($currentClassName, $currentRecord) {
+		/*
 		$serializedData = array();
 
 		foreach ($currentRecord as $key => $data) {
@@ -226,6 +395,7 @@ class Serializer extends Object {
 		}
 
 		return $serializedData;
+		*/
 	}
 
 	/**

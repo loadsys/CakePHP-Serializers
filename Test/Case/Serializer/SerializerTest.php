@@ -237,6 +237,69 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
+	public function testSerializeRelatedRecordsSingleSecondaryASD() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'TestSecondLevelUser' => array(
+				'first_name' => 'Jane',
+				'last_name' => 'Smith',
+			),
+		);
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					'first_name' => 'Jane', 'last_name' => 'Smith',
+				),
+			),
+		);
+
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
+	public function testSerializeRelatedRecordsMultipleSecondary() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+			'TestSecondLevelUser' => array(
+				0 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					0 => array(
+						'first_name' => 'Jane', 'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane', 'last_name' => 'Text',
+					),
+				),
+			),
+		);
+
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
 	public function testSerializeTwoSubModelRecords() {
 		$inputData = array(
 			'TestUser' => array(
@@ -254,9 +317,9 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
+
 		$expectedOutput = array(
-			'test_users' =>
-			array(
+			'test_users' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_users' => array(
@@ -575,25 +638,22 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeMultiplePrimaryRecordsWithMultipleTopLevelModelsAsFromPaginate() {
 		$expectedOutput = array(
-			'test_users' =>
-			array(
+			'test_users' => array(
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
+					'test_second_level_users' => array(
+						'first_name' => 'Someone',
+						'last_name' => 'THings',
+					),
 				),
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-				),
-			),
-			'test_second_level_users' => array(
-				0 => array(
-					'first_name' => 'Someone',
-					'last_name' => 'THings',
-				),
-				1 => array(
-					'first_name' => 'Random',
-					'last_name' => 'Person',
+					'test_second_level_users' => array(
+						'first_name' => 'Random',
+						'last_name' => 'Person',
+					),
 				),
 			),
 		);
@@ -625,23 +685,22 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeMultiplePrimaryRecordsWithMultipleRecords() {
 		$expectedOutput = array(
-			'test_users' =>
-			array(
+			'test_users' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-			),
-			'test_second_level_users' => array(
-				0 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Smith',
-				),
-				1 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Text',
-				),
-				2 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Ipsum',
+				'test_second_level_users' => array(
+					0 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
 				),
 			),
 		);
