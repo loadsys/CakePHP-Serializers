@@ -119,8 +119,15 @@ class Serializer extends Object {
 		}
 
 		// assign the serialized data to the tableized model name array
+		$jsonKey = Inflector::tableize($this->rootKey);
+		if (
+			!array_key_exists(0, $serializedData)
+		) {
+			$jsonKey = Inflector::singularize($jsonKey);
+		}
+
 		$serializedData = array(
-			Inflector::tableize($this->rootKey) => $serializedData,
+			$jsonKey => $serializedData,
 		);
 
 		return $this->afterSerialize($serializedData, $unserializedData);
@@ -368,10 +375,14 @@ class Serializer extends Object {
 	protected function deserializeData(array $serializedData = array()) {
 		$deserializedData = array();
 
-		foreach ($serializedData as $key => $record) {
-			// if the key for this record is an int, multiple records
-			$className = Inflector::classify($key);
-			$deserializedData[$className] = $this->deserializeRecord($className, $record);
+		$className = Inflector::classify($this->rootKey);
+		$tableizedName = Inflector::tableize($this->rootKey);
+		$singularizedTableName = Inflector::singularize($tableizedName);
+
+		if (array_key_exists($tableizedName, $serializedData)) {
+			$deserializedData[$className] = $this->deserializeRecord($className, $serializedData[$tableizedName]);
+		} elseif (array_key_exists($singularizedTableName, $serializedData)) {
+			$deserializedData[$className] = $this->deserializeRecord($className, $serializedData[$singularizedTableName]);
 		}
 
 		return $deserializedData;
@@ -402,7 +413,8 @@ class Serializer extends Object {
 					}
 				} elseif (is_array($data)) {
 					$classifiedSubModelKey = Inflector::classify($key);
-					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$tableizedName = Inflector::tableize($key);
+					$recordsToProcess[$tableizedName] = $currentRecord[$key];
 					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
 					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
 					$deserializedData = $deserializedData + $subModelDeserializedData;

@@ -14,7 +14,7 @@ class SerializationTest extends CakeTestCase {
 			'body' => 'Body1',
 			'summary' => 'Summary',
 		));
-		$expected = array('test_posts' =>
+		$expected = array('test_post' =>
 			array(
 				'title' => 'Title1',
 				'body' => 'Body1',

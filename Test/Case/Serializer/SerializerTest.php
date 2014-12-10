@@ -22,7 +22,7 @@ class SerializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$expected = array(
-			'test_users' => array(
+			'test_user' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe'
 			)
@@ -43,7 +43,7 @@ class SerializerTest extends CakeTestCase {
 			'TestUser' => array()
 		);
 		$serializer = new TestUserSerializer();
-		$expected = array('test_users' => array(
+		$expected = array('test_user' => array(
 		));
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
@@ -77,7 +77,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestBadOptionalSerializer();
-		$expected = array('test_bad_optionals' => array(
+		$expected = array('test_bad_optional' => array(
 			'title' => 'Title',
 			'body' => 'Body',
 		));
@@ -102,7 +102,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optionals' => array(
+		$expected = array('test_optional' => array(
 			'title' => 'Title',
 			'body' => 'BODY',
 			'summary' => 'SUMMARY',
@@ -119,7 +119,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optionals' => array(
+		$expected = array('test_optional' => array(
 			'title' => 'Title',
 			'body' => 'BODY',
 		));
@@ -136,7 +136,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optionals' => array(
+		$expected = array('test_optional' => array(
 			'title' => 'Title',
 			'body' => 'BODY',
 			'published' => true
@@ -154,7 +154,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optionals' => array(
+		$expected = array('test_method_optional' => array(
 			'title' => 'Title',
 			'body' => 'Body',
 			'published' => true,
@@ -172,7 +172,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optionals' => array(
+		$expected = array('test_method_optional' => array(
 				'title' => 'Title',
 				'body' => 'Body',
 				'published' => true,
@@ -189,7 +189,7 @@ class SerializerTest extends CakeTestCase {
 			)
 		);
 		$serializer = new TestIgnoreSerializer();
-		$expected = array('test_ignores' => array(
+		$expected = array('test_ignore' => array(
 			'title' => 'Title',
 			'body' => 'Body',
 		));
@@ -208,11 +208,11 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_users' => array(
+				'test_second_level_user' => array(
 					'first_name' => 'Jane', 'last_name' => 'Doe',
 				),
 			),
@@ -223,11 +223,11 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeSubModelRecordsWithAttributeMethod() {
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user_with_methods' => array(
+				'test_second_level_user_with_method' => array(
 					'first_name' => 'FIRST',
 					'last_name' => 'Doe',
 				),
@@ -259,11 +259,11 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_users' => array(
+				'test_second_level_user' => array(
 					'first_name' => 'Jane', 'last_name' => 'Smith',
 				),
 			),
@@ -291,7 +291,7 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -329,7 +329,7 @@ class SerializerTest extends CakeTestCase {
 		);
 
 		$expectedOutput = array(
-			'test_users' => array(
+			'test_user' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_users' => array(
@@ -369,7 +369,7 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -431,7 +431,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_users' => array(
+					'test_second_level_user' => array(
 						'first_name' => 'Jane',
 						'last_name' => 'Ipsum',
 					),
@@ -522,7 +522,7 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeSinglePrimaryRecordsWithMultipleSubRecords() {
 		$expectedOutput = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
@@ -605,7 +605,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_users' => array(
+					'test_second_level_user' => array(
 						'first_name' => 'Someone',
 						'last_name' => 'THings',
 					),
@@ -613,7 +613,7 @@ class SerializerTest extends CakeTestCase {
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_users' => array(
+					'test_second_level_user' => array(
 						'first_name' => 'Random',
 						'last_name' => 'Person',
 					),
@@ -652,7 +652,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_users' => array(
+					'test_second_level_user' => array(
 						'first_name' => 'Someone',
 						'last_name' => 'THings',
 					),
@@ -660,7 +660,7 @@ class SerializerTest extends CakeTestCase {
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_users' => array(
+					'test_second_level_user' => array(
 						'first_name' => 'Random',
 						'last_name' => 'Person',
 					),
@@ -695,7 +695,7 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeMultiplePrimaryRecordsWithMultipleRecords() {
 		$expectedOutput = array(
-			'test_users' => array(
+			'test_user' => array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_users' => array(
