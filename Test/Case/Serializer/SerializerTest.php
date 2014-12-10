@@ -221,6 +221,28 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
+	public function testSerializeSubModelRecordWithNoData() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+				),
+			),
+		);
+		$expectedOutput = array(
+			'test_user' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_user' => array(
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+	}
+
 	public function testSerializeSubModelRecordsWithAttributeMethod() {
 		$expectedOutput = array(
 			'test_user' =>
