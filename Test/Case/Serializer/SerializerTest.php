@@ -239,7 +239,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testSerializeRelatedRecordsSingleSecondaryASD() {
+	public function testSerializeRelatedRecordsSingleSecondary() {
 		$inputData = array(
 			'TestUser' => array(
 				'first_name' => 'John',
@@ -386,7 +386,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testSerializeMultiplePrimaryRecordsfgghjkjghj() {
+	public function testSerializeMultiplePrimaryRecords() {
 		$expectedOutput = array(
 			'test_users' =>
 			array(
