@@ -86,13 +86,14 @@ class CakeSerializerView extends View {
 	 *
 	 * @return bool
 	 */
-	protected function controllerRenderAsPropertyExists($type = 'json') {
+	protected function controllerRenderAsPropertyExists() {
 		return property_exists($this->controller, 'renderAs');
 	}
 
 	/**
 	 * determines if the renderAs property for the controller is set to json
 	 *
+	 * @param string $type the value of renderAs we wish to ensure is matched
 	 * @return bool
 	 */
 	protected function checkControllerRenderAs($type = 'json') {
@@ -102,6 +103,7 @@ class CakeSerializerView extends View {
 	/**
 	 * sets the data and name of for the view vars to serialize
 	 *
+	 * @param array arg any additional arguments to append to data
 	 * @return bool
 	 */
 	protected function parseNameAndData($arg = null) {
