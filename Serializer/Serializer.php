@@ -85,9 +85,21 @@ class Serializer extends Object {
 		}
 
 		// Might be multiple hasMany records, or a single hasOne or belongsTo record.
-		if (isset($unserializedData[$this->rootKey]) && !empty($unserializedData[$this->rootKey])) {
+		if (
+			isset($unserializedData[$this->rootKey])
+			&& !empty($unserializedData[$this->rootKey])
+			&& !array_key_exists(0, $unserializedData[$this->rootKey])
+		) {
 			$serializedData = $this->_convertAssociated($this->rootKey, $unserializedData);
-		} elseif (!isset($unserializedData[$this->rootKey])) {
+		} elseif (
+			isset($unserializedData[$this->rootKey])
+			&& array_key_exists(0, $unserializedData[$this->rootKey])
+		) {
+			$serializedData = $this->_convertMany($this->rootKey, $unserializedData[$this->rootKey]);
+		} elseif (
+			!isset($unserializedData[$this->rootKey])
+			&& array_key_exists(0, $unserializedData)
+		) {
 			$serializedData = $this->_convertMany($this->rootKey, $unserializedData);
 		} else {
 			$serializedData = array();
@@ -177,19 +189,11 @@ class Serializer extends Object {
 		foreach ($data as $modelName => $records) {
 			$jsonModelName = Inflector::tableize($modelName);
 
-			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
 			if (array_key_exists(0, $data[$modelName])) {
-				$jsonData = array_merge($jsonData, $this->_convertMany($modelName, $data[$modelName]));
+				$jsonData = array_merge($jsonData, $this->serializeModel($modelName, $data));
 			} else {
-				$single = $this->_convertSingle($modelName, $data[$modelName]);
-				if (!empty($single)) {
-					$jsonData[$jsonModelName][] = $single;
-				} else {
-					$jsonData[$jsonModelName] = array(); // Just initialize the subkey.
-				}
-				if (count($jsonData[$jsonModelName])) {
-					$jsonData[$jsonModelName] = array_pop($jsonData[$jsonModelName]);
-				}
+				$recordsForSubModel = array($modelName => $records);
+				$jsonData = array_merge($jsonData, $this->serializeModel($modelName, $recordsForSubModel));
 			}
 		}
 
@@ -238,9 +242,11 @@ class Serializer extends Object {
 		foreach ($data as $key => $value) {
 			if (is_array($value)) {
 				if (array_key_exists(0, $data[$key])) {
-					$jsonData = array_merge($jsonData, $this->_convertMany($key, $value));
+					$jsonData = array_merge($jsonData, $this->serializeModel($key, $value));
 				} else {
-					$jsonData[Inflector::tableize($key)][] = $this->_convertSingle($key, $value);
+					$recordsForSubModel[$key] = $value;
+					$jsonData = array_merge($jsonData, $this->serializeModel($key, $recordsForSubModel));
+					/*$this->_convertSingle($key, $value)*/;
 				}
 			}
 		}
@@ -254,9 +260,7 @@ class Serializer extends Object {
 	}
 
 	protected function convertFields($data) {
-		$this->validateSerializedRequiredAttributes($data);
-		$whitelistFields = array_merge($this->required, $this->optional);
-
+		$whitelistFields = array_merge((array) $this->required, (array) $this->optional);
 		$jsonData = array();
 		foreach ($whitelistFields as $key ) {
 			if (isset($data[$key])) {
@@ -273,6 +277,7 @@ class Serializer extends Object {
 				}
 			}
 		}
+		$this->validateSerializedRequiredAttributes($jsonData);
 		return $jsonData;
 	}
 

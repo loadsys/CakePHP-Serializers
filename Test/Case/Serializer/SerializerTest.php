@@ -51,7 +51,9 @@ class SerializerTest extends CakeTestCase {
 
 	public function testMissingRequiredAttribute() {
 		$data = array(
-			array('TestUser' => array('first_name' => 'John'))
+			'TestUser' => array(
+				'first_name' => 'John'
+			)
 		);
 		$serializer = new TestUserSerializer();
 		$this->setExpectedException(
@@ -384,7 +386,7 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
 	}
 
-	public function testSerializeMultiplePrimaryRecords() {
+	public function testSerializeMultiplePrimaryRecordsfgghjkjghj() {
 		$expectedOutput = array(
 			'test_users' =>
 			array(
