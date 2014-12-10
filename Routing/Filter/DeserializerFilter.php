@@ -30,19 +30,30 @@ class DeserializerFilter extends DispatcherFilter {
 		$request = $event->data['request'];
 		$data = $request->input('json_decode', true);
 
+		// if the data is empty, set to an empty array
 		if (empty($data)) {
 			$data = array();
 		}
-		$deserializedData = array();
 
+		$deserializedData = array();
 		foreach ($data as $key => $dataForKey) {
-			$classifiedRootKey = Inflector::classify($key);
-			$Serialization = new Serialization($classifiedRootKey, $data);
-			$dataForKey = $Serialization->deserialize();
-			$deserializedData = $dataForKey;
+			$deserializedData = $this->deserializePostData($key, $data);
 		}
 
+		// merge the arrays of the deserialized data and request data
 		$request->data = Hash::merge($request->data, $deserializedData);
+	}
+
+	/**
+	 * call out to the Serializer as needed
+	 *
+	 * @param  string $key  the name of the model being serialized
+	 * @param  array  $data the request data
+	 * @return array        the deserialized data
+	 */
+	protected function deserializePostData($key, $data) {
+		$Serialization = new Serialization(Inflector::classify($key), $data);
+		return $Serialization->deserialize();
 	}
 
 }
