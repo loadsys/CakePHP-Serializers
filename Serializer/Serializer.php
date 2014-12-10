@@ -118,6 +118,7 @@ class Serializer extends Object {
 			$serializedData = array();
 		}
 
+		// assign the serialized data to the tableized model name array
 		$serializedData = array(
 			Inflector::tableize($this->rootKey) => $serializedData,
 		);
