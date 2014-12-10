@@ -136,15 +136,11 @@ class Serializer extends Object {
 	/**
 	 * Convert data from a find('all') style query by converting each indexed result.
 	 *
-	 * @param	string	$modelName	The Model->alias name on which the find was performed.
-	 * @param	array	$data		Numerically indexed results from a find('all') query.
-	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 * @param  string $modelName The Model->alias name on which the find was performed.
+	 * @param  array $data       Numerically indexed results from a find('all') query.
+	 * @return array             Transformed data in an array that can conforms to JSON API.
 	 */
 	protected function _convertMany($modelName, $data) {
-		if (empty($data)) {
-			return $data;
-		}
-
 		$jsonData = array();
 		foreach ($data as $index => $record) {
 			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
@@ -268,11 +264,6 @@ class Serializer extends Object {
 					$recordsForSubModel = array($key => $value);
 					$jsonData = array_merge($jsonData, $this->serializeModel($key, $recordsForSubModel));
 				}
-			}
-		}
-		foreach ($jsonData as $key => $val) {
-			if (is_array($val) && count($val) === 1 && array_key_exists(0, $val)) {
-				$jsonData[$key] = array_pop($val);
 			}
 		}
 
