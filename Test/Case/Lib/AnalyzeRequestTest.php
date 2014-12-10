@@ -1,8 +1,11 @@
 <?php
-
+/**
+ * AnalyzeRequestTest
+ */
 App::uses('AnalyzeRequest', 'Serializers.Lib');
 
 class AnalyzeRequestTest extends CakeTestCase {
+
 	public $analyzer;
 
 	public function setUp() {
@@ -17,18 +20,18 @@ class AnalyzeRequestTest extends CakeTestCase {
 
 	public function testIsJsonTrueWhenRequestContentTypeIsAJsonType() {
 		$this->request
-		     ->expects($this->once())
-		     ->method('header')
-		     ->with($this->equalTo('Content-Type'))
-		     ->will($this->returnValue('application/json'));
+			->expects($this->once())
+			->method('header')
+			->with($this->equalTo('Content-Type'))
+			->will($this->returnValue('application/json'));
 		$this->assertTrue($this->analyzer->isJson());
 	}
 
 	public function testIsJsonTrueWhenRequestAcceptsHeaderIsAJsonType() {
 		$this->request
-		     ->expects($this->once())
-		     ->method('accepts')
-		     ->will($this->returnValue(array('application/json')));
+			->expects($this->once())
+			->method('accepts')
+			->will($this->returnValue(array('application/json')));
 		$this->assertTrue($this->analyzer->isJson());
 	}
 
@@ -39,14 +42,14 @@ class AnalyzeRequestTest extends CakeTestCase {
 
 	public function testIsJsonFalseWhenRequestPartsAreNotJson() {
 		$this->request
-		     ->expects($this->once())
-		     ->method('header')
-		     ->with($this->equalTo('Content-Type'))
-		     ->will($this->returnValue('text/html'));
+			->expects($this->once())
+			->method('header')
+			->with($this->equalTo('Content-Type'))
+			->will($this->returnValue('text/html'));
 		$this->request
-		     ->expects($this->once())
-		     ->method('accepts')
-		     ->will($this->returnValue(array('text/html')));
+			->expects($this->once())
+			->method('accepts')
+			->will($this->returnValue(array('text/html')));
 		$this->assertFalse($this->analyzer->isJson());
 	}
 }

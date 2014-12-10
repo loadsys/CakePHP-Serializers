@@ -83,7 +83,7 @@ class Serializer extends Object {
 	/**
 	 * Convert the supplied normalized data array to jsonapi format.
 	 *
-	 * @param array $data the data to serialize
+	 * @param array $unserializedData the data to serialize
 	 * @return array
 	 */
 	public function serialize($unserializedData = array()) {
@@ -99,21 +99,21 @@ class Serializer extends Object {
 		) {
 			// this is an associated record of the rootKey, ie we will have to call
 			// sub serializers
-			$serializedData = $this->_convertAssociated($this->rootKey, $unserializedData);
+			$serializedData = $this->convertAssociated($this->rootKey, $unserializedData);
 		} elseif (
 			isset($unserializedData[$this->rootKey])
 			&& array_key_exists(0, $unserializedData[$this->rootKey])
 		) {
 			// this is many records for the rootKey Model without the data having the
 			// top level Model key
-			$serializedData = $this->_convertMany($this->rootKey, $unserializedData[$this->rootKey]);
+			$serializedData = $this->convertMany($this->rootKey, $unserializedData[$this->rootKey]);
 		} elseif (
 			!isset($unserializedData[$this->rootKey])
 			&& array_key_exists(0, $unserializedData)
 		) {
 			// this is many records for the rootKey Model with the data having the top
 			// level Model key
-			$serializedData = $this->_convertMany($this->rootKey, $unserializedData);
+			$serializedData = $this->convertMany($this->rootKey, $unserializedData);
 		} else {
 			$serializedData = array();
 		}
@@ -140,14 +140,14 @@ class Serializer extends Object {
 	 * @param  array $data       Numerically indexed results from a find('all') query.
 	 * @return array             Transformed data in an array that can conforms to JSON API.
 	 */
-	protected function _convertMany($modelName, $data) {
+	protected function convertMany($modelName, $data) {
 		$jsonData = array();
 		foreach ($data as $index => $record) {
 			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
 			if (isset($record[$modelName])) {
-				$jsonData[$index] = $this->_convertAssociated($modelName, $record);
+				$jsonData[$index] = $this->convertAssociated($modelName, $record);
 			} else {
-				$jsonData[$index] = $this->_convertSingle($index, $record);
+				$jsonData[$index] = $this->convertSingle($index, $record);
 			}
 		}
 
@@ -197,9 +197,9 @@ class Serializer extends Object {
 	 * @param	array	$data		A record as produced by a find('first') query.
 	 * @return	array				Transformed data in an array that can conforms to JSON API.
 	 */
-	protected function _convertAssociated($primaryModel, $data) {
+	protected function convertAssociated($primaryModel, $data) {
 		// Prime the record with the primary model's data.
-		$jsonData = $this->_convertSingle($primaryModel, $data[$primaryModel]);
+		$jsonData = $this->convertSingle($primaryModel, $data[$primaryModel]);
 		unset($data[$primaryModel]);
 
 		// For all other top-level associations, add them as sub-keys to the primary.
@@ -252,7 +252,7 @@ class Serializer extends Object {
 	 * @param	array	$data		A record as produced by a find('first') query.
 	 * @return	array				Transformed data in an array that can conforms to JSON API.
 	 */
-	protected function _convertSingle($modelName, $data) {
+	protected function convertSingle($modelName, $data) {
 		$jsonData = $this->convertFields($data);
 
 		// Process any nested arrays.
@@ -278,9 +278,12 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	protected function convertFields($data) {
-		$whitelistFields = array_merge((array) $this->required, (array) $this->optional);
+		$whitelistFields = array_merge(
+			(array)$this->required,
+			(array)$this->optional
+		);
 		$jsonData = array();
-		foreach ($whitelistFields as $key ) {
+		foreach ($whitelistFields as $key) {
 			if (isset($data[$key])) {
 				$methodName = "serialize_{$key}";
 
