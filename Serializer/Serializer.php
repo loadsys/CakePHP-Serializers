@@ -69,9 +69,21 @@ class Serializer extends Object {
 	}
 
 	/**
+	 * helper method to call a sub-serializer class and return the results
+	 *
+	 * @param  string $modelName   the name of the model to serialize
+	 * @param  array $dataForModel the array of data for the model to serialize
+	 * @return array
+	 */
+	public function serializeModel($modelName, $dataForModel) {
+		$Serialization = new Serialization($modelName, $dataForModel);
+		return $Serialization->serialize($modelName, $dataForModel);
+	}
+
+	/**
 	 * Convert the supplied normalized data array to jsonapi format.
 	 *
-	 * @param array $data the data to serialize
+	 * @param array $unserializedData the data to serialize
 	 * @return array
 	 */
 	public function serialize($unserializedData = array()) {
@@ -79,36 +91,213 @@ class Serializer extends Object {
 			return $unserializedData;
 		}
 
-		$keysAreInts = true;
-		foreach ($unserializedData as $key => $row) {
-			if (!is_int($key)) {
-				$keysAreInts = false;
-			}
-		}
-
-		$serializedData = array();
-
-		if ($keysAreInts) {
-			foreach ($unserializedData as $key => $row) {
-				$className = Inflector::classify($this->rootKey);
-				$tableName = Inflector::tableize($this->rootKey);
-
-				$Serialization = new Serialization($className, $row);
-				$subModelSerializedData = $Serialization->serialize($className, $row);
-				if (is_array($subModelSerializedData)) {
-					foreach($subModelSerializedData as $keyForSerializedData => $serializedRecord) {
-						$serializedData[$keyForSerializedData][] = $serializedRecord;
-					}
-				} else {
-					$serializedData[$tableName] = $subModelSerializedData;
-				}
-			}
+		// Might be multiple hasMany records, or a single hasOne or belongsTo record.
+		if (
+			isset($unserializedData[$this->rootKey])
+			&& !empty($unserializedData[$this->rootKey])
+			&& !array_key_exists(0, $unserializedData[$this->rootKey])
+		) {
+			// this is an associated record of the rootKey, ie we will have to call
+			// sub serializers
+			$serializedData = $this->convertAssociated($this->rootKey, $unserializedData);
+		} elseif (
+			isset($unserializedData[$this->rootKey])
+			&& array_key_exists(0, $unserializedData[$this->rootKey])
+		) {
+			// this is many records for the rootKey Model without the data having the
+			// top level Model key
+			$serializedData = $this->convertMany($this->rootKey, $unserializedData[$this->rootKey]);
+		} elseif (
+			!isset($unserializedData[$this->rootKey])
+			&& array_key_exists(0, $unserializedData)
+		) {
+			// this is many records for the rootKey Model with the data having the top
+			// level Model key
+			$serializedData = $this->convertMany($this->rootKey, $unserializedData);
 		} else {
-			//debug($unserializedData);
-			$serializedData = $this->serializeData($unserializedData);
+			$serializedData = array();
 		}
+
+		// assign the serialized data to the tableized model name array
+		$jsonKey = Inflector::tableize($this->rootKey);
+		if (
+			!array_key_exists(0, $serializedData)
+		) {
+			$jsonKey = Inflector::singularize($jsonKey);
+		}
+
+		$serializedData = array(
+			$jsonKey => $serializedData,
+		);
 
 		return $this->afterSerialize($serializedData, $unserializedData);
+	}
+
+	/**
+	 * Convert data from a find('all') style query by converting each indexed result.
+	 *
+	 * @param  string $modelName The Model->alias name on which the find was performed.
+	 * @param  array $data       Numerically indexed results from a find('all') query.
+	 * @return array             Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function convertMany($modelName, $data) {
+		$jsonData = array();
+		foreach ($data as $index => $record) {
+			// Might be multiple hasMany records, or a single hasOne or belongsTo record.
+			if (isset($record[$modelName])) {
+				$jsonData[$index] = $this->convertAssociated($modelName, $record);
+			} else {
+				$jsonData[$index] = $this->convertSingle($index, $record);
+			}
+		}
+
+		if (count($jsonData) === 1) {
+			$jsonData = array_pop($jsonData);
+		}
+
+		return $jsonData;
+	}
+
+	/**
+	 * Convert data from a find('first') style query. Transforms adjacent
+	 * [RelatedModel] keys into properties containing indexed arrays of
+	 * sub-records.
+	 *
+	 * Sample input:
+	 *
+	 * 	array(
+	 * 		'ResinLot' => array(
+	 * 			'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 			'resin_product_id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 			'name' => 'Lot 1',
+	 * 			'date_received' => '2014-10-17',
+	 * 			'ResinTest' => array('name' => 'whatever'),
+	 * 		),
+	 * 		'ResinProduct' => array(
+	 * 			'id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 			'name' => 'Product 1',
+	 * 		),
+	 * 	);
+	 *
+	 * Sample output:
+	 *
+	 * 	array(
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'resin_products' => array(
+	 * 			0 => array(
+	 * 				'id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 				'name' => 'Product 1',
+	 * 			),
+	 * 		),
+	 * 	);
+	 *
+	 * @param	string $primaryModel The primary model name for the top level model
+	 * @param	array $data		       the associated data being serialized
+	 * @return array				       Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function convertAssociated($primaryModel, $data) {
+		// Prime the record with the primary model's data.
+		$jsonData = $this->convertSingle($primaryModel, $data[$primaryModel]);
+		unset($data[$primaryModel]);
+
+		// For all other top-level associations, add them as sub-keys to the primary.
+		foreach ($data as $modelName => $records) {
+			$jsonModelName = Inflector::tableize($modelName);
+
+			if (array_key_exists(0, $data[$modelName])) {
+				$jsonData = array_merge($jsonData, $this->serializeModel($modelName, $data));
+			} else {
+				$recordsForSubModel = array($modelName => $records);
+				$jsonData = array_merge($jsonData, $this->serializeModel($modelName, $recordsForSubModel));
+			}
+		}
+
+		return $jsonData;
+	}
+
+	/**
+	 * Convert data from a single Cake model record.
+	 *
+	 * Sample input:
+	 *
+	 * 	array( // ResinLot
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'resin_product_id' => '79f3f7f0-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'date_received' => '2014-10-17',
+	 * 		'ResinLotCertificate' => array(
+	 * 			0 => array(
+	 * 				'id' => 'abcde',
+	 * 				'value' => '42',
+	 * 		 	),
+	 * 		 ),
+	 * 	);
+	 *
+	 * Sample output:
+	 *
+	 * 	array(
+	 * 		'id' => '9f90b5d8-563f-11e4-a97c-08002786663d',
+	 * 		'name' => 'Lot 1',
+	 * 		'resin_lot_certificates' => array(
+	 * 			0 => array(
+	 * 				'id' => 'abcde',
+	 * 				'value' => '42',
+	 * 			),
+	 * 	);
+	 *
+	 * @param	string	$modelName	The Model->alias name on which the find was performed.
+	 * @param	array	$data		A record as produced by a find('first') query.
+	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 */
+	protected function convertSingle($modelName, $data) {
+		$jsonData = $this->convertFields($data);
+
+		// Process any nested arrays.
+		foreach ($data as $key => $value) {
+			if (is_array($value)) {
+				if (array_key_exists(0, $data[$key])) {
+					$jsonData = array_merge($jsonData, $this->serializeModel($key, $value));
+				} else {
+					$recordsForSubModel = array($key => $value);
+					$jsonData = array_merge($jsonData, $this->serializeModel($key, $recordsForSubModel));
+				}
+			}
+		}
+
+		return $jsonData;
+	}
+
+	/**
+	 * convert fields for a single model record, both calls methods for a property
+	 * as well as validates that required attributes are present
+	 *
+	 * @param  array $data a single record row for a CakePHP Model array
+	 * @return array
+	 */
+	protected function convertFields($data) {
+		$whitelistFields = array_merge(
+			(array)$this->required,
+			(array)$this->optional
+		);
+		$jsonData = array();
+		foreach ($whitelistFields as $key) {
+			if (isset($data[$key])) {
+				$methodName = "serialize_{$key}";
+
+				if (method_exists($this, $methodName)) {
+					try {
+						$jsonData[$key] = $this->{$methodName}($data, $data[$key]);
+					} catch (SerializerIgnoreException $e) {
+						// if we throw this exception catch it and don't set any data for that record
+					}
+				} else {
+					$jsonData[$key] = $data[$key];
+				}
+			}
+		}
+		$this->validateSerializedRequiredAttributes($jsonData);
+		return $jsonData;
 	}
 
 	/**
@@ -120,42 +309,6 @@ class Serializer extends Object {
 	 * @return multi
 	 */
 	public function afterSerialize($serializedData, $unserializedData) {
-		return $serializedData;
-	}
-
-	/**
-	 * Serializes a CakePHP data array into a jsonapi format array
-	 *
-	 * @param array $unserializedData the unserialized data, typically set in a
-	 * Controller to the View
-	 * @return array
-	 */
-	protected function serializeData($unserializedData) {
-		$serializedData = array();
-
-		foreach ($unserializedData as $key => $record) {
-
-			$className = Inflector::classify($key);
-			$tableName = Inflector::tableize($key);
-
-			if($className !== $this->rootKey) {
-				$recordsToProcess[$className] = $unserializedData[$key];
-				$Serialization = new Serialization($className, $recordsToProcess);
-				$subModelSerializedData = $Serialization->serialize($className, $recordsToProcess);
-
-				if (is_array($subModelSerializedData)) {
-					$serializedData = $serializedData + $subModelSerializedData;
-				} else {
-					$serializedData[$tableName] = $subModelSerializedData;
-				}
-			} else {
-				if (!empty($record)) {
-					$serializedData[$tableName] = $this->serializeRecord($className, $record);
-				} else {
-					$serializedData[$tableName] = array();
-				}
-			}
-		}
 		return $serializedData;
 	}
 
@@ -175,57 +328,6 @@ class Serializer extends Object {
 			$msg = "The following keys were missing from $this->rootKey: $missing";
 			throw new SerializerMissingRequiredException($msg);
 		}
-	}
-
-	/**
-	 * serialize a record
-	 *
-	 * @param  string $currentClassName the name of the class being operated on
-	 * @param  array $currentRecord    the current record being serialized
-	 * @return array
-	 */
-	protected function serializeRecord($currentClassName, $currentRecord) {
-		$serializedData = array();
-
-		foreach ($currentRecord as $key => $data) {
-			if (is_int($key)) {
-				$serializedData[] = $this->serializeRecord($currentClassName, $data);
-			} else {
-				$methodName = "serialize_{$key}";
-
-				if (method_exists($this, $methodName)) {
-					$this->validateSerializedRequiredAttributes($currentRecord);
-					// if there exists a method for the current key process it
-					try {
-						$serializedData[$key] = $this->{$methodName}($serializedData, $currentRecord);
-					} catch (SerializerIgnoreException $e) {
-						// if we throw this exception catch it and don't set any data for that record
-					}
-				} elseif (is_array($data)) {
-					$classifiedSubModelKey = Inflector::classify($key);
-					$tabelizedSubModelKey = Inflector::tableize($key);
-					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
-					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
-					$subModelSerializedData = $Serialization->serialize($classifiedSubModelKey, $recordsToProcess);
-
-					if (is_array($subModelSerializedData)) {
-						$serializedData = $serializedData + $subModelSerializedData;
-					} else {
-						$serializedData[$tabelizedSubModelKey] = $subModelSerializedData;
-					}
-				} else {
-					if (
-						in_array($key, $this->required)
-						|| in_array($key, $this->optional)
-					) {
-						$this->validateSerializedRequiredAttributes($currentRecord);
-						$serializedData[$key] = $data;
-					}
-				}
-			}
-		}
-
-		return $serializedData;
 	}
 
 	/**
@@ -265,10 +367,14 @@ class Serializer extends Object {
 	protected function deserializeData(array $serializedData = array()) {
 		$deserializedData = array();
 
-		foreach ($serializedData as $key => $record) {
-			// if the key for this record is an int, multiple records
-			$className = Inflector::classify($key);
-			$deserializedData[$className] = $this->deserializeRecord($className, $record);
+		$className = Inflector::classify($this->rootKey);
+		$tableizedName = Inflector::tableize($this->rootKey);
+		$singularizedTableName = Inflector::singularize($tableizedName);
+
+		if (array_key_exists($tableizedName, $serializedData)) {
+			$deserializedData[$className] = $this->deserializeRecord($className, $serializedData[$tableizedName]);
+		} elseif (array_key_exists($singularizedTableName, $serializedData)) {
+			$deserializedData[$className] = $this->deserializeRecord($className, $serializedData[$singularizedTableName]);
 		}
 
 		return $deserializedData;
@@ -299,7 +405,8 @@ class Serializer extends Object {
 					}
 				} elseif (is_array($data)) {
 					$classifiedSubModelKey = Inflector::classify($key);
-					$recordsToProcess[$classifiedSubModelKey] = $currentRecord[$key];
+					$tableizedName = Inflector::tableize($key);
+					$recordsToProcess[$tableizedName] = $currentRecord[$key];
 					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
 					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
 					$deserializedData = $deserializedData + $subModelDeserializedData;

@@ -26,6 +26,39 @@ class DeserializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
+	public function testDeserializerSingular() {
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$data = array('test_user' => array(
+			'first_name' => 'John', 'last_name' => 'Doe'
+		));
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
+	public function testDeserializerSingularWithSecondTopLevelModel() {
+		$expected = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$data = array(
+			'test_user' => array(
+				'first_name' => 'John', 'last_name' => 'Doe'
+			),
+			'test_second_level_user' => array(
+				'first_name' => 'Jane', 'last_name' => 'Smith'
+			)
+		);
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
 	public function testDeserializerUsesNoDataPassedToTheSerializerArray() {
 		$data = array(
 		);
@@ -51,6 +84,15 @@ class DeserializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->deserialize($data));
 	}
 
+	public function testDeserializerAfterDeserializeCallbackWithSingularCase() {
+		$serializer = new TestCallbackSerializer();
+		$data = array('test_callback' => array(
+			'first_name' => 'John', 'last_name' => 'Doe'
+		));
+		$expected = "after deserialize";
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
 	public function testDeserializeNoData() {
 		$data = null;
 		$expected = null;
@@ -69,6 +111,26 @@ class DeserializerTest extends CakeTestCase {
 			),
 		);
 		$data = array('test_optionals' => array(
+			'title' => 'Title',
+			'body' => 'Body',
+			'summary' => 'Summary',
+			'published' => true
+		));
+
+		$serializer = new TestOptionalSerializer();
+		$this->assertEquals($expected, $serializer->deserialize($data));
+	}
+
+	public function testDeserializeSingularDataWithMethod() {
+		$expected = array(
+			'TestOptional' => array(
+				'title' => 'Title',
+				'body' => 'BODY',
+				'summary' => 'SUMMARY',
+				'published' => true,
+			),
+		);
+		$data = array('test_optional' => array(
 			'title' => 'Title',
 			'body' => 'Body',
 			'summary' => 'Summary',
@@ -109,11 +171,11 @@ class DeserializerTest extends CakeTestCase {
 		);
 		$serializer = new TestUserSerializer();
 		$data = array(
-			'test_users' =>
+			'test_user' =>
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_users' => array(
+				'test_second_level_user' => array(
 					'first_name' => 'Jane', 'last_name' => 'Doe',
 				),
 			),
@@ -128,6 +190,32 @@ class DeserializerTest extends CakeTestCase {
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_user_with_methods' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Doe',
+				),
+			),
+		);
+		$expectedOutput = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUserWithMethod' => array(
+					'first_name' => 'FIRST',
+					'last_name' => 'Doe',
+				),
+			),
+		);
+		$serializer = new TestUserSerializer();
+		$this->assertEquals($expectedOutput, $serializer->deserialize($inputData));
+	}
+
+	public function testDeserializeSingularSubModelRecords() {
+		$inputData = array(
+			'test_user' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_user_with_method' => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Doe',
 				),

@@ -8,6 +8,12 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This plugin is designed to work with the Ember Data Spec for de/serialization of
 records: http://emberjs.com/guides/models/the-rest-adapter/
 
+As a secondary reference when deciding on implementation details the JSON API
+spec was also used: http://jsonapi.org/
+
+Questions on any implementation details can be answered typically using the Test
+Cases as the final authoritative answer.
+
 This is currently not fully production ready - be warned bugs/issues may exist.
 
 ## Examples ##
@@ -32,15 +38,13 @@ into:
 
 ```javascript
 {
-	"users": [
-		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
-		},
-	]
+	"user": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	}
 }
 ```
 
@@ -49,6 +53,20 @@ And to perform the reverse, by deserializing data passed in the request body:
 ```javascript
 {
 	"users": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	}
+}
+```
+
+or:
+
+```javascript
+{
+	"user": {
 		"id" => 1,
 		"username" => "testusername",
 		"first_name" => "first",
@@ -302,6 +320,76 @@ $this->request->data = array(
 );
 ```
 
+If there is a second top level model in the data to be serialized it is moved
+to a property of the first model
+
+```php
+$data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
+	),
+	'SecondModel' => array(
+		'id' => 1,
+		'name' => 'asdflkjasdf',
+	),
+);
+```
+
+into:
+
+```javascript
+{
+	"user": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+		"second_model" => {
+			'id' => 1,
+			'name' => 'asdflkjasdf',
+		}
+	}
+}
+```
+
+If there is a second top level model in the data to be deserialized, it is
+ignored:
+
+```javascript
+{
+	"users": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	},
+	"second_models": {
+		"id" => 1,
+		"something" => "data",
+	}
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
+	)
+);
+```
+
 ## Installation ##
 
 ### Composer ###
@@ -415,8 +503,8 @@ class UserSerializer extends Serializer {
 	public $required = array('id', 'first_name', 'last_name');
 
 	// $data is the pre-serialized data record for the $data[User] from the controller
-	// $record is the pre-serialized record for the $data from the controller
-	public function serialize_first_name($data, $record) {
+	// $value is the pre-serialized value for the $data[User][first_name]
+	public function serialize_first_name($data, $value) {
 		return strtoupper($data['first_name']);
 	}
 }
@@ -477,12 +565,13 @@ is not supplied.
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
+
 	public $required = array('id', 'first_name', 'last_name');
 
 	public $optional = array('email');
 
 	// $data is the pre-serialized data record for the $data[User] from the controller
-	// $record is the pre-serialized record for the $data from the controller
+	// $value is the pre-serialized value for the $data[User][first_name]
 	public function email($data, $record) {
 		if(!array_key_exists('email', $data)) {
 			throw new SerializerIgnoreException();
@@ -509,6 +598,7 @@ post processing after all the data has been serialized.
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
+
 	public $required = array('id', 'first_name', 'last_name');
 
 	public $optional = array('email');
@@ -537,6 +627,7 @@ post processing after all the data has been deserialized.
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
+
 	public $required = array('id', 'first_name', 'last_name');
 
 	public $optional = array('email');
@@ -574,7 +665,7 @@ The serializer will transform `$data` to [json:api](http://jsonapi.org/) complia
 ### Controller Usage Deserializing ###
 
 The serializer will transform the JSON payload of an HTTP request from
-[json:api](http://jsonapi.org/) compliant JSON to the `Controller->request->data`
+[Ember Data](http://emberjs.com/guides/models/the-rest-adapter/) compliant JSON to the `Controller->request->data`
 property and as a standard CakePHP array.
 
 ## Contributing ##

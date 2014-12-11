@@ -3,13 +3,16 @@
 App::uses('SerializerFactory', 'Serializers.Lib');
 App::uses('Model', 'Model');
 
-class TestCommentSerializer {}
+class TestCommentSerializer {
+}
 
 class TestTag extends Model {
+
 	public $useTable = false;
 }
 
 class SerializerFactoryTest extends CakeTestCase {
+
 	public function testLooksUpConventionallyNamedClasses() {
 		$factory = new SerializerFactory('TestComment');
 		$this->assertTrue($factory->generate() instanceof TestCommentSerializer);

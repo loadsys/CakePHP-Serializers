@@ -54,14 +54,23 @@ class CakeSerializerView extends View {
 	 * @access protected
 	 * @return string
 	 */
+
+	/**
+	 * converts view data to serialized data
+	 *
+	 * @param  string $name the model name to serialize
+	 * @param  array  $data the data to serialize
+	 * @return array
+	 */
 	protected function toJSON($name, $data) {
 		$serialization = new Serialization($name, $data);
 		return json_encode($serialization->serialize());
 	}
 
 	/**
-	 * @access protected
-	 * @return Boolean
+	 * decides to render the response as json
+	 *
+	 * @return bool
 	 */
 	protected function renderAsJSON() {
 		if ($this->controllerRenderAsPropertyExists()) {
@@ -73,24 +82,29 @@ class CakeSerializerView extends View {
 	}
 
 	/**
-	 * @access protected
-	 * @return Boolean
+	 * determines if the renderAs property for the controller exists
+	 *
+	 * @return bool
 	 */
-	protected function controllerRenderAsPropertyExists($type = 'json') {
+	protected function controllerRenderAsPropertyExists() {
 		return property_exists($this->controller, 'renderAs');
 	}
 
 	/**
-	 * @access protected
-	 * @return Boolean
+	 * determines if the renderAs property for the controller is set to json
+	 *
+	 * @param string $type the value of renderAs we wish to ensure is matched
+	 * @return bool
 	 */
 	protected function checkControllerRenderAs($type = 'json') {
 		return strtolower($this->controller->renderAs) === $type;
 	}
 
 	/**
-	 * @access protected
-	 * @return Boolean
+	 * sets the data and name of for the view vars to serialize
+	 *
+	 * @param array $arg any additional arguments to append to data
+	 * @return bool
 	 */
 	protected function parseNameAndData($arg = null) {
 		$data = array();
