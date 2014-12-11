@@ -192,10 +192,9 @@ class Serializer extends Object {
 	 * 		),
 	 * 	);
 	 *
-	 *
-	 * @param	string	$modelName	The Model->alias name on which the find was performed.
-	 * @param	array	$data		A record as produced by a find('first') query.
-	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 * @param	string $primaryModel The primary model name for the top level model
+	 * @param	array $data		       the associated data being serialized
+	 * @return array				       Transformed data in an array that can conforms to JSON API.
 	 */
 	protected function convertAssociated($primaryModel, $data) {
 		// Prime the record with the primary model's data.
@@ -246,7 +245,6 @@ class Serializer extends Object {
 	 * 				'value' => '42',
 	 * 			),
 	 * 	);
-	 *
 	 *
 	 * @param	string	$modelName	The Model->alias name on which the find was performed.
 	 * @param	array	$data		A record as produced by a find('first') query.

@@ -103,7 +103,7 @@ class CakeSerializerView extends View {
 	/**
 	 * sets the data and name of for the view vars to serialize
 	 *
-	 * @param array arg any additional arguments to append to data
+	 * @param array $arg any additional arguments to append to data
 	 * @return bool
 	 */
 	protected function parseNameAndData($arg = null) {

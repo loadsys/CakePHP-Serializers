@@ -6,7 +6,11 @@ App::uses('CakeResponse', 'Network');
 App::uses('CakeEvent', 'Event');
 
 class TestDispatchUserSerializer extends Serializer {
-	public $required = array('first_name', 'last_name');
+
+	public $required = array(
+		'first_name',
+		'last_name'
+	);
 }
 
 /**
@@ -219,6 +223,5 @@ class DeserializerFilterTest extends CakeTestCase {
 			'POST Data should be updated to match the provided request body'
 		);
 	}
-
 
 }
