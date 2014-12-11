@@ -8,6 +8,12 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This plugin is designed to work with the Ember Data Spec for de/serialization of
 records: http://emberjs.com/guides/models/the-rest-adapter/
 
+As a secondary reference when deciding on implementation details the JSON API
+spec was also used: http://jsonapi.org/
+
+Questions on any implementation details can be answered typically using the Test
+Cases as the final authoritative answer.
+
 This is currently not fully production ready - be warned bugs/issues may exist.
 
 ## Examples ##
@@ -32,7 +38,7 @@ into:
 
 ```javascript
 {
-	"users": [
+	"user": [
 		{
 			"id" => 1,
 			"username" => "testusername",
@@ -49,6 +55,20 @@ And to perform the reverse, by deserializing data passed in the request body:
 ```javascript
 {
 	"users": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	}
+}
+```
+
+or:
+
+```javascript
+{
+	"user": {
 		"id" => 1,
 		"username" => "testusername",
 		"first_name" => "first",
@@ -298,6 +318,39 @@ $this->request->data = array(
 				),
 			),
 		),
+	)
+);
+```
+
+If there is a second top level model in the data to be deserialized, it is
+ignored:
+
+```javascript
+{
+	"users": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+	},
+	"second_models": {
+		"id" => 1,
+		"something" => "data",
+	}
+}
+```
+
+into
+
+```php
+$this->request->data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
 	)
 );
 ```
