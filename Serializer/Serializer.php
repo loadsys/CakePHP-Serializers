@@ -69,15 +69,27 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * helper method to call a sub-serializer class and return the results
+	 * helper method to call a sub-serializer class and return the results, in the
+	 * instance that a method exists for the name of the model, this calls that
+	 * method instead, in this way a serialize_{name} will always override
 	 *
 	 * @param  string $modelName   the name of the model to serialize
 	 * @param  array $dataForModel the array of data for the model to serialize
 	 * @return array
 	 */
 	public function serializeModel($modelName, $dataForModel) {
-		$Serialization = new Serialization($modelName, $dataForModel);
-		return $Serialization->serialize($modelName, $dataForModel);
+		$methodName = "serialize_{$modelName}";
+
+		if (method_exists($this, $methodName)) {
+			try {
+				return $this->{$methodName}(array(), $dataForModel);
+			} catch (SerializerIgnoreException $e) {
+				// if we throw this exception catch it and don't set any data for that record
+			}
+		} else {
+			$Serialization = new Serialization($modelName, $dataForModel);
+			return $Serialization->serialize($modelName, $dataForModel);
+		}
 	}
 
 	/**

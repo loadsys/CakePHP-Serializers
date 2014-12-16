@@ -512,6 +512,62 @@ class UserSerializer extends Serializer {
 
 This will return the `first_name` as upper case when serializing data.
 
+Methods on serialized data will override calling a SubSerializer if you so desire
+it, however you will need to return the array wrapped in the name of the sub-model
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+	public $required = array('id', 'first_name', 'last_name');
+
+	// $data is an empty array in this case
+	// $value is the pre-serialized value for the $data[User]['Permission']
+	public function serialize_Permission($data, $value) {
+		return array(
+			'permissions' => array_value($value),
+		);
+	}
+}
+```
+
+Will result in:
+
+```php
+$data = array(
+	'User' => array(
+		'id' => 1,
+		'username' => 'testusername',
+		'first_name' => 'first',
+		'last_name' => 'last',
+		'is_active' => true,
+	),
+	'Permission' => array(
+		0 => 'write:testing',
+		1 => 'read:secondary',
+	),
+);
+```
+
+being transformed into:
+
+```javascript
+{
+	"user": {
+		"id" => 1,
+		"username" => "testusername",
+		"first_name" => "first",
+		"last_name" => "last",
+		"is_active" => true,
+		"permissions" => {
+			'write:testing',
+			'read:secondary',
+		}
+	}
+}
+```
+
 #### Format Return of Data - Deserializing ####
 
 If you need to do any formatting or data manipulation when deserializing data,
