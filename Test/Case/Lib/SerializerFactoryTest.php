@@ -38,4 +38,11 @@ class SerializerFactoryTest extends CakeTestCase {
 		$this->assertEquals(array_keys($testTagSchema), $serializer->required);
 		$this->assertEquals('TestTag', $serializer->rootKey);
 	}
+
+	public function testNoModelExistsNorSerializerClassExists() {
+		$factory = new SerializerFactory('TestNoModelExistsWithThisName');
+		$serializer = $factory->generate();
+		$this->assertTrue($serializer instanceof Serializer);
+		$this->assertEquals(array(), $serializer->required);
+	}
 }

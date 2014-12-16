@@ -41,10 +41,18 @@ class SerializerFactory {
 		App::uses($this->className, 'Serializer');
 		if (!class_exists($this->className)) {
 			$modelName = preg_replace('/Serializer$/', '', $this->className);
-			$model = ClassRegistry::init($modelName);
+
+			// try to load the model name, catch if an exception occurs
+			try {
+				$model = ClassRegistry::init($modelName);
+				$required = array_keys($model->schema());
+			} catch (MissingTableException $e) {
+				$required = array();
+			}
+
 			$serializer = new Serializer();
 			$serializer->rootKey = $modelName;
-			$serializer->required = array_keys($model->schema());
+			$serializer->required = $required;
 			return $serializer;
 		}
 		return new $this->className();
