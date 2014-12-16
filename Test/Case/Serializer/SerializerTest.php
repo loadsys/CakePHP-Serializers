@@ -144,6 +144,60 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
+	public function testSubSerializeWithMethodOverride() {
+		$data = array(
+			'TestMethodSubSerialize' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+				'tags' => 'tag1,tag2,tag3',
+				'tests' => array(
+					'cf08573d-856b-11e4-ba2d-080027506c76',
+					'd583c827-856b-11e4-ba2d-080027506c76'
+				),
+			)
+		);
+		$serializer = new TestMethodSubSerializeSerializer();
+		$expected = array('test_method_sub_serialize' => array(
+			'title' => 'Title',
+			'body' => 'Body',
+			'published' => true,
+			'tags' => 'tag1,tag2,tag3',
+			'tests' => array(
+				'cf08573d-856b-11e4-ba2d-080027506c76',
+				'd583c827-856b-11e4-ba2d-080027506c76',
+			),
+		));
+		$this->assertEquals($expected, $serializer->serialize($data));
+	}
+
+	public function testSubSerializeWithUpperCaseMethodOverride() {
+		$data = array(
+			'TestMethodSubSerialize' => array(
+				'title' => 'Title',
+				'body' => 'Body',
+				'published' => true,
+				'tags' => 'tag1,tag2,tag3',
+				'UpperCaseTest' => array(
+					'cf08573d-856b-11e4-ba2d-080027506c76',
+					'd583c827-856b-11e4-ba2d-080027506c76'
+				),
+			)
+		);
+		$serializer = new TestMethodSubSerializeSerializer();
+		$expected = array('test_method_sub_serialize' => array(
+			'title' => 'Title',
+			'body' => 'Body',
+			'published' => true,
+			'tags' => 'tag1,tag2,tag3',
+			'upper_case_tests' => array(
+				'cf08573d-856b-11e4-ba2d-080027506c76',
+				'd583c827-856b-11e4-ba2d-080027506c76',
+			),
+		));
+		$this->assertEquals($expected, $serializer->serialize($data));
+	}
+
 	public function testSerializeAttributesWithMethod() {
 		$data = array(
 			'TestMethodOptional' => array(

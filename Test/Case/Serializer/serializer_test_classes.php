@@ -62,6 +62,23 @@ class TestOptionalSerializer extends Serializer {
 	}
 }
 
+class TestMethodSubSerializeSerializer extends Serializer {
+	public $required = array('title', 'body');
+	public $optional = array('summary', 'published', 'tags', 'created');
+
+	public function serialize_tests($data, $record) {
+		return array(
+			'tests' => $record,
+		);
+	}
+
+	public function serialize_UpperCaseTest($data, $record) {
+		return array(
+			'upper_case_tests' => $record,
+		);
+	}
+}
+
 class TestMethodOptionalSerializer extends Serializer {
 	public $required = array('title', 'body');
 	public $optional = array('summary', 'published', 'tags', 'created');
