@@ -100,7 +100,11 @@ class Serializer extends Object {
 	 */
 	public function serialize($unserializedData = array()) {
 		if (empty($unserializedData)) {
-			return $unserializedData;
+			$jsonKey = Inflector::tableize($this->rootKey);
+			$serializedData = array(
+				$jsonKey => array(),
+			);
+			return $this->afterSerialize($serializedData, $unserializedData);
 		}
 
 		// Might be multiple hasMany records, or a single hasOne or belongsTo record.
