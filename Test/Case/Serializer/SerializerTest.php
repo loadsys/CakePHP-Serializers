@@ -34,7 +34,9 @@ class SerializerTest extends CakeTestCase {
 		$data = array(
 		);
 		$serializer = new TestUserSerializer();
-		$expected = array();
+		$expected = array(
+			'test_users' => array(),
+		);
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
@@ -86,7 +88,9 @@ class SerializerTest extends CakeTestCase {
 
 	public function testSerializeNoData() {
 		$data = null;
-		$expected = null;
+		$expected = array(
+			'test_root_keys' => array(),
+		);
 
 		$serializer = new TestRootKeySerializer();
 		$this->assertEquals($expected, $serializer->serialize($data));
