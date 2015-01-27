@@ -453,7 +453,7 @@ public $viewClass = 'Serializers.CakeSerializer';
 To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
 
 ``` php
-// Serialize and return JSON:
+// Serialize and return JSON, no view files are used when rendering the JSON:
 public $renderAs = 'json';
 
 // No serialization and a view will be used:
