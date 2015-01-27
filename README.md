@@ -8,8 +8,8 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This plugin is designed to work with the Ember Data Spec for de/serialization of
 records: http://emberjs.com/guides/models/the-rest-adapter/
 
-As a secondary reference when deciding on implementation details the JSON API
-spec was also used: http://jsonapi.org/
+As a secondary reference when deciding on implementation details the [json:api](http://jsonapi.org/)
+spec was also used.
 
 Questions on any implementation details can be answered typically using the Test
 Cases as the final authoritative answer.
@@ -716,7 +716,7 @@ public function index() {
 }
 ```
 
-The serializer will transform `$data` to [json:api](http://jsonapi.org/) compliant JSON.
+The serializer will transform `$data` to JSON.
 
 ### Controller Usage Deserializing ###
 
