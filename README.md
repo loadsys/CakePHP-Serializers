@@ -394,12 +394,10 @@ $this->request->data = array(
 
 ### Composer ###
 
-* Add to your `composer.json` file
+* Run this shell command
 
-```php
-"require": {
-  "loadsys/cakephp_serializers": "dev-master"
-}
+```bash
+php composer.phar require loadsys/cakephp_serializers "dev-master"
 ```
 
 ### Git ###
