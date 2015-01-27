@@ -39,11 +39,11 @@ into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -53,11 +53,11 @@ And to perform the reverse, by deserializing data passed in the request body:
 ```javascript
 {
 	"users": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -67,11 +67,11 @@ or:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -121,18 +121,18 @@ into:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 	]
 }
@@ -178,21 +178,21 @@ into
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": {
 				"something": "blahh",
 			}
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": [
 				{
 					"something": "teasdf",
@@ -212,18 +212,18 @@ The same with deserialize both multiple records:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id" : 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 	]
 }
@@ -258,21 +258,21 @@ And deserialize sub model records, even if there are multiple records:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": {
 				"something": "blahh",
 			}
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": [
 				{
 					"something": "teasdf",
@@ -344,14 +344,14 @@ into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
-		"second_model" => {
-			'id' => 1,
-			'name' => 'asdflkjasdf',
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
+		"second_model": {
+			'id': 1,
+			'name': 'asdflkjasdf',
 		}
 	}
 }
@@ -363,15 +363,15 @@ ignored:
 ```javascript
 {
 	"users": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	},
 	"second_models": {
-		"id" => 1,
-		"something" => "data",
+		"id": 1,
+		"something": "data",
 	}
 }
 ```
@@ -553,12 +553,12 @@ being transformed into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
-		"permissions" => {
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
+		"permissions": {
 			'write:testing',
 			'read:secondary',
 		}
