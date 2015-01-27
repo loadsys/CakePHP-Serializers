@@ -8,8 +8,8 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This plugin is designed to work with the Ember Data Spec for de/serialization of
 records: http://emberjs.com/guides/models/the-rest-adapter/
 
-As a secondary reference when deciding on implementation details the JSON API
-spec was also used: http://jsonapi.org/
+As a secondary reference when deciding on implementation details the [json:api](http://jsonapi.org/)
+spec was also used.
 
 Questions on any implementation details can be answered typically using the Test
 Cases as the final authoritative answer.
@@ -39,11 +39,11 @@ into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -53,11 +53,11 @@ And to perform the reverse, by deserializing data passed in the request body:
 ```javascript
 {
 	"users": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -67,11 +67,11 @@ or:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	}
 }
 ```
@@ -121,18 +121,18 @@ into:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 	]
 }
@@ -178,21 +178,21 @@ into
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": {
 				"something": "blahh",
 			}
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": [
 				{
 					"something": "teasdf",
@@ -212,18 +212,18 @@ The same with deserialize both multiple records:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id" : 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 		},
 	]
 }
@@ -258,21 +258,21 @@ And deserialize sub model records, even if there are multiple records:
 {
 	"users": [
 		{
-			"id" => 1,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 1,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": {
 				"something": "blahh",
 			}
 		},
 		{
-			"id" => 2,
-			"username" => "testusername",
-			"first_name" => "first",
-			"last_name" => "last",
-			"is_active" => true,
+			"id": 2,
+			"username": "testusername",
+			"first_name": "first",
+			"last_name": "last",
+			"is_active": true,
 			"secondary_models": [
 				{
 					"something": "teasdf",
@@ -344,14 +344,14 @@ into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
-		"second_model" => {
-			'id' => 1,
-			'name' => 'asdflkjasdf',
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
+		"second_model": {
+			'id': 1,
+			'name': 'asdflkjasdf',
 		}
 	}
 }
@@ -363,15 +363,15 @@ ignored:
 ```javascript
 {
 	"users": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
 	},
 	"second_models": {
-		"id" => 1,
-		"something" => "data",
+		"id": 1,
+		"something": "data",
 	}
 }
 ```
@@ -394,12 +394,10 @@ $this->request->data = array(
 
 ### Composer ###
 
-* Add to your `composer.json` file
+* Run this shell command
 
-```php
-"require": {
-  "loadsys/cakephp_serializers": "dev-master"
-}
+```bash
+php composer.phar require loadsys/cakephp_serializers "dev-master"
 ```
 
 ### Git ###
@@ -455,7 +453,7 @@ public $viewClass = 'Serializers.CakeSerializer';
 To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
 
 ``` php
-// Serialize and return JSON:
+// Serialize and return JSON, no view files are used when rendering the JSON:
 public $renderAs = 'json';
 
 // No serialization and a view will be used:
@@ -555,12 +553,12 @@ being transformed into:
 ```javascript
 {
 	"user": {
-		"id" => 1,
-		"username" => "testusername",
-		"first_name" => "first",
-		"last_name" => "last",
-		"is_active" => true,
-		"permissions" => {
+		"id": 1,
+		"username": "testusername",
+		"first_name": "first",
+		"last_name": "last",
+		"is_active": true,
+		"permissions": {
 			'write:testing',
 			'read:secondary',
 		}
@@ -716,7 +714,7 @@ public function index() {
 }
 ```
 
-The serializer will transform `$data` to [json:api](http://jsonapi.org/) compliant JSON.
+The serializer will transform `$data` to JSON.
 
 ### Controller Usage Deserializing ###
 
