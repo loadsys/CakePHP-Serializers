@@ -19,7 +19,9 @@ This Readme is split into the following sections:
 
 1. [Base Use Cases](#basic-use-case)
 2. [Requirements](#requirements)
-3. [Installationn](#installation)
+3. [Installation](#installation)
+4. [Basic Setup](#basic-setup)
+5. [Basic Controller Setup - Serializing](#basic-controller-setup-serializing)
 
 ## Basic Use Case ##
 
@@ -114,7 +116,7 @@ php composer.phar require loadsys/cakephp_serializers "dev-master"
 git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
 ```
 
-### Setup ###
+## Basic Setup ##
 
 Load the plugin and be sure that bootstrap is set to true:
 
@@ -127,7 +129,8 @@ CakePlugin::loadAll(array(
 ));
 ```
 
-To deserialize data in an HTTP request a few other changes are required:
+If you are planning on using this plugin, to deserialize data in an HTTP request 
+a few other changes are required:
 
 ```php
 // Config/boostrap.php
@@ -146,6 +149,54 @@ Router::mapResources(array(
 ));
 Router::parseExtensions('json');
 ```
+
+The [CakePHP book has more information on doing REST APIs](http://book.cakephp.org/2.0/en/development/rest.html)
+with CakePHP and this feature.
+
+### Basic Controller Setup - Serializing ###
+
+Set a `$viewClass` property, either globally in your `Controller/AppController.php` or in specific
+controllers as needed:
+
+```php
+public $viewClass = 'Serializers.CakeSerializer';
+```
+
+To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
+
+``` php
+// Serialize and return JSON, no view files are used when rendering the JSON:
+public $renderAs = 'json';
+
+// No serialization and a view will be used:
+public $renderAs = 'html';
+```
+
+At this point, there will be a default Serializer Class created for every Model. 
+This Serializer will require every attribute in the Model Schema to be passed to 
+it for output. If all you want to do is to Serialize the output of every field 
+in a Model with no data manipulation and all fields required, this is all you need.
+
+Create your Controller method that sets whatever data you need to be output as 
+JSON, to the view variable `$data`, you must do this for Serializers to
+function properly.
+
+``` php
+// Controller/UsersController.php
+
+public function index() {
+	$this->User->recursive = 0;
+	$data = $this->paginate();
+	$this->set(compact('data'));
+}
+```
+
+No view files are used to render the output, simply visit:
+http://path/to/cake/app/{controller-name}/{method-name}
+And you should see your data rendered as JSON.
+
+This is the minimal use case for serializing data from your CakePHP Controller to
+JSON at the view layer.
 
 ## Advanced Use Cases ##
 
@@ -449,32 +500,6 @@ $this->request->data = array(
 
 ## Usage ##
 
-### Controller Setup ###
-
-Set a `$viewClass` property, either globally in your `Controller/AppController.php` or in specific
-controllers as needed:
-
-```php
-public $viewClass = 'Serializers.CakeSerializer';
-```
-
-To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
-
-``` php
-// Serialize and return JSON, no view files are used when rendering the JSON:
-public $renderAs = 'json';
-
-// No serialization and a view will be used:
-public $renderAs = 'html';
-```
-
-### Default Serializer Setup ###
-
-There will be a default Serializer Class created for every Model. This Serializer will
-require every attribute in the Model Schema to be passed to it for output. If all
-you want to do is to Serialize the output of every field in a Model with no data
-manipulation and all fields required, this is all you need.
-
 ### Custom Serializer Setup ###
 
 #### Basic Custom Serializer Classes ####
@@ -707,22 +732,6 @@ class UserSerializer extends Serializer {
 	}
 }
 ```
-
-### Controller Usage Serializing ###
-
-Simply perform a model find/paginate and set the results to a variable named `$data`.
-
-``` php
-// Controller/UsersController.php
-
-public function index() {
-	$this->User->recursive = 0;
-	$data = $this->paginate();
-	$this->set(compact('data'));
-}
-```
-
-The serializer will transform `$data` to JSON.
 
 ### Controller Usage Deserializing ###
 
