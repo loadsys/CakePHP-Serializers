@@ -217,6 +217,8 @@ deserilization to work.
 
 ## Advanced Setup - Serializing ##
 
+### Setup of Serializer Class ###
+
 To do anything advanced with serializing data requires a custom Serializer class:
 
 Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. 
@@ -231,6 +233,8 @@ App::uses('Serializer', 'Serializers.Serializer');
 class UserSerializer extends Serializer {
 }
 ```
+
+### Required Property of Serializer Class ###
 
 You can set the fields that are required to be included in the serialized data, by
 adding a `$required` property.
@@ -248,142 +252,13 @@ class UserSerializer extends Serializer {
 }
 ```
 
+This Serializer will throw a `SerializerMissingRequiredException` if the data passed
+to the Serializer does not include all of the required properties.
+
 All other fields (in this exampled `created` and `modified`) will be suppressed
 when rendering the JSON.
 
-## Advanced Setup - Deserializing ##
-
-
-
-
-
-
-
-
-## Usage ##
-
-### Custom Serializer Setup ###
-
-#### Basic Custom Serializer Classes ####
-
-Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. This
-directory will contain your specific model serialization classes. For example, if we have a `User`
-model with required fields `id`, `first_name`, and `last_name` create the file
-`Serializer/UserSerializer.php`:
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
-
-class UserSerializer extends Serializer {
-	public $required = array('id', 'first_name', 'last_name');
-}
-```
-
-This serializer will throw a `SerializerMissingRequiredException` if the data passed
-to the serializer does not include all of these properties.
-
-#### Format Return of Data - Serializing ####
-
-If you need to do any formatting or data manipulation when serializing data,
-create a method named after a field with the prefix `serialize_`. For example:
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
-
-class UserSerializer extends Serializer {
-	public $required = array('id', 'first_name', 'last_name');
-
-	// $data is the pre-serialized data record for the $data[User] from the controller
-	// $value is the pre-serialized value for the $data[User][first_name]
-	public function serialize_first_name($data, $value) {
-		return strtoupper($data['first_name']);
-	}
-}
-```
-
-This will return the `first_name` as upper case when serializing data.
-
-Methods on serialized data will override calling a SubSerializer if you so desire
-it, however you will need to return the array wrapped in the name of the sub-model
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
-
-class UserSerializer extends Serializer {
-	public $required = array('id', 'first_name', 'last_name');
-
-	// $data is an empty array in this case
-	// $value is the pre-serialized value for the $data[User]['Permission']
-	public function serialize_Permission($data, $value) {
-		return array(
-			'permissions' => array_value($value),
-		);
-	}
-}
-```
-
-Will result in:
-
-```php
-$data = array(
-	'User' => array(
-		'id' => 1,
-		'username' => 'testusername',
-		'first_name' => 'first',
-		'last_name' => 'last',
-		'is_active' => true,
-	),
-	'Permission' => array(
-		0 => 'write:testing',
-		1 => 'read:secondary',
-	),
-);
-```
-
-being transformed into:
-
-```javascript
-{
-	"user": {
-		"id": 1,
-		"username": "testusername",
-		"first_name": "first",
-		"last_name": "last",
-		"is_active": true,
-		"permissions": {
-			'write:testing',
-			'read:secondary',
-		}
-	}
-}
-```
-
-#### Format Return of Data - Deserializing ####
-
-If you need to do any formatting or data manipulation when deserializing data,
-create a method named after a field with the prefix `deserialize_`. For example:
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
-
-class UserSerializer extends Serializer {
-	public $required = array('id', 'first_name', 'last_name');
-
-	// $data is the deserialized data record that will be set to the data CakeRequest property
-	// $record is the pre-deserialized record for the {"users":} from the HTTP request
-	public function deserialize_first_name($data, $record) {
-		return strtoupper($data['first_name']);
-	}
-}
-```
-
-This will return the `first_name` as upper case when serializing data.
-
-#### Optional Attributes for Serializers  ####
+### Optional Property of Serializer Class ###
 
 If you have attributes that you wish to have as optional attributes, ie. attributes
 that are passed to the output only when provided to the Serializer, you can setup
@@ -394,20 +269,26 @@ an array of optional properties.
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
-	public $required = array('id', 'first_name', 'last_name');
 
-	public $optional = array('email');
+	public $required = array(
+		'id', 
+		'first_name', 
+		'last_name'
+	);
+
+	public $optional = array(
+		'created'
+	);
 }
 ```
 
-If `email` is passed to the Serializer, then `email` will be Serialized and passed
-to the output.
+If `created` is passed to the Serializer, then `created` will be Serialized 
+and passed to the output.
 
-#### Optional Methods for Serializers  ####
+### Custom Serialize Methods ###
 
-You can also create methods to process required and optional attributes. The
-method for an optional attribute will always get called even if the attribute
-is not supplied.
+If you need to do any formatting or data manipulation when serializing data,
+create a method named after a field with the prefix `serialize_`. For example:
 
 ``` php
 // Serializer/UserSerializer.php
@@ -415,31 +296,85 @@ App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
 
-	public $required = array('id', 'first_name', 'last_name');
+	public $required = array(
+		'id', 
+		'first_name', 
+		'last_name'
+	);
 
-	public $optional = array('email');
-
-	// $data is the pre-serialized data record for the $data[User] from the controller
-	// $value is the pre-serialized value for the $data[User][first_name]
-	public function email($data, $record) {
-		if(!array_key_exists('email', $data)) {
-			throw new SerializerIgnoreException();
-		}
-
-		return strtoupper($data['email']);
+	/**
+	 * On Serializing the data, modify the first_name value by converting to 
+	 * UPPER_CASE
+	 * @param  array  $data   the data for the overall User record being serialized
+	 * @param  string $record the single value for the property being serialized
+	 * @return multi
+	 */
+	public function serialize_first_name($data, $record) {
+		//	$data = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		//	$record = "Doe";
+		return strtoupper($record);
 	}
 }
 ```
 
-If `email` exists in the data, then it will be upper cased when returned.
+If you want to return an optional attribute only in certain cases and otherwise
+not include that property in the JSON array, you can throw a `SerializerIgnoreException`
+and the optional property will be ignored.
 
-If `email` does not exist in the data, then it will be ignored and no data will
-be returned for that key. The base Serializer Class will catch Exceptions of type
-`SerializerIgnoreException` and unset the data array for that key.
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
 
-#### AfterSerializer Callbacks ####
+class UserSerializer extends Serializer {
 
-There is an afterSerialize callback setup if you wish to do some amount of
+	public $required = array(
+		'id', 
+		'first_name', 
+		'last_name'
+	);
+
+	public $optional = array(
+		'created'
+	);
+
+	/**
+	 * On Serializing the data, modify the first_name value by converting to 
+	 * UPPER_CASE
+	 * @param  array  $data   the data for the overall User record being serialized
+	 * @param  string $record the single value for the property being serialized
+	 * @return multi
+	 * @throws SerializerIgnoreException if the User's id is not 2
+	 */
+	public function serialize_created($data, $record) {
+		//	$data = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		//	$record = "2014-11-18 19:22:17";
+		if ($data['id'] === 2) {
+			return $record;
+		}
+
+		throw new SerializerIgnoreException();
+	}
+}
+```
+
+If you throw this Exception on a required attribute you will still have a `SerializerMissingRequiredException`
+thrown as you are now missing a required attribute.
+
+### Custom Serializer AfterSerialize Callback ####
+
+There is an `afterSerialize` callback if you wish to do some amount of
 post processing after all the data has been serialized.
 
 ``` php
@@ -448,9 +383,15 @@ App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
 
-	public $required = array('id', 'first_name', 'last_name');
+	public $required = array(
+		'id', 
+		'first_name', 
+		'last_name'
+	);
 
-	public $optional = array('email');
+	public $optional = array(
+		'created'
+	);
 
 	/**
 	 * Callback method called after automatic serialization. Whatever is returned
@@ -466,7 +407,110 @@ class UserSerializer extends Serializer {
 }
 ```
 
-#### AfterDeserializer Callbacks ####
+## Advanced Setup - Deserializing ##
+
+### Setup of Deserializer Class ###
+
+To do anything advanced with deserializing data requires a custom Serializer class:
+
+Create a new directory at the `APP` level (Controller, Model, etc.) named `Serializer`. 
+This directory will contain your specific Model serialization classes. 
+For example, if we have a `User` model with fields `id`, `first_name`, 
+`last_name`, `created` and `modified` create the file `Serializer/UserSerializer.php`:
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+}
+```
+
+This is the same `Serializer` class that is also used for serializing data. 
+While serializing data uses the `$required` and `$optional` properties of the 
+`UserSerializer` class, deserializing does not. All data passed to the Deserializer
+will be passed through to the CakePHP Controller.
+
+### Custom Deserialize Methods ###
+
+If you need to do any formatting or data manipulation when deserializing data,
+create a method named after a field with the prefix `deserialize_`. For example:
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+
+	/**
+	 * On Deserializing the data, modify the first_name value by converting to 
+	 * UPPER_CASE
+	 * @param  array  $data   the current deserialized data for the overall User record
+	 * @param  string $record the current User record being deserialized
+	 * @return multi
+	 */
+	public function serialize_first_name($data, $record) {
+		//	$data = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		//	$record = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		return strtoupper($record['first_name']);
+	}
+}
+```
+
+If you want to return an attribute only in certain cases and otherwise
+not include that property in the CakePHP data array, you can throw a 
+`DeserializerIgnoreException` and the property will be ignored.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('Serializer', 'Serializers.Serializer');
+
+class UserSerializer extends Serializer {
+
+	/**
+	 * On Deserializing the data, only return the created timestamp if the id === 
+	 * @param  array  $data   the current deserialized data for the overall User record
+	 * @param  string $record the current User record being deserialized
+	 * @return multi
+	 * @throws DeserializerIgnoreException if the User's id is not 2
+	 */
+	public function deserialize_created($data, $record) {
+		//	$data = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		//	$record = array(
+		//		'id' => 1,
+		//		'first_name' => 'Jane', 
+		//		'last_name' => 'Doe',
+		//		'created' => '2014-11-18 19:22:17',
+		//		'modified' => '2014-11-18 19:22:17'
+		//	);
+		if ($record['id'] === 1) {
+			return $record['created'];
+		}
+
+		throw new DeserializerIgnoreException();
+	}
+}
+```
+
+### Custom Deserializer AfterDeserialize Callback ####
 
 There is an afterDeserialize callback setup if you wish to do some amount of
 post processing after all the data has been deserialized.
@@ -476,10 +520,6 @@ post processing after all the data has been deserialized.
 App::uses('Serializer', 'Serializers.Serializer');
 
 class UserSerializer extends Serializer {
-
-	public $required = array('id', 'first_name', 'last_name');
-
-	public $optional = array('email');
 
 	/**
 	 * Callback method called after automatic deserialization. Whatever is returned
@@ -494,10 +534,6 @@ class UserSerializer extends Serializer {
 	}
 }
 ```
-
-
-
-
 
 ## Advanced Examples ##
 
@@ -803,7 +839,7 @@ $this->request->data = array(
 
 ### Reporting Issues ###
 
-Please use [GitHub Isuses](https://github.com/loadsys/CakePHP-Serializers/issues) for listing any known defects or issues
+Please use [GitHub Isuses](https://github.com/loadsys/CakePHP-Serializers/issues) for listing any known defects or issues.
 
 ### Development ###
 
