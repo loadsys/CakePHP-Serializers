@@ -16,9 +16,10 @@ Cases as the final authoritative answer.
 This is currently not fully production ready - be warned bugs/issues may exist.
 
 This Readme is split into the following sections:
-1. [Base Use Cases](https://github.com/loadsys/CakePHP-Serializers#basic-use-case)
-2. [Requirements](https://github.com/loadsys/CakePHP-Serializers#requirements)
-3. [Installationn](https://github.com/loadsys/CakePHP-Serializers#installation)
+
+1. [Base Use Cases](#basic-use-case)
+2. [Requirements](#requirements)
+3. [Installationn](#installation)
 
 ## Basic Use Case ##
 
