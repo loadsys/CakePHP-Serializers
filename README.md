@@ -17,7 +17,7 @@ This is currently not fully production ready - be warned bugs/issues may exist.
 
 This Readme is split into the following sections:
 
-1. [Base Use Cases](#basic-use-case)
+1. [Base Use Case](#basic-use-case)
 1. [Requirements](#requirements)
 1. [Installation](#installation)
 1. [Basic Setup](#basic-setup)
@@ -29,8 +29,6 @@ This Readme is split into the following sections:
 1. [Contributing](#contributing)
 1. [License](#license)
 1. [Copyright](#copyright)
-
-## Copyright
 
 ## Basic Use Case ##
 
