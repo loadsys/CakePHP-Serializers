@@ -253,7 +253,7 @@ class UserSerializer extends Serializer {
 This Serializer will throw a `SerializerMissingRequiredException` if the data passed
 to the Serializer does not include all of the required properties.
 
-All other fields (in this exampled `created` and `modified`) will be suppressed
+All other fields (in this example `created` and `modified`) will be suppressed
 when rendering the JSON.
 
 ### Optional Property of Serializer Class ###
