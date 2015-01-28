@@ -5,20 +5,22 @@
 An object oriented solution to CakePHP model data serialization to JSON and the
 corresponding deserialization of a JSON payload to CakePHP data arrays.
 
-This plugin is designed to work with the Ember Data Spec for de/serialization of
-records: http://emberjs.com/guides/models/the-rest-adapter/
+This plugin is designed to match the [Ember Data Spec](http://emberjs.com/guides/models/the-rest-adapter/) 
+for serialization and deserialization of records.
 
-As a secondary reference when deciding on implementation details the [json:api](http://jsonapi.org/)
-spec was also used.
+As a secondary reference the [json:api](http://jsonapi.org/) spec was also used.
 
 Questions on any implementation details can be answered typically using the Test
 Cases as the final authoritative answer.
 
 This is currently not fully production ready - be warned bugs/issues may exist.
 
-## Examples ##
+This Readme is split into the following sections:
+1. [Base Use Cases](https://github.com/loadsys/CakePHP-Serializers#basic-use-case)
+2. [Requirements](https://github.com/loadsys/CakePHP-Serializers#requirements)
+3. [Installationn](https://github.com/loadsys/CakePHP-Serializers#installation)
 
-### Simple Cases ###
+## Basic Use Case ##
 
 The basic concept for this plugin is to serialize data when rendering a view:
 
@@ -90,7 +92,61 @@ $this->request->data = array(
 );
 ```
 
-### Advanced Cases ###
+## Requirements ##
+
+* PHP >= 5.3.0
+* CakePHP >= 2.3
+
+## Installation ##
+
+### Composer ###
+
+* Run this shell command
+
+```bash
+php composer.phar require loadsys/cakephp_serializers "dev-master"
+```
+
+### Git ###
+
+```bash
+git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
+```
+
+### Setup ###
+
+Load the plugin and be sure that bootstrap is set to true:
+
+```php
+// Config/boostrap.php
+CakePlugin::load('Serializers', array('bootstrap' => true));
+// or
+CakePlugin::loadAll(array(
+	'Serializers' => array('bootstrap' => true),
+));
+```
+
+To deserialize data in an HTTP request a few other changes are required:
+
+```php
+// Config/boostrap.php
+Configure::write('Dispatcher.filters', array(
+	'Serializers.DeserializerFilter',
+));
+```
+
+When deserializing data and setting your CakePHP controller to respond to REST
+HTTP requests you will also need to add:
+
+```php
+// Config/routes.php
+Router::mapResources(array(
+	'{controller_name}',
+));
+Router::parseExtensions('json');
+```
+
+## Advanced Use Cases ##
 
 We can serialize both multiple records:
 
@@ -388,55 +444,6 @@ $this->request->data = array(
 		'is_active' => true,
 	)
 );
-```
-
-## Installation ##
-
-### Composer ###
-
-* Run this shell command
-
-```bash
-php composer.phar require loadsys/cakephp_serializers "dev-master"
-```
-
-### Git ###
-
-```bash
-git clone git@github.com:loadsys/CakePHP-Serializers.git Plugin/Serializers
-```
-
-### Setup ###
-
-Load the plugin and be sure that bootstrap is set to true:
-
-```php
-// Config/boostrap.php
-CakePlugin::load('Serializers', array('bootstrap' => true));
-// or
-CakePlugin::loadAll(array(
-	'Serializers' => array('bootstrap' => true),
-));
-```
-
-To deserialize data in an HTTP request a few other changes are required:
-
-```php
-// Config/boostrap.php
-Configure::write('Dispatcher.filters', array(
-	'Serializers.DeserializerFilter',
-));
-```
-
-Note for deserializing data and setup your CakePHP controller to respond to REST
-HTTP requests you will also need to add:
-
-```php
-// Config/routes.php
-Router::mapResources(array(
-	'{controller_name}',
-));
-Router::parseExtensions('json');
 ```
 
 ## Usage ##
