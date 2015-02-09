@@ -108,9 +108,26 @@ class CakeSerializerView extends View {
 	 */
 	protected function parseNameAndData($arg = null) {
 		$data = array();
-		if (isset($this->controller->viewVars['data'])) {
+
+		// if the CakePHP standard variable names exist use them else, fallback
+		// to a standard $data variable
+		$variableNamePlural = Inflector::variable($this->controller->name);
+		$variableNameSingular = Inflector::singularize($variableNamePlural);
+
+		if (
+			isset($this->controller->viewVars[$variableNamePlural])
+		) {
+			$data = $this->controller->viewVars[$variableNamePlural];
+		} elseif (
+			isset($this->controller->viewVars[$variableNameSingular])
+		) {
+			$data = $this->controller->viewVars[$variableNameSingular];
+		} elseif (
+			isset($this->controller->viewVars['data'])
+		) {
 			$data = $this->controller->viewVars['data'];
 		}
+
 		if (is_array($arg)) {
 			$data = $arg;
 		}
