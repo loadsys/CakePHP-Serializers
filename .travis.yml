@@ -3,6 +3,7 @@ language: php
 php:
   - 5.4
   - 5.5
+  - 5.6
 
 env:
   - CAKE_VERSION=2.3.10 DB=mysql
@@ -10,6 +11,12 @@ env:
   - CAKE_VERSION=2.5.8 DB=mysql
   - CAKE_VERSION=2.6.1 DB=mysql
   - CAKE_VERSION=master DB=mysql
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.4
+      env: PHPCS=1
 
 install:
   - git clone git://github.com/cakephp/cakephp ../cakephp && cd ../cakephp && git checkout $CAKE_VERSION
@@ -77,7 +84,8 @@ before_script:
     }" > ../cakephp/app/Config/database.php
 
 script:
-  - ./lib/Cake/Console/cake test Serializers AllSerializers --stderr
+  - sh -c "if [ '$PHPCS' != '1' ]; then ./lib/Cake/Console/cake test Serializers AllSerializers --stderr; fi"
+  - sh -c "if [ '$PHPCS' = '1' ]; then ./vendor/bin/phpcs -n -p --extensions=php --standard=Vendor/loadsys/loadsys_codesniffer/Loadsys ./src ./tests; fi"
 
 
 # After a Successful Build
