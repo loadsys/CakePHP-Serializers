@@ -27,7 +27,8 @@
     "composer/installers": "*"
   },
   "require-dev": {
-    "loadsys/loadsys_codesniffer": "1.0.0"
+    "squizlabs/php_codesniffer": "2.*",
+    "loadsys/loadsys_codesniffer": "~1.0"
   },
   "extra": {
     "installer-name": "Serializers"
