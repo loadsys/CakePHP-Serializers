@@ -185,16 +185,18 @@ it for output. If all you want to do is to Serialize the output of every field
 in a Model with no data manipulation and all fields required, this is all you need.
 
 Create your Controller method that sets whatever data you need to be output as 
-JSON, to the view variable `$data`, you must do this for Serializers to
-function properly.
+JSON, to the standard CakePHP view variables `${controllerNamePluarlized}` or 
+`${controllerNameSingular}`. As an example if you have a Controller named Users,
+Serializers will look for your data first at the view variable `$users`, then `$user`.
+As a final fallback, Serializers will use the `$data` variable for output.
 
 ``` php
 // Controller/UsersController.php
 
 public function index() {
 	$this->User->recursive = 0;
-	$data = $this->paginate();
-	$this->set(compact('data'));
+	$users = $this->paginate();
+	$this->set(compact('users'));
 }
 ```
 
