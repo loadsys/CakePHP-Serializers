@@ -1,7 +1,7 @@
 # CakePHP-Serializers #
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master)](https://travis-ci.org/loadsys/CakePHP-Serializers)
+[![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master?style=flat-square)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 [![Total Downloads](https://img.shields.io/packagist/dt/loadsys/cakephp_serializers.svg?style=flat-square)](https://packagist.org/packages/loadsys/cakephp_serializers)
 
 An object oriented solution to CakePHP model data serialization to JSON and the
