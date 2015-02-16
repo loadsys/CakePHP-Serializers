@@ -1,25 +1,25 @@
 <?php
 /**
- * Class to the test the CakeSerializerView class
+ * Class to the test the EmberDataSerializerView class
  */
 App::uses('Controller', 'Controller');
 App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
-App::uses('CakeSerializerView', 'Serializers.View');
+App::uses('EmberDataSerializerView', 'Serializers.View');
 
 /**
- * CakeSerializerViewTest
+ * EmberDataSerializerViewTest
  */
-class CakeSerializerViewTest extends CakeTestCase {
+class EmberDataSerializerViewTest extends CakeTestCase {
 
 	/**
-	 * setup the CakeSerializerViewTest when testing
+	 * setup the EmberDataSerializerView when testing
 	 *
 	 * @return void
 	 */
 	public function setUp() {
 		parent::setUp();
-		$this->CakeSerializerView = new CakeSerializerView();
+		$this->EmberDataSerializerView = new EmberDataSerializerView();
 		$this->baseUrl = trim(Router::url('/', true), '/');
 	}
 
@@ -29,7 +29,7 @@ class CakeSerializerViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function tearDown() {
-		unset($this->CakeSerializerView);
+		unset($this->EmberDataSerializerView);
 		unset($this->baseUrl);
 		parent::tearDown();
 	}
@@ -40,7 +40,7 @@ class CakeSerializerViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testIncomplete() {
-		$this->markTestIncomplete("CakeSerializerView currently has no test methods.");
+		$this->markTestIncomplete("EmberDataSerializerView currently has no test methods.");
 	}
 
 }

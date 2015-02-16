@@ -10,12 +10,13 @@ corresponding deserialization of a JSON payload to CakePHP data arrays.
 This plugin is designed to match the [Ember Data Spec](http://emberjs.com/guides/models/the-rest-adapter/) 
 for serialization and deserialization of records.
 
-As a secondary reference the [json:api](http://jsonapi.org/) spec was also used.
+As a secondary reference the [json:api](http://jsonapi.org/) spec was also used
+where Ember Data format was incomplete.
 
 Questions on any implementation details can be answered typically using the Test
 Cases as the final authoritative answer.
 
-This is currently not fully production ready - be warned bugs/issues may exist.
+:warning: This is currently not fully production ready - be warned bugs/issues may exist.
 
 This Readme is split into the following sections:
 
@@ -168,7 +169,7 @@ Set a `$viewClass` property, either globally in your `Controller/AppController.p
 controllers as needed:
 
 ```php
-public $viewClass = 'Serializers.CakeSerializer';
+public $viewClass = 'Serializers.EmberDataSerializer';
 ```
 
 To force JSON rendering from all controller responses, set a `$renderAs` property in `Controller/AppController.php`, and override it with 'html' as needed:
@@ -853,9 +854,9 @@ The Complete Test Suite for the Plugin can be run via this command:
 
 ## License
 
-[MIT](https://github.com/loadsys/CakePHP-Serializers/blob/master/LICENSE)
+[MIT](https://github.com/loadsys/CakePHP-Serializers/blob/master/LICENSE.md)
 
 
 ## Copyright
 
-[Loadsys Web Strategies](http://www.loadsys.com) 2014
+[Loadsys Web Strategies](http://www.loadsys.com) 2015

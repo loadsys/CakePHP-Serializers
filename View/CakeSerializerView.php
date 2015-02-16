@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom view class for rending serialized data
+ * Base custom view class for rending serialized data
  *
  * @package  Serializers.View
  */
@@ -49,11 +49,6 @@ class CakeSerializerView extends View {
 		}
 		return $render;
 	}
-
-	/**
-	 * @access protected
-	 * @return string
-	 */
 
 	/**
 	 * converts view data to serialized data
