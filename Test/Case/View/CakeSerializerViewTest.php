@@ -13,7 +13,7 @@ App::uses('CakeSerializerView', 'Serializers.View');
 class CakeSerializerViewTest extends CakeTestCase {
 
 	/**
-	 * setup the CakeSerializerViewTest when testing\
+	 * setup the CakeSerializerViewTest when testing
 	 *
 	 * @return void
 	 */

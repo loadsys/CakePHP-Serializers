@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom view class for rending serialized data
+ * Base custom view class for rending serialized data
  *
  * @package  Serializers.View
  */
