@@ -5,7 +5,7 @@
 App::uses('Controller', 'Controller');
 App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
-App::uses('EmberDataSerializer', 'Serializers.View');
+App::uses('EmberDataSerializerView', 'Serializers.View');
 
 /**
  * EmberDataSerializerViewTest
