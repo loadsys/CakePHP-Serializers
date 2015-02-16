@@ -853,7 +853,7 @@ The Complete Test Suite for the Plugin can be run via this command:
 
 ## License
 
-[MIT](https://github.com/loadsys/CakePHP-Serializers/blob/master/LICENSE)
+[MIT](https://github.com/loadsys/CakePHP-Serializers/blob/master/LICENSE.md)
 
 
 ## Copyright
