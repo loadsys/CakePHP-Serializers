@@ -51,11 +51,6 @@ class CakeSerializerView extends View {
 	}
 
 	/**
-	 * @access protected
-	 * @return string
-	 */
-
-	/**
 	 * converts view data to serialized data
 	 *
 	 * @param  string $name the model name to serialize
