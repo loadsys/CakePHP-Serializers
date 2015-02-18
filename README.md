@@ -4,11 +4,11 @@
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master&style=flat-square)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 [![Total Downloads](https://img.shields.io/packagist/dt/loadsys/cakephp_serializers.svg?style=flat-square)](https://packagist.org/packages/loadsys/cakephp_serializers)
 
-An object oriented solution to CakePHP model data serialization to JSON and the
-corresponding deserialization of a JSON payload to CakePHP data arrays.
+An object oriented solution to serialize CakePHP response to JSON and 
+correspondingly deserialize JSON into CakePHP data arrays.
 
 This plugin is designed to match the [Ember Data Spec](http://emberjs.com/guides/models/the-rest-adapter/) 
-for serialization and deserialization of records.
+for serialization and deserialization of CakePHP generated responses.
 
 As a secondary reference the [json:api](http://jsonapi.org/) spec was also used
 where Ember Data format was incomplete.
@@ -16,9 +16,9 @@ where Ember Data format was incomplete.
 Questions on any implementation details can be answered typically using the Test
 Cases as the final authoritative answer.
 
-:warning: This is currently not fully production ready - be warned bugs/issues may exist.
+This is currently not fully production ready - be warned bugs/issues may exist.
 
-This Readme is split into the following sections:
+This README is split into the following sections:
 
 1. [Base Use Case](#basic-use-case)
 1. [Requirements](#requirements)
@@ -26,6 +26,8 @@ This Readme is split into the following sections:
 1. [Basic Setup](#basic-setup)
 1. [Basic Controller Setup - Serializing](#basic-controller-setup---serializing)
 1. [Basic Controller Setup - Deserializing](#basic-controller-setup---deserializing)
+1. [Error and Exception Handling Setup](#error-and-exception-handling-setup)
+1. [Custom Bake Templates](#custom-bake-templates)
 1. [Advanced Setup - Serializing](#advanced-setup---serializing)
 1. [Advanced Setup - Deserializing](#advanced-setup---deserializing)
 1. [Advanced Examples](#advanced-examples)
@@ -35,7 +37,11 @@ This Readme is split into the following sections:
 
 ## Basic Use Case ##
 
-The basic concept for this plugin is to serialize data when rendering a view:
+The basic concept for this plugin is to create an end to end solution for serializing
+and deserializing CakePHP respones into JSON. This plugin is primarily designed around
+the use of Ember and Ember Data.
+
+So serializing a CakePHP model data array:
 
 ```php
 $data = array(
@@ -210,13 +216,45 @@ And you should see your data rendered as JSON.
 This is the minimal use case for serializing data from your CakePHP Controller to
 JSON at the view layer.
 
-## Basic Controller Setup - Deserializing ##
+### Basic Controller Setup - Deserializing ###
 
 The Deserializer Dispatch Filter will transform the JSON payload of an HTTP 
 request from [Ember Data](http://emberjs.com/guides/models/the-rest-adapter/) 
 compliant  JSON to the `Controller->request->data` property and as a standard 
 CakePHP array format. No other code changes are required for basic 
 deserilization to work.
+
+### Error and Exception Handling Setup ###
+
+Errors and Exceptions can also be handled with this plugin.
+
+Modify your `app/Config/core.php` file to use the Custom Exceptions/Error
+handling in this plugin with this code:
+
+``` php
+Configure::write('Error', array(
+	'handler' => 'EmberDataError::handleError',
+	'level' => E_ALL & ~E_DEPRECATED,
+	'trace' => true
+));
+
+Configure::write('Exception', array(
+	'handler' => 'EmberDataError::handleException',
+	'renderer' => 'Serializers.EmberDataExceptionRenderer',
+	'log' => true
+));
+```
+
+This does two things:
+
+* Errors and Exceptions get output as correctly formatted JSON
+* Allows the use of Custom Exceptions that match Ember Data exceptions for error cases
+
+### Custom Bake Templates ###
+
+There are custom bake templates included in this project for baking your CakePHP 
+Controller classes. Use the `serializers` template when baking a Controller, to 
+generate a Controller to work with the Serializers Plugin.
 
 ## Advanced Setup - Serializing ##
 
