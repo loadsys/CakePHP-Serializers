@@ -210,7 +210,7 @@ And you should see your data rendered as JSON.
 This is the minimal use case for serializing data from your CakePHP Controller to
 JSON at the view layer.
 
-## Basic Controller Setup - Deserializing ##
+### Basic Controller Setup - Deserializing ###
 
 The Deserializer Dispatch Filter will transform the JSON payload of an HTTP 
 request from [Ember Data](http://emberjs.com/guides/models/the-rest-adapter/) 
