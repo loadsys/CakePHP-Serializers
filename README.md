@@ -32,7 +32,8 @@ covering certain topics.
 1. [License](#license)
 1. [Copyright](#copyright)
 
-1. [Serialization](/SERALIZE_README.md)
+
+* [Serialization](/SERIALIZE_README.md)
 
 ## Basic Use Case ##
 
