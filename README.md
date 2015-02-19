@@ -32,8 +32,10 @@ covering certain topics.
 1. [License](#license)
 1. [Copyright](#copyright)
 
+Additional README Documents:
 
-* [Serialization](/SERIALIZE_README.md)
+1. [Serialization](/Docs/SERIALIZE_README.md)
+1. [Deserialization](/Docs/DESERIALIZE_README.md)
 
 ## Basic Use Case ##
 
