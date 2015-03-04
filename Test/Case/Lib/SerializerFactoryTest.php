@@ -1,9 +1,10 @@
 <?php
 
 App::uses('SerializerFactory', 'Serializers.Lib');
+App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Model', 'Model');
 
-class TestCommentSerializer {
+class TestCommentSerializer extends Serializer {
 }
 
 class TestTag extends Model {
@@ -17,7 +18,7 @@ class SerializerFactoryTest extends CakeTestCase {
 		$factory = new SerializerFactory('TestComment');
 		$serializer = $factory->generate();
 
-		$this->assertTrue($serializer instanceof Serializer);
+		$this->assertTrue(is_subclass_of($serializer, 'Serializer'));
 		$this->assertTrue($serializer instanceof TestCommentSerializer);
 		$this->assertEquals(array(), $serializer->required);
 		$this->assertEquals('TestComment', $serializer->rootKey);

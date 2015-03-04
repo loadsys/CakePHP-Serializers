@@ -57,7 +57,7 @@ class SerializerFactory {
 			return $serializer;
 		}
 
-		$serializer = new Serializer();
+		$serializer = new $this->className();
 		$serializer->rootKey = $modelName;
 		return $serializer;
 	}
