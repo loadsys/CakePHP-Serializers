@@ -15,7 +15,12 @@ class SerializerFactoryTest extends CakeTestCase {
 
 	public function testLooksUpConventionallyNamedClasses() {
 		$factory = new SerializerFactory('TestComment');
-		$this->assertTrue($factory->generate() instanceof TestCommentSerializer);
+		$serializer = $factory->generate();
+
+		$this->assertTrue($serializer instanceof Serializer);
+		$this->assertTrue($serializer instanceof TestCommentSerializer);
+		$this->assertEquals(array(), $serializer->required);
+		$this->assertEquals('TestComment', $serializer->rootKey);
 	}
 
 	public function testGetsDefaultInstanceWhenClassNotDefined() {
