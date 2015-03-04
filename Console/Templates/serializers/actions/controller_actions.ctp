@@ -25,8 +25,8 @@
 	public function <?php echo $admin ?>index() {
 		$this->Paginator->settings = array_merge($this->paginate, array(
 		));
-		$data = $this->paginate();
-		$this->set(compact('data'));
+		$<?php echo $pluralName ?> = $this->paginate();
+		$this->set(compact('<?php echo $pluralName ?>'));
 	}
 
 	/**
@@ -41,8 +41,8 @@
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
 		$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $id));
-		$data = $this-><?php echo $currentModelName; ?>->find('first', $options);
-		$this->set(compact('data'));
+		$<?php echo $singularName; ?> = $this-><?php echo $currentModelName; ?>->find('first', $options);
+		$this->set(compact('<?php echo $singularName; ?>'));
 	}
 
 <?php $compact = array(); ?>
@@ -55,11 +55,11 @@
 	 */
 	public function <?php echo $admin ?>add() {
 		$this-><?php echo $currentModelName; ?>->create();
-		$this->request->data['<?php echo $currentModelName; ?>']['creator_id'] = $this->Auth->user('id');
+
 		if (!empty($this->request->data) && $this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 			$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $this-><?php echo $currentModelName; ?>->id));
-			$data = $this-><?php echo $currentModelName; ?>->find('first', $options);
-			$this->set(compact('data'));
+			$<?php echo $singularName; ?> = $this-><?php echo $currentModelName; ?>->find('first', $options);
+			$this->set(compact('<?php echo $singularName; ?>'));
 		} else {
 			// if there are validation errors, render them, else return a generic
 			// save failure exception
@@ -85,12 +85,11 @@
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
-		$this->request->data['<?php echo $currentModelName; ?>'][$this-><?php echo $currentModelName; ?>->primaryKey] = $id;
-		$this->request->data['<?php echo $currentModelName; ?>']['modifier_id'] = $this->Auth->user('id');
+
 		if (!empty($this->request->data) && $this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 			$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $id));
-			$this->request->data = $data = $this-><?php echo $currentModelName; ?>->find('first', $options);
-			$this->set(compact('data'));
+			$this->request->data = $<?php echo $singularName; ?> = $this-><?php echo $currentModelName; ?>->find('first', $options);
+			$this->set(compact('<?php echo $singularName; ?>'));
 		} else {
 			// if there are validation errors, render them, else return a generic
 			// save failure exception
