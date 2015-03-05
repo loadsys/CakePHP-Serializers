@@ -100,3 +100,11 @@ class TestIgnoreSerializer extends Serializer {
 		throw new DeserializerIgnoreException();
 	}
 }
+
+class TestPrimarySerializer extends Serializer {
+	public $required = array('id', 'name');
+}
+
+class TestSubSecondarySerializer extends Serializer {
+	public $required = array('test_field');
+}
