@@ -910,4 +910,60 @@ class SerializerTest extends CakeTestCase {
 		$serializer->serialize($inputData);
 	}
 
+	public function testMissingRequiredAttributeOnSecondaryModelRecordWithDifferentFieldNames() {
+		$inputData = array(
+			'TestPrimary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+			),
+			'TestSubSecondary' => array(
+				0 => array(
+					'test_field' => 'Smith',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+				2 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Ipsum',
+				),
+			),
+		);
+		$serializer = new TestPrimarySerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSubSecondary: test_field"
+		);
+		$serializer->serialize($inputData);
+	}
+
+	public function testMissingRequiredAttributeOnSubModelRecordWithDifferentFieldNames() {
+		$inputData = array(
+			'TestPrimary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+				'TestSubSecondary' => array(
+					0 => array(
+						'test_field' => 'Smith',
+					),
+					1 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Text',
+					),
+					2 => array(
+						'first_name' => 'Jane',
+						'last_name' => 'Ipsum',
+					),
+				),
+			),
+		);
+		$serializer = new TestPrimarySerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSubSecondary: test_field"
+		);
+		$serializer->serialize($inputData);
+	}
+
 }

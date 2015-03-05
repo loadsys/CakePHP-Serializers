@@ -39,8 +39,9 @@ class SerializerFactory {
 	 */
 	public function generate() {
 		App::uses($this->className, 'Serializer');
+		$modelName = preg_replace('/Serializer$/', '', $this->className);
+
 		if (!class_exists($this->className)) {
-			$modelName = preg_replace('/Serializer$/', '', $this->className);
 
 			// try to load the model name, catch if an exception occurs
 			try {
@@ -55,6 +56,9 @@ class SerializerFactory {
 			$serializer->required = $required;
 			return $serializer;
 		}
-		return new $this->className();
+
+		$serializer = new $this->className();
+		$serializer->rootKey = $modelName;
+		return $serializer;
 	}
 }
