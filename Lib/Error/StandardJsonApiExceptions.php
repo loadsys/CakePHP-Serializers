@@ -81,26 +81,20 @@ class StandardJsonApiExceptions extends CakeException {
 	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public function __construct($title = null, $detail = null, $code = null, $href = null, $id = null) {
-		if (!empty($title)) {
-			$this->title = $title;
-		}
+	public function __construct(
+		$title = 'JSON API Exception',
+		$detail = 'JSON API Exception',
+		$code = 400,
+		$href = null,
+		$id = null
+	) {
 
-		if (!empty($detail)) {
-			$this->detail = $detail;
-		}
-
-		if (!empty($code)) {
-			$this->code = $code;
-		}
-
-		if (!empty($href)) {
-			$this->href = $href;
-		}
-
-		if (!empty($id)) {
-			$this->id = $id;
-		}
+		// Set the passed in properties to the properties of the Object
+		$this->title = $title;
+		$this->detail = $detail;
+		$this->code = $code;
+		$this->href = $href;
+		$this->id = $id;
 
 		parent::__construct($this->title, $code);
 	}
@@ -149,25 +143,23 @@ class StandardJsonApiExceptions extends CakeException {
 class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the UnauthorizedJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 401;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Unauthorized Access';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Unauthorized Access';
+	public function __construct(
+		$title = 'Unauthorized Access',
+		$detail = 'Unauthorized Access',
+		$code = 401,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -177,25 +169,23 @@ class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
 class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the ForbiddenByPermissionsException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 403;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Unauthorized Access';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Access to the requested resource is denied by the Permissions on your account.';
+	public function __construct(
+		$title = 'Unauthorized Access',
+		$detail = 'Access to the requested resource is denied by the Permissions on your account.',
+		$code = 403,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -206,25 +196,23 @@ class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
 class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the ValidationFailedJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 422;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Validation Failed';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Validation Failed';
+	public function __construct(
+		$title = 'Validation Failed',
+		array $detail = array(),
+		$code = 422,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -235,25 +223,23 @@ class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
 class ModelSaveFailedJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the ModelSaveFailedJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 400;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Model Save Failed';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Model Save Failed';
+	public function __construct(
+		$title = 'Model Save Failed',
+		$detail = 'Model Save Failed',
+		$code = 400,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -264,25 +250,23 @@ class ModelSaveFailedJsonApiException extends StandardJsonApiExceptions {
 class InvalidPassedDataJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the InvalidPassedDataJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 400;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Invalid Data Passed';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Invalid Data Passed';
+	public function __construct(
+		$title = 'Invalid Data Passed',
+		$detail = 'Invalid Data Passed',
+		$code = 400,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -293,25 +277,23 @@ class InvalidPassedDataJsonApiException extends StandardJsonApiExceptions {
 class ModelDeleteFailedJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the ModelDeleteFailedJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 502;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Model Delete Failed';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Model Delete Failed';
+	public function __construct(
+		$title = 'Model Delete Failed',
+		$detail = 'Model Delete Failed',
+		$code = 502,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
 /**
@@ -323,24 +305,22 @@ class ModelDeleteFailedJsonApiException extends StandardJsonApiExceptions {
 class ModelDeleteFailedValidationJsonApiException extends StandardJsonApiExceptions {
 
 	/**
-	 * An application-specific error code, expressed as a string value.
+	 * Constructs a new instance of the ModelDeleteFailedJsonApiException
 	 *
-	 * @var int
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 */
-	public $code = 502;
-
-	/**
-	 * A short, human-readable summary of the problem.
-	 *
-	 * @var string
-	 */
-	public $title = 'Model Delete Failed Due to Validation Issue';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var string
-	 */
-	public $detail = 'Model Delete Failed Due to Validation Issue';
+	public function __construct(
+		$title = 'Model Delete Failed Due to Validation Issue',
+		$detail = 'Model Delete Failed Due to Validation Issue',
+		$code = 502,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
 }
 
