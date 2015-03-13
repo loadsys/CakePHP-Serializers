@@ -7,10 +7,10 @@ App::build(array(
 ), App::REGISTER);
 
 // Load JSON API Exceptions
-App::uses('Lib/Error', 'Serializers.StandardJsonApiExceptions');
+App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
 
 // Load Serializer Exceptions
-App::uses('Lib/Error', 'Serializers.SerializerExceptions');
+App::import('Lib/Error', 'Serializers.SerializerExceptions');
 
 // Load the EmberDataError Class
 App::uses('EmberDataError', 'Serializers.Error');

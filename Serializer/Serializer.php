@@ -7,6 +7,7 @@
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
 App::uses('Serialization', 'Serializers.Lib');
+App::import('Lib/Error', 'Serializers.SerializerExceptions');
 
 /**
  * Serializer
