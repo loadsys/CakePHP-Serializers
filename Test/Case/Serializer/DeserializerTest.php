@@ -4,7 +4,7 @@
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
-App::import('Lib/Error', 'Serializers.SerializerExceptions');
+App::uses('Lib/Error', 'Serializers.SerializerExceptions');
 require_once( dirname(__FILE__) . '/serializer_test_classes.php');
 
 class DeserializerTest extends CakeTestCase {
