@@ -17,11 +17,11 @@
  */
 ?>
 
-	/**
-	 * <?php echo $admin; ?>paginate through the <?php echo $currentModelName; ?> records
-	 *
-	 * @return	void
-	 */
+/**
+ * <?php echo $admin; ?>paginate through the <?php echo $currentModelName; ?> records
+ *
+ * @return void
+ */
 	public function <?php echo $admin ?>index() {
 		$this->Paginator->settings = array_merge($this->paginate, array(
 		));
@@ -29,13 +29,13 @@
 		$this->set(compact('<?php echo $pluralName ?>'));
 	}
 
-	/**
-	 * <?php echo $admin; ?>view a single <?php echo $currentModelName; ?> record
-	 *
-	 * @param	string $id the primary key for the <?php echo $currentModelName; ?>
-	 * @return	void
-	 * @throws	NotFoundException If the passed id record does not exist
-	 */
+/**
+ * <?php echo $admin; ?>view a single <?php echo $currentModelName; ?> record
+ *
+ * @param	string $id the primary key for the <?php echo $currentModelName; ?>
+ * @return void
+ * @throws NotFoundException If the passed id record does not exist
+ */
 	public function <?php echo $admin ?>view($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
@@ -46,13 +46,13 @@
 	}
 
 <?php $compact = array(); ?>
-	/**
-	 * <?php echo $admin; ?>add a new <?php echo $currentModelName; ?> record
-	 *
-	 * @return	void
-	 * @throws	ValidationFailedJsonApiException If the add fails due to validation errors
-	 * @throws	ModelSaveFailedJsonApiException If the add fails on save
-	 */
+/**
+ * <?php echo $admin; ?>add a new <?php echo $currentModelName; ?> record
+ *
+ * @return void
+ * @throws ValidationFailedJsonApiException If the add fails due to validation errors
+ * @throws ModelSaveFailedJsonApiException If the add fails on save
+ */
 	public function <?php echo $admin ?>add() {
 		$this-><?php echo $currentModelName; ?>->create();
 
@@ -72,15 +72,15 @@
 	}
 
 <?php $compact = array(); ?>
-	/**
-	 * <?php echo $admin; ?>edit a <?php echo $currentModelName; ?> record
-	 *
-	 * @param 	string $id the primary key for the <?php echo $currentModelName; ?> record
-	 * @return	void
-	 * @throws	NotFoundException If the passed id record does not exist
-	 * @throws	ValidationFailedJsonApiException If the edit fails due to validation errors
-	 * @throws	ModelSaveFailedJsonApiException If the edit fails on save
-	 */
+/**
+ * <?php echo $admin; ?>edit a <?php echo $currentModelName; ?> record
+ *
+ * @param string $id the primary key for the <?php echo $currentModelName; ?> record
+ * @return void
+ * @throws NotFoundException If the passed id record does not exist
+ * @throws ValidationFailedJsonApiException If the edit fails due to validation errors
+ * @throws ModelSaveFailedJsonApiException If the edit fails on save
+ */
 	public function <?php echo $admin; ?>edit($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
@@ -101,14 +101,14 @@
 		}
 	}
 
-	/**
-	 * delete a <?php echo $currentModelName; ?> record
-	 *
-	 * @param 	string $id the primary key for the <?php echo $currentModelName; ?>
-	 * @return	CakeResponse
-	 * @throws	NotFoundException If the passed id record does not exist
-	 * @throws	ModelDeleteFailedJsonApiException If the delete fails
-	 */
+/**
+ * <?php echo $admin ?>delete a <?php echo $currentModelName; ?> record
+ *
+ * @param string $id the primary key for the <?php echo $currentModelName; ?>
+ * @return CakeResponse
+ * @throws NotFoundException If the passed id record does not exist
+ * @throws ModelDeleteFailedJsonApiException If the delete fails
+ */
 	public function <?php echo $admin; ?>delete($id = null) {
 		$this-><?php echo $currentModelName; ?>->id = $id;
 		if (!$this-><?php echo $currentModelName; ?>->exists()) {
