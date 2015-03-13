@@ -201,6 +201,9 @@ There are custom bake templates included in this project for baking your CakePHP
 Controller classes. Use the `serializers` template when baking a Controller, to 
 generate a Controller to work with the Serializers Plugin.
 
+The Custom Bake Templates include using the Custom Exception Classes from the above
+section to provide feedback that matches Ember Data's expectations.
+
 ## Advanced Examples ##
 
 We can serialize both multiple records:
