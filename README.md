@@ -34,6 +34,7 @@ Additional README Documents:
 
 1. [Serialization](/Docs/SERIALIZE_README.md)
 1. [Deserialization](/Docs/DESERIALIZE_README.md)
+1. [Exceptions](/Docs/EXCEPTIONS_README.md)
 
 ## Basic Use Case ##
 
