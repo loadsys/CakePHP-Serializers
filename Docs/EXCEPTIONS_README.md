@@ -124,7 +124,7 @@ This Exception class is actively used by the bake templates. A sample use case:
 
 ```php
 throw new ValidationFailedJsonApiException(__('ModelName create failed.'), $this->ModelName->invalidFields());
-```php
+```
 
 ```php
 __construct(
