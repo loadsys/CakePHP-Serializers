@@ -7,7 +7,7 @@ provided via an HTTP Response Body into CakePHP Request Data arrays.
 1. [Advanced Setup - Deserializing](#advanced-setup---deserializing)
   1. [Setup of Deserializer Class](#setup-of-deserializer-class)
   1. [Custom Deserialize Methods](#custom-deserialize-methods)
-  1. [Custom Deserializer AfterDeserialize Callback](#custom-deserializer-afterDeserialize-callback)
+  1. [Custom Deserializer AfterDeserialize Callback](#custom-deserializer-afterdeserialize-callback)
 
 # Basic Controller Setup - Deserializing #
 

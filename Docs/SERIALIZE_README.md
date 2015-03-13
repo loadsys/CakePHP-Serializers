@@ -9,7 +9,7 @@ into JSON and rendering it to the front end.
   1. [Required Property of Serializer Class](#required-property-of-serializer-class)
   1. [Optional Property of Serializer Class](#optional-property-of-serializer-class)
   1. [Custom Serialize Methods](#custom-serialize-methods)
-  1. [Custom Serializer AfterSerialize Callback](#custom-serializer-afterSerialize-callback)
+  1. [Custom Serializer AfterSerialize Callback](#custom-serializer-afterserialize-callback)
 
 # Basic Controller Setup - Serializing #
 
