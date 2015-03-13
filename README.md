@@ -113,7 +113,7 @@ $this->request->data = array(
 
 ## Requirements ##
 
-* PHP >= 5.3.0
+* PHP >= 5.4.0
 * CakePHP >= 2.3
 
 ## Installation ##
