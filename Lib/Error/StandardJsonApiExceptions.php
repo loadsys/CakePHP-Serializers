@@ -1,6 +1,7 @@
 <?php
 /**
- * Custom Exceptions for the CakePHP Serializers Class
+ * Custom Exceptions for CakePHP Controllers that use Serializers, designed
+ * to provide feedback via standard JSON payloads
  */
 
 /**
