@@ -85,6 +85,8 @@
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
+		
+		$this-><?php echo $currentModelName; ?>->id = $id;
 
 		if (!empty($this->request->data) && $this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 			$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $id));
