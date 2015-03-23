@@ -9,8 +9,7 @@ env:
   - CAKE_VERSION=2.3.10 DB=mysql
   - CAKE_VERSION=2.4.10 DB=mysql
   - CAKE_VERSION=2.5.8 DB=mysql
-  - CAKE_VERSION=2.6.1 DB=mysql
-  - CAKE_VERSION=master DB=mysql
+  - CAKE_VERSION=2.6.3 DB=mysql
 
 matrix:
   fast_finish: true
