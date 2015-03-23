@@ -1,8 +1,16 @@
 {
   "name": "loadsys/cakephp_serializers",
   "type": "cakephp-plugin",
-  "description": "An object oriented solution to serialize CakePHP response to JSON and correspondingly deserialize JSON into CakePHP data arrays.",
-  "keywords": ["cakephp","view","json","serializers","cakephp-plugin"],
+  "description": "A solution to serialize CakePHP response to JSON and correspondingly deserialize JSON into CakePHP data arrays, designed primarily around building REST APIs with Ember and Ember Data.",
+  "keywords": [
+    "cakephp",
+    "view",
+    "json",
+    "serializers",
+    "cakephp-plugin",
+    "ember",
+    "ember-data"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/loadsys/CakePHP-Serializers",
   "authors": [
