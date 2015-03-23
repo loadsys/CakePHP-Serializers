@@ -4,8 +4,7 @@
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master&style=flat-square)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 [![Total Downloads](https://img.shields.io/packagist/dt/loadsys/cakephp_serializers.svg?style=flat-square)](https://packagist.org/packages/loadsys/cakephp_serializers)
 
-An object oriented solution to serialize CakePHP response to JSON and 
-correspondingly deserialize JSON into CakePHP data arrays.
+A solution to serialize CakePHP response to JSON and correspondingly deserialize JSON into CakePHP data arrays, designed primarily around building REST APIs with Ember and Ember Data.
 
 This plugin is designed to match the [Ember Data](http://emberjs.com/guides/models/the-rest-adapter/)
 and the [DS.ActiveModelAdapter](http://emberjs.com/api/data/classes/DS.ActiveModelAdapter.html) for
