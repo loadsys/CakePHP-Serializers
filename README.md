@@ -519,11 +519,11 @@ The Complete Test Suite for the Plugin can be run via this command:
 
 `./lib/Cake/Console/cake test Serializers AllSerializers`
 
-## License
+## License ##
 
 [MIT](https://github.com/loadsys/CakePHP-Serializers/blob/master/LICENSE.md)
 
 
-## Copyright
+## Copyright ##
 
 [Loadsys Web Strategies](http://www.loadsys.com) 2015
