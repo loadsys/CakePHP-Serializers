@@ -298,7 +298,7 @@ class Serializer extends Object {
 		);
 		$jsonData = array();
 		foreach ($whitelistFields as $key) {
-			if (isset($data[$key])) {
+			if (array_key_exists($key, $data)) {
 				$methodName = "serialize_{$key}";
 
 				if (method_exists($this, $methodName)) {
