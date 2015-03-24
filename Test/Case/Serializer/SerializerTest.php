@@ -111,6 +111,34 @@ class SerializerTest extends CakeTestCase {
 		);
 	}
 
+	/**
+	 * test that a empty string required attribute does not throw the
+	 * SerializerMissingRequiredException and serializes correctly
+	 *
+	 * @return void
+	 */
+	public function testEmptyStringRequiredAttribute() {
+		$userData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => '',
+			)
+		);
+		$expectedResult = array(
+			'test_user' => array(
+				'first_name' => 'John',
+				'last_name' => '',
+			),
+		);
+		$TestUserSerializer = new TestUserSerializer();
+		$result = $TestUserSerializer->serialize($userData);
+		$this->assertEquals(
+			$expectedResult,
+			$result,
+			"The result from serialize did not match the expected result"
+		);
+	}
+
 	public function testBadOptionalAttributes() {
 		$data = array(
 			'TestBadOptional' => array(
