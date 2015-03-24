@@ -18,9 +18,6 @@
 
 echo "<?php\n";
 ?>
-<?php if ($type === 'Controller'): ?>
-App::uses('JsonApiControllerTestCase', 'Test');
-<?php endif; ?>
 <?php foreach ($uses as $dependency): ?>
 App::uses('<?php echo $dependency[0]; ?>', '<?php echo $dependency[1]; ?>');
 <?php endforeach; ?>
@@ -30,69 +27,56 @@ App::uses('<?php echo $dependency[0]; ?>', '<?php echo $dependency[1]; ?>');
  *
  */
 <?php if ($type === 'Controller'): ?>
-class <?php echo $fullClassName; ?>Test extends JsonApiControllerTestCase {
+class <?php echo $fullClassName; ?>Test extends ControllerTestCase {
 <?php else: ?>
 class <?php echo $fullClassName; ?>Test extends CakeTestCase {
 <?php endif; ?>
 
 <?php if (!empty($fixtures)): ?>
-	/**
-	 * Fixtures
-	 *
-	 * @var	array
-	 */
+/**
+ * Fixtures
+ *
+ * @var array
+ */
 	public $fixtures = array(
-		'<?php echo join("',\n\t\t'", $fixtures); ?>',
+		'<?php echo join("',\n\t\t'", $fixtures); ?>'
 	);
 
 <?php endif; ?>
 <?php if (!empty($construction)): ?>
-	/**
-	 * setUp method
-	 *
-	 * @return	void
-	 */
+/**
+ * setUp method
+ *
+ * @return void
+ */
 	public function setUp() {
 		parent::setUp();
 <?php echo $preConstruct ? "\t\t" . $preConstruct : ''; ?>
 		$this-><?php echo $className . ' = ' . $construction; ?>
 <?php echo $postConstruct ? "\t\t" . $postConstruct : ''; ?>
-<?php if ($type === 'Controller'): ?>
-		// setup the XMLHttpRequest aka AJAX style request
-		$_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
-<?php endif; ?>
 	}
 
-	/**
-	 * tearDown method
-	 *
-	 * @return	void
-	 */
+/**
+ * tearDown method
+ *
+ * @return void
+ */
 	public function tearDown() {
 		unset($this-><?php echo $className; ?>);
+
 		parent::tearDown();
 	}
 
 <?php endif; ?>
-<?php if (empty($methods)) {
-	$methods = array('placeholder');
-} ?>
 <?php foreach ($methods as $method): ?>
-
-	/**
-	 * test<?php echo Inflector::camelize($method); ?> method
-	 *
-	 * @return	void
-	 */
+/**
+ * test<?php echo Inflector::camelize($method); ?> method
+ *
+ * @return void
+ */
 	public function test<?php echo Inflector::camelize($method); ?>() {
-<?php if ($method == 'placeholder'): ?>
-		$this->markTestSkipped('<?php echo $fullClassName; ?> has no methods to test yet.');
-<?php else: ?>
 		$this->markTestIncomplete('test<?php echo Inflector::camelize($method); ?> not implemented.');
-<?php endif; ?>
-<?php if ($type === 'Model'): ?>
-		$dummy = $this-><?php echo $className; ?>->find('first'); // This sometimes "fixes" code coverage reports when there are no actual methods in the Model.
-<?php endif; ?>
 	}
+
 <?php endforeach; ?>
 }
