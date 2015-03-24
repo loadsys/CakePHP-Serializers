@@ -6,11 +6,23 @@ App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 require_once( dirname(__FILE__) . '/serializer_test_classes.php');
 
+/**
+ * SerializerTest
+ */
 class SerializerTest extends CakeTestCase {
 
+	/**
+	 * test the RootKey Generates correctly
+	 *
+	 * @return void
+	 */
 	public function testRootKeyGeneration() {
-		$serializer = new TestRootKeySerializer();
-		$this->assertEquals('TestRootKey', $serializer->rootKey);
+		$Serializer = new TestRootKeySerializer();
+		$this->assertEquals(
+			'TestRootKey',
+			$Serializer->rootKey,
+			"The Generated RootKey does not equal the name of the Class"
+		);
 	}
 
 	public function testSerializerUsesAttributesInAttributesArray() {
