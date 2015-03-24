@@ -18,17 +18,7 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-// Exclude Session and Paginator if they are present since Session
-// isn't used and Paginator is in AppController already.
-$components = array_diff($components, array('Session', 'Paginator'));
-
 echo "<?php\n";
-?>
-/**
- * <?php echo "$controllerName\n"; ?>
- */
-
-<?php
 echo "App::uses('{$plugin}AppController', '{$pluginPath}Controller');\n";
 ?>
 
@@ -40,10 +30,10 @@ echo "App::uses('{$plugin}AppController', '{$pluginPath}Controller');\n";
 <?php
 if (!$isScaffold) {
 	$defaultModel = Inflector::singularize($controllerName);
-	echo " * @property\t{$defaultModel}\t\${$defaultModel}\n";
+	echo " * @property {$defaultModel} \${$defaultModel}\n";
 	if (!empty($components)) {
 		foreach ($components as $component) {
-			echo " * @property\t{$component}Component\t\${$component}\n";
+			echo " * @property {$component}Component \${$component}\n";
 		}
 	}
 }
@@ -52,61 +42,43 @@ if (!$isScaffold) {
 class <?php echo $controllerName; ?>Controller extends <?php echo $plugin; ?>AppController {
 
 <?php if ($isScaffold): ?>
-	/**
-	 * Scaffold
-	 *
-	 * @var	mixed
-	 */
+/**
+ * Scaffold
+ *
+ * @var mixed
+ */
 	public $scaffold;
 
-<?php else: ?>
-	/**
-	 * Defines the Privilege.slug relevant to the current controller, which
-	 * is used when authorizing the current User's access to the requested
-	 * Cake action.
-	 *
-	 * @var string
-	 */
-	public $privilege = ''; <?php echo '//@TO' . 'DO'; ?>: MUST be set to a slug from the `privileges` table!
+<?php else:
 
-	/**
-	 * Models
-	 *
-	 * @var	array
-	 */
-	//public $uses = array();
-
-	/**
-	 * Components
-	 *
-	 * @var	array
-	 */
-<?php
-	if (count($components)):
-		echo "\tpublic \$components = array(\n\t\t'";
-		echo implode("',\n\t\t'", array_map('Inflector::camelize', $components));
-		echo "',\n\t);\n";
-	else:
-		echo "\t//public \$components = array();\n";
-	endif;
-?>
-
-	/**
-	 * Helpers
-	 *
-	 * @var	array
-	 */
-<?php
 	if (count($helpers)):
-		echo "\tpublic \$helpers = array(\n\t\t'";
-		echo implode("',\n\t\t'", array_map('Inflector::camelize', $helpers));
-		echo "',\n\t);\n";
-	else:
-		echo "\t//public \$helpers = array();\n";
+		echo "/**\n * Helpers\n *\n * @var array\n */\n";
+		echo "\tpublic \$helpers = array(";
+		for ($i = 0, $len = count($helpers); $i < $len; $i++):
+			if ($i != $len - 1):
+				echo "'" . Inflector::camelize($helpers[$i]) . "', ";
+			else:
+				echo "'" . Inflector::camelize($helpers[$i]) . "'";
+			endif;
+		endfor;
+		echo ");\n\n";
+	endif;
+
+	if (count($components)):
+		echo "/**\n * Components\n *\n * @var array\n */\n";
+		echo "\tpublic \$components = array(";
+		for ($i = 0, $len = count($components); $i < $len; $i++):
+			if ($i != $len - 1):
+				echo "'" . Inflector::camelize($components[$i]) . "', ";
+			else:
+				echo "'" . Inflector::camelize($components[$i]) . "'";
+			endif;
+		endfor;
+		echo ");\n\n";
 	endif;
 
 	if (!empty($actions)) {
-		echo "\n\t" . trim($actions) . "\n";
+		echo trim($actions) . "\n";
 	}
 
 endif; ?>

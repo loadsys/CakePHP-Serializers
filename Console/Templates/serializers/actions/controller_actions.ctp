@@ -25,7 +25,7 @@
 	public function <?php echo $admin ?>index() {
 		$this->Paginator->settings = array_merge($this->paginate, array(
 		));
-		$<?php echo $pluralName ?> = $this->paginate();
+		$<?php echo $pluralName ?> = $this->Paginator->paginate();
 		$this->set(compact('<?php echo $pluralName ?>'));
 	}
 
@@ -85,7 +85,7 @@
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
 			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
-		
+
 		$this-><?php echo $currentModelName; ?>->id = $id;
 
 		if (!empty($this->request->data) && $this-><?php echo $currentModelName; ?>->save($this->request->data)) {
