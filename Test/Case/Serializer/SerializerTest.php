@@ -83,6 +83,34 @@ class SerializerTest extends CakeTestCase {
 		$serializer->serialize($data);
 	}
 
+	/**
+	 * test that a null required attribute does not throw the
+	 * SerializerMissingRequiredException and serializes correctly
+	 *
+	 * @return void
+	 */
+	public function testNullRequiredAttribute() {
+		$userData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => null,
+			)
+		);
+		$expectedResult = array(
+			'test_user' => array(
+				'first_name' => 'John',
+				'last_name' => null,
+			),
+		);
+		$TestUserSerializer = new TestUserSerializer();
+		$result = $TestUserSerializer->serialize($userData);
+		$this->assertEquals(
+			$expectedResult,
+			$result,
+			"The result from serialize did not match the expected result"
+		);
+	}
+
 	public function testBadOptionalAttributes() {
 		$data = array(
 			'TestBadOptional' => array(
