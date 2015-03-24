@@ -139,6 +139,34 @@ class SerializerTest extends CakeTestCase {
 		);
 	}
 
+	/**
+	 * test that a zero int required attribute does not throw the
+	 * SerializerMissingRequiredException and serializes correctly
+	 *
+	 * @return void
+	 */
+	public function testZeroIntRequiredAttribute() {
+		$userData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 0,
+			)
+		);
+		$expectedResult = array(
+			'test_user' => array(
+				'first_name' => 'John',
+				'last_name' => 0,
+			),
+		);
+		$TestUserSerializer = new TestUserSerializer();
+		$result = $TestUserSerializer->serialize($userData);
+		$this->assertEquals(
+			$expectedResult,
+			$result,
+			"The result from serialize did not match the expected result"
+		);
+	}
+
 	public function testBadOptionalAttributes() {
 		$data = array(
 			'TestBadOptional' => array(
