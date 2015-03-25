@@ -138,6 +138,31 @@ class StandardJsonApiExceptions extends CakeException {
 }
 
 /**
+ * Used when an Not Found Exception occurs
+ */
+class NotFoundJsonApiException extends StandardJsonApiExceptions {
+
+	/**
+	 * Constructs a new instance of the NotFoundJsonApiException
+	 *
+	 * @param string $title The title of the exception.
+	 * @param string $detail A detailed human readable message.
+	 * @param int $code The http status code of the error.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 */
+	public function __construct(
+		$title = 'Resource Not Found',
+		$detail = 'Resource Not Found',
+		$code = 404,
+		$href = null,
+		$id = null
+	) {
+		parent::__construct($title, $detail, $code, $href, $id);
+	}
+}
+
+/**
  * Used when an HTTP_AUTHORIZATON header token is not set, expired, or invalid.
  */
 class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
