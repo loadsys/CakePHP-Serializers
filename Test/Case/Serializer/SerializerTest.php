@@ -11,20 +11,6 @@ require_once( dirname(__FILE__) . '/serializer_test_classes.php');
  */
 class SerializerTest extends CakeTestCase {
 
-	/**
-	 * test the RootKey Generates correctly
-	 *
-	 * @return void
-	 */
-	public function testRootKeyGeneration() {
-		$Serializer = new TestRootKeySerializer();
-		$this->assertEquals(
-			'TestRootKey',
-			$Serializer->rootKey,
-			"The Generated RootKey does not equal the name of the Class"
-		);
-	}
-
 	public function testSerializerUsesAttributesInAttributesArray() {
 		$data = array(
 			'TestUser' => array(
