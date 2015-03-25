@@ -134,6 +134,19 @@ class Serializer extends Object {
 			$serializedData = array();
 		}
 
+		$serializedData = $this->correctKeyName($serializedData);
+
+		return $this->afterSerialize($serializedData, $unserializedData);
+	}
+
+	/**
+	 * corrects the key name, singularizes when the key does
+	 * not have an array of arrays
+	 *
+	 * @param array $serializedData the serialized data
+	 * @return array
+	 */
+	protected function correctKeyName(array $serializedData = array()) {
 		// assign the serialized data to the tableized model name array
 		$jsonKey = Inflector::tableize($this->rootKey);
 		if (
@@ -146,7 +159,7 @@ class Serializer extends Object {
 			$jsonKey => $serializedData,
 		);
 
-		return $this->afterSerialize($serializedData, $unserializedData);
+		return $serializedData;
 	}
 
 	/**
