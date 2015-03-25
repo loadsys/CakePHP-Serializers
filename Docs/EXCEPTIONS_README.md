@@ -35,6 +35,7 @@ manner that EmberData expects, like so:
 This README is split into the following sections.
 
 1. [StandardJsonApiExceptions](#standardjsonapiexceptions)
+1. [NotFoundJsonApiException](#notfoundjsonapiexception)
 1. [UnauthorizedJsonApiException](#unauthorizedjsonapiexception)
 1. [ForbiddenByPermissionsException](#forbiddenbypermissionsexception)
 1. [ValidationFailedJsonApiException](#validationfailedjsonapiexception)
@@ -80,6 +81,23 @@ as a JSON Array following this pattern:
 		}
 	]
 }
+```
+
+## NotFoundJsonApiException ##
+
+Used when a resource can not be found for an endpoint.
+
+This Exception class is used by the bake templates, in place of the standard
+NotFoundException.
+
+```php
+__construct(
+	$title = 'Resource Not Found',
+	$detail = 'Resource Not Found',
+	$code = 404,
+	$href = null,
+	$id = null
+)
 ```
 
 ## UnauthorizedJsonApiException ##
