@@ -77,13 +77,13 @@
  *
  * @param string $id the primary key for the <?php echo $currentModelName; ?> record
  * @return void
- * @throws NotFoundException If the passed id record does not exist
+ * @throws NotFoundJsonApiException If the passed id record does not exist
  * @throws ValidationFailedJsonApiException If the edit fails due to validation errors
  * @throws ModelSaveFailedJsonApiException If the edit fails on save
  */
 	public function <?php echo $admin; ?>edit($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
-			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
+			throw new NotFoundJsonApiException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
 
 		$this-><?php echo $currentModelName; ?>->id = $id;
@@ -108,13 +108,13 @@
  *
  * @param string $id the primary key for the <?php echo $currentModelName; ?>
  * @return CakeResponse
- * @throws NotFoundException If the passed id record does not exist
+ * @throws NotFoundJsonApiException If the passed id record does not exist
  * @throws ModelDeleteFailedJsonApiException If the delete fails
  */
 	public function <?php echo $admin; ?>delete($id = null) {
 		$this-><?php echo $currentModelName; ?>->id = $id;
 		if (!$this-><?php echo $currentModelName; ?>->exists()) {
-			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
+			throw new NotFoundJsonApiException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
 		$this->request->onlyAllow('delete');
 		if ($this-><?php echo $currentModelName; ?>->delete()) {
