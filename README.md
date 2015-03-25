@@ -38,8 +38,8 @@ Additional README Documents:
 ## Basic Use Case ##
 
 The basic concept for this plugin is to create an end to end solution for serializing
-and deserializing CakePHP respones into JSON. This plugin is primarily designed around
-the use of Ember and Ember Data.
+and deserializing CakePHP responses into JSON. This plugin is primarily designed around
+the use of Ember and Ember Data with the ActiveModelAdapter.
 
 So serializing a CakePHP model data array:
 
@@ -297,9 +297,11 @@ into
 			"first_name": "first",
 			"last_name": "last",
 			"is_active": true,
-			"secondary_models": {
-				"something": "blahh",
-			}
+			"secondary_models": [
+				{
+					"something": "blahh"
+				}
+			]
 		},
 		{
 			"id": 2,
@@ -309,10 +311,10 @@ into
 			"is_active": true,
 			"secondary_models": [
 				{
-					"something": "teasdf",
+					"something": "teasdf"
 				},
 				{
-					"something": "fgdfghdfg",
+					"something": "fgdfghdfg"
 				}
 			]
 		},
@@ -448,7 +450,7 @@ $data = array(
 	),
 	'SecondModel' => array(
 		'id' => 1,
-		'name' => 'asdflkjasdf',
+		'name' => 'asdflkjasdf'
 	),
 );
 ```
@@ -463,10 +465,12 @@ into:
 		"first_name": "first",
 		"last_name": "last",
 		"is_active": true,
-		"second_model": {
-			'id': 1,
-			'name': 'asdflkjasdf',
-		}
+		"second_models": [
+			{
+				'id': 1,
+				'name': 'asdflkjasdf'
+			}
+		]
 	}
 }
 ```
@@ -485,7 +489,7 @@ ignored:
 	},
 	"second_models": {
 		"id": 1,
-		"something": "data",
+		"something": "data"
 	}
 }
 ```
