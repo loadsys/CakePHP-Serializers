@@ -104,6 +104,24 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 			),
 
 			array(
+				'NotFoundJsonApiException',
+				array(
+					'title' => 'Resource Not Found',
+					'detail' => 'Resource Not Found',
+					'code' => 404,
+					'href' => '/right/here/right/now',
+					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
+				),
+				array(
+					'getTitle' => 'Resource Not Found',
+					'getDetail' => 'Resource Not Found',
+					'getCode' => 404,
+					'getHref' => '/right/here/right/now',
+					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
+				),
+			),
+
+			array(
 				'UnauthorizedJsonApiException',
 				array(
 					'title' => 'Unauthorized Access',
@@ -267,6 +285,17 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 					'getId' => null,
 				),
 				// optional phpunit assertion failed message here
+			),
+
+			array(
+				'NotFoundJsonApiException',
+				array(
+					'getTitle' => 'Resource Not Found',
+					'getDetail' => 'Resource Not Found',
+					'getCode' => 404,
+					'getHref' => null,
+					'getId' => null,
+				),
 			),
 
 			array(
