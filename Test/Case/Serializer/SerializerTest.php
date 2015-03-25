@@ -647,8 +647,10 @@ class SerializerTest extends CakeTestCase {
 					'first_name' => 'John',
 					'last_name' => 'Doe',
 					'test_second_level_user' => array(
-						'first_name' => 'Jane',
-						'last_name' => 'Ipsum',
+						0 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Ipsum',
+						),
 					),
 				),
 				1 => array(
@@ -821,16 +823,20 @@ class SerializerTest extends CakeTestCase {
 					'first_name' => 'John',
 					'last_name' => 'Doe',
 					'test_second_level_user' => array(
-						'first_name' => 'Someone',
-						'last_name' => 'THings',
+						0 => array(
+							'first_name' => 'Someone',
+							'last_name' => 'THings',
+						),
 					),
 				),
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
 					'test_second_level_user' => array(
-						'first_name' => 'Random',
-						'last_name' => 'Person',
+						0 => array(
+							'first_name' => 'Random',
+							'last_name' => 'Person',
+						),
 					),
 				),
 			),
@@ -868,16 +874,20 @@ class SerializerTest extends CakeTestCase {
 					'first_name' => 'John',
 					'last_name' => 'Doe',
 					'test_second_level_user' => array(
-						'first_name' => 'Someone',
-						'last_name' => 'THings',
+						0 => array(
+							'first_name' => 'Someone',
+							'last_name' => 'THings',
+						),
 					),
 				),
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
 					'test_second_level_user' => array(
-						'first_name' => 'Random',
-						'last_name' => 'Person',
+						0 => array(
+							'first_name' => 'Random',
+							'last_name' => 'Person',
+						),
 					),
 				),
 			),
