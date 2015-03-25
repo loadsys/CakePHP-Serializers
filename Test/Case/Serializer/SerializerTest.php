@@ -399,7 +399,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
+				'test_second_level_users' => array(
 					array(
 						'first_name' => 'Jane', 'last_name' => 'Doe',
 					)
@@ -424,7 +424,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
+				'test_second_level_users' => array(
 				),
 			),
 		);
@@ -438,7 +438,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user_with_method' => array(
+				'test_second_level_user_with_methods' => array(
 					array(
 						'first_name' => 'FIRST',
 						'last_name' => 'Doe',
@@ -476,7 +476,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
+				'test_second_level_users' => array(
 					array(
 						'first_name' => 'Jane', 'last_name' => 'Smith',
 					),
@@ -646,7 +646,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
+					'test_second_level_users' => array(
 						0 => array(
 							'first_name' => 'Jane',
 							'last_name' => 'Ipsum',
@@ -822,7 +822,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
+					'test_second_level_users' => array(
 						0 => array(
 							'first_name' => 'Someone',
 							'last_name' => 'THings',
@@ -832,7 +832,7 @@ class SerializerTest extends CakeTestCase {
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_user' => array(
+					'test_second_level_users' => array(
 						0 => array(
 							'first_name' => 'Random',
 							'last_name' => 'Person',
@@ -873,7 +873,7 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
+					'test_second_level_users' => array(
 						0 => array(
 							'first_name' => 'Someone',
 							'last_name' => 'THings',
@@ -883,7 +883,7 @@ class SerializerTest extends CakeTestCase {
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_user' => array(
+					'test_second_level_users' => array(
 						0 => array(
 							'first_name' => 'Random',
 							'last_name' => 'Person',
