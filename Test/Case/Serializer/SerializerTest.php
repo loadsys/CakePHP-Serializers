@@ -378,6 +378,11 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
+	/**
+	 * test serializing SubModel Records
+	 *
+	 * @return void
+	 */
 	public function testSerializeSubModelRecords() {
 		$inputData = array(
 			'TestUser' => array(
@@ -395,7 +400,9 @@ class SerializerTest extends CakeTestCase {
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_user' => array(
-					'first_name' => 'Jane', 'last_name' => 'Doe',
+					array(
+						'first_name' => 'Jane', 'last_name' => 'Doe',
+					)
 				),
 			),
 		);
@@ -432,8 +439,10 @@ class SerializerTest extends CakeTestCase {
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_user_with_method' => array(
-					'first_name' => 'FIRST',
-					'last_name' => 'Doe',
+					array(
+						'first_name' => 'FIRST',
+						'last_name' => 'Doe',
+					)
 				),
 			),
 		);
@@ -468,7 +477,9 @@ class SerializerTest extends CakeTestCase {
 				'first_name' => 'John',
 				'last_name' => 'Doe',
 				'test_second_level_user' => array(
-					'first_name' => 'Jane', 'last_name' => 'Smith',
+					array(
+						'first_name' => 'Jane', 'last_name' => 'Smith',
+					),
 				),
 			),
 		);
