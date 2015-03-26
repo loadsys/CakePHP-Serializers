@@ -11,20 +11,6 @@ require_once( dirname(__FILE__) . '/serializer_test_classes.php');
  */
 class SerializerTest extends CakeTestCase {
 
-	/**
-	 * test the RootKey Generates correctly
-	 *
-	 * @return void
-	 */
-	public function testRootKeyGeneration() {
-		$Serializer = new TestRootKeySerializer();
-		$this->assertEquals(
-			'TestRootKey',
-			$Serializer->rootKey,
-			"The Generated RootKey does not equal the name of the Class"
-		);
-	}
-
 	public function testSerializerUsesAttributesInAttributesArray() {
 		$data = array(
 			'TestUser' => array(
@@ -378,6 +364,11 @@ class SerializerTest extends CakeTestCase {
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
+	/**
+	 * test serializing SubModel Records
+	 *
+	 * @return void
+	 */
 	public function testSerializeSubModelRecords() {
 		$inputData = array(
 			'TestUser' => array(
@@ -394,8 +385,10 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
-					'first_name' => 'Jane', 'last_name' => 'Doe',
+				'test_second_level_users' => array(
+					array(
+						'first_name' => 'Jane', 'last_name' => 'Doe',
+					)
 				),
 			),
 		);
@@ -417,7 +410,7 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
+				'test_second_level_users' => array(
 				),
 			),
 		);
@@ -431,9 +424,11 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user_with_method' => array(
-					'first_name' => 'FIRST',
-					'last_name' => 'Doe',
+				'test_second_level_user_with_methods' => array(
+					array(
+						'first_name' => 'FIRST',
+						'last_name' => 'Doe',
+					)
 				),
 			),
 		);
@@ -467,8 +462,10 @@ class SerializerTest extends CakeTestCase {
 			array(
 				'first_name' => 'John',
 				'last_name' => 'Doe',
-				'test_second_level_user' => array(
-					'first_name' => 'Jane', 'last_name' => 'Smith',
+				'test_second_level_users' => array(
+					array(
+						'first_name' => 'Jane', 'last_name' => 'Smith',
+					),
 				),
 			),
 		);
@@ -635,9 +632,11 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
-						'first_name' => 'Jane',
-						'last_name' => 'Ipsum',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Jane',
+							'last_name' => 'Ipsum',
+						),
 					),
 				),
 				1 => array(
@@ -809,17 +808,21 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
-						'first_name' => 'Someone',
-						'last_name' => 'THings',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Someone',
+							'last_name' => 'THings',
+						),
 					),
 				),
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_user' => array(
-						'first_name' => 'Random',
-						'last_name' => 'Person',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Random',
+							'last_name' => 'Person',
+						),
 					),
 				),
 			),
@@ -856,17 +859,21 @@ class SerializerTest extends CakeTestCase {
 				0 => array(
 					'first_name' => 'John',
 					'last_name' => 'Doe',
-					'test_second_level_user' => array(
-						'first_name' => 'Someone',
-						'last_name' => 'THings',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Someone',
+							'last_name' => 'THings',
+						),
 					),
 				),
 				1 => array(
 					'first_name' => 'Jane',
 					'last_name' => 'Smith',
-					'test_second_level_user' => array(
-						'first_name' => 'Random',
-						'last_name' => 'Person',
+					'test_second_level_users' => array(
+						0 => array(
+							'first_name' => 'Random',
+							'last_name' => 'Person',
+						),
 					),
 				),
 			),

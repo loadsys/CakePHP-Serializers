@@ -88,7 +88,9 @@ class Serializer extends Object {
 			}
 		} else {
 			$Serialization = new Serialization($modelName, $dataForModel);
-			return $Serialization->serialize($modelName, $dataForModel);
+			$subSerializedData = $Serialization->serialize($modelName, $dataForModel);
+			$subSerializedData = $this->correctSubSerializedModels($modelName, $subSerializedData);
+			return $subSerializedData;
 		}
 	}
 
@@ -134,6 +136,19 @@ class Serializer extends Object {
 			$serializedData = array();
 		}
 
+		$serializedData = $this->correctKeyName($serializedData);
+
+		return $this->afterSerialize($serializedData, $unserializedData);
+	}
+
+	/**
+	 * corrects the key name, singularizes when the key does
+	 * not have an array of arrays
+	 *
+	 * @param array $serializedData the serialized data
+	 * @return array
+	 */
+	protected function correctKeyName(array $serializedData) {
 		// assign the serialized data to the tableized model name array
 		$jsonKey = Inflector::tableize($this->rootKey);
 		if (
@@ -146,7 +161,47 @@ class Serializer extends Object {
 			$jsonKey => $serializedData,
 		);
 
-		return $this->afterSerialize($serializedData, $unserializedData);
+		return $serializedData;
+	}
+
+	/**
+	 * corrects the key name and ensures sub records are always
+	 * arrays of arrays
+	 *
+	 * @param string $modelName the name of the SubModel being serialized
+	 * @param array $subModelSerializedData the serialized data
+	 * @return array
+	 */
+	protected function correctSubSerializedModels($modelName, array $subModelSerializedData) {
+		$pluralSubModelKey = Inflector::tableize($modelName);
+		$singularSubModelKey = Inflector::singularize($pluralSubModelKey);
+
+		// verify the key for the data is plural as opposed to being singular
+		if (
+			array_key_exists($singularSubModelKey, $subModelSerializedData)
+		) {
+			$tempData = $subModelSerializedData[$singularSubModelKey];
+			unset($subModelSerializedData[$singularSubModelKey]);
+			$subModelSerializedData[$pluralSubModelKey] = $tempData;
+		}
+
+		// if there is not a zero key for the sub model serialized
+		// data move it around to make it an array of arrays
+		if (
+			array_key_exists($pluralSubModelKey, $subModelSerializedData)
+			&& !empty($subModelSerializedData[$pluralSubModelKey])
+			&& !array_key_exists(0, $subModelSerializedData[$pluralSubModelKey])
+		) {
+			$tempData = $subModelSerializedData[$pluralSubModelKey];
+			unset($subModelSerializedData[$pluralSubModelKey]);
+			$subModelSerializedData[$pluralSubModelKey][0] = $tempData;
+		}
+
+		$returnData = array(
+			$pluralSubModelKey => $subModelSerializedData[$pluralSubModelKey]
+		);
+
+		return $returnData;
 	}
 
 	/**
