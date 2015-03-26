@@ -445,20 +445,7 @@ class Serializer extends Object {
 			if (is_int($key)) {
 				$deserializedData[] = $this->deserializeRecord($currentClassName, $data);
 			} else {
-				$methodName = $this->returnDeserializeMethodName($key);
-
-				if (method_exists($this, $methodName)) {
-					// if there exists a method for the current key process it
-					try {
-						$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
-					} catch (DeserializerIgnoreException $e) {
-						// if we throw this exception catch it and don't set any data for that record
-					}
-				} elseif (is_array($data)) {
-					$deserializedData = $this->deserializeSubModelRecords($key, $currentRecord, $deserializedData);
-				} else {
-					$deserializedData[$key] = $data;
-				}
+				$deserializedData = $this->deserializeDataForKey($key, $data, $deserializedData, $currentRecord);
 			}
 		}
 
@@ -466,30 +453,34 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * deserialize data for a single key in a record, if it is an array, call a
-	 * sub deserializer
+	 * deserialize data for a key, if there is a method for the key, call the method
+	 * if the data for the key is an array, call a sub deserializer, else set the deserialized
+	 * data to the data for the key
 	 *
-	 * @param string $key              [description]
-	 * @param multi $dataForKey       [description]
-	 * @param array $deserializedData [description]
-	 * @param array $currentRecord    [description]
+	 * @param string $keyName                the name of the key
+	 * @param multi $dataForkey              the data for the key
+	 * @param array $alreadyDeserializedData any already deserialized data
+	 * @param array $dataForModel            the overall data array for the model being deserialized
 	 * @return array
 	 */
-	protected function deserializeDataForKey($key, $dataForKey, $deserializedData, array $currentRecord) {
-		$methodName = $this->returnDeserializeMethodName($key);
+	protected function deserializeDataForKey($keyName, $dataForkey, $alreadyDeserializedData, $dataForModel) {
+		$methodName = $this->returnDeserializeMethodName($keyName);
 
 		if (method_exists($this, $methodName)) {
-			// if there exists a method for the current key process it
+			// if there exists a method for the current keyName process it
 			try {
-				$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
+				$alreadyDeserializedData[$keyName] = $this->{$methodName}($alreadyDeserializedData, $dataForModel);
 			} catch (DeserializerIgnoreException $e) {
 				// if we throw this exception catch it and don't set any data for that record
 			}
-		} elseif (is_array($dataForKey)) {
-			$deserializedData = $this->deserializeSubModelRecords($key, $currentRecord, $deserializedData);
+		} elseif (is_array($dataForkey)) {
+			// the data for the key is an array, therefor call a sub deserializer
+			$alreadyDeserializedData = $this->deserializeSubModelRecords($keyName, $dataForModel, $alreadyDeserializedData);
 		} else {
-			$deserializedData[$key] = $dataForKey;
+			$alreadyDeserializedData[$keyName] = $dataForkey;
 		}
+
+		return $alreadyDeserializedData;
 	}
 
 	/**
