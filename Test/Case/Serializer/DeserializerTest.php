@@ -4,7 +4,7 @@
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
-require_once( dirname(__FILE__) . '/serializer_test_classes.php');
+require_once dirname(__FILE__) . '/serializer_test_classes.php';
 
 class DeserializerTest extends CakeTestCase {
 	public function testRootKeyGeneration() {

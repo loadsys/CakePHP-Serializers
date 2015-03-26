@@ -34,8 +34,7 @@ class Serializer extends Object {
 	/**
 	 * The key name used to find data on the supplied data array
 	 *
-	 * @access public
-	 * @var String $rootKey
+	 * @var string $rootKey
 	 */
 	public $rootKey = false;
 
@@ -43,8 +42,7 @@ class Serializer extends Object {
 	 * List of required required for this model to be serialized into the
 	 * array.
 	 *
-	 * @access public
-	 * @var Array $required
+	 * @var array $required
 	 */
 	public $required = array();
 
@@ -52,15 +50,14 @@ class Serializer extends Object {
 	 * List of optional required for this model to be serialized into the
 	 * array.
 	 *
-	 * @access public
 	 * @var Array $required
 	 */
 	public $optional = array();
 
 	/**
-	 * Generate the rootKey if it wasn't assigned in the class definition
+	 * Generate the rootKey if it wasn't assigned in the class definition or if
+	 * the rootKey was not already set in the class creation
 	 *
-	 * @access public
 	 */
 	public function __construct() {
 		if (!$this->rootKey) {
@@ -78,7 +75,7 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	public function serializeModel($modelName, $dataForModel) {
-		$methodName = "serialize_{$modelName}";
+		$methodName = $this->returnSerializeMethodName($modelName);
 
 		if (method_exists($this, $methodName)) {
 			try {
@@ -87,8 +84,8 @@ class Serializer extends Object {
 				// if we throw this exception catch it and don't set any data for that record
 			}
 		} else {
-			$Serialization = new Serialization($modelName, $dataForModel);
-			$subSerializedData = $Serialization->serialize($modelName, $dataForModel);
+			$SubModelSerializer = $this->returnSerializationInstance($modelName, $dataForModel);
+			$subSerializedData = $SubModelSerializer->serialize($modelName, $dataForModel);
 			$subSerializedData = $this->correctSubSerializedModels($modelName, $subSerializedData);
 			return $subSerializedData;
 		}
@@ -142,8 +139,7 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * corrects the key name, singularizes when the key does
-	 * not have an array of arrays
+	 * corrects the key name, singularizes when the key is not an array of arrays
 	 *
 	 * @param array $serializedData the serialized data
 	 * @return array
@@ -165,8 +161,7 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * corrects the key name and ensures sub records are always
-	 * arrays of arrays
+	 * corrects the key name and ensures sub records are always arrays of arrays
 	 *
 	 * @param string $modelName the name of the SubModel being serialized
 	 * @param array $subModelSerializedData the serialized data
@@ -356,7 +351,7 @@ class Serializer extends Object {
 			// if the array key exists, serialize it, so even if there is null
 			// data it will still be serialized
 			if (array_key_exists($key, $data)) {
-				$methodName = "serialize_{$key}";
+				$methodName = $this->returnSerializeMethodName($key);
 
 				if (method_exists($this, $methodName)) {
 					try {
@@ -383,24 +378,6 @@ class Serializer extends Object {
 	 */
 	public function afterSerialize($serializedData, $unserializedData) {
 		return $serializedData;
-	}
-
-	/**
-	 * validate that required attributes for a record are present
-	 *
-	 * @param  array $record the data for a record
-	 * @throws SerializerMissingRequiredException If a required attribute is
-	 * missing from record
-	 * @return void
-	 */
-	private function validateSerializedRequiredAttributes($record) {
-		$keysInRecord = array_keys($record);
-		$requiredCheck = array_diff($this->required, $keysInRecord);
-		if (!empty($requiredCheck)) {
-			$missing = join(', ', $requiredCheck);
-			$msg = "The following keys were missing from $this->rootKey: $missing";
-			throw new SerializerMissingRequiredException($msg);
-		}
 	}
 
 	/**
@@ -464,32 +441,117 @@ class Serializer extends Object {
 		$deserializedData = array();
 
 		foreach ($currentRecord as $key => $data) {
+			// if the key is an int, then this is an array of arrays
 			if (is_int($key)) {
 				$deserializedData[] = $this->deserializeRecord($currentClassName, $data);
 			} else {
-				$methodName = "deserialize_{$key}";
-
-				if (method_exists($this, $methodName)) {
-					// if there exists a method for the current key process it
-					try {
-						$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
-					} catch (DeserializerIgnoreException $e) {
-						// if we throw this exception catch it and don't set any data for that record
-					}
-				} elseif (is_array($data)) {
-					$classifiedSubModelKey = Inflector::classify($key);
-					$tableizedName = Inflector::tableize($key);
-					$recordsToProcess[$tableizedName] = $currentRecord[$key];
-					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
-					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
-					$deserializedData = $deserializedData + $subModelDeserializedData;
-				} else {
-					$deserializedData[$key] = $data;
-				}
+				$deserializedData = $this->deserializeDataForKey($key, $data, $deserializedData, $currentRecord);
 			}
 		}
 
 		return $deserializedData;
+	}
+
+	/**
+	 * deserialize data for a key, if there is a method for the key, call the method
+	 * if the data for the key is an array, call a sub deserializer, else set the deserialized
+	 * data to the data for the key
+	 *
+	 * @param string $keyName                the name of the key
+	 * @param multi $dataForkey              the data for the key
+	 * @param array $alreadyDeserializedData any already deserialized data
+	 * @param array $dataForModel            the overall data array for the model being deserialized
+	 * @return array
+	 */
+	protected function deserializeDataForKey($keyName, $dataForkey, $alreadyDeserializedData, $dataForModel) {
+		$methodName = $this->returnDeserializeMethodName($keyName);
+
+		if (method_exists($this, $methodName)) {
+			// if there exists a method for the current keyName process it
+			try {
+				$alreadyDeserializedData[$keyName] = $this->{$methodName}($alreadyDeserializedData, $dataForModel);
+			} catch (DeserializerIgnoreException $e) {
+				// if we throw this exception catch it and don't set any data for that record
+			}
+		} elseif (is_array($dataForkey)) {
+			// the data for the key is an array, therefor call a sub deserializer
+			$alreadyDeserializedData = $this->deserializeSubModelRecords($keyName, $dataForModel, $alreadyDeserializedData);
+		} else {
+			$alreadyDeserializedData[$keyName] = $dataForkey;
+		}
+
+		return $alreadyDeserializedData;
+	}
+
+	/**
+	 * deserialize a sub model record
+	 *
+	 * @param string $subModelName           the name of the sub model
+	 * @param array $subModelData            the data for the sub model
+	 * @param array $alreadyDeserializedData the data that has already been deserialized
+	 * @return array
+	 */
+	protected function deserializeSubModelRecords($subModelName, $subModelData, $alreadyDeserializedData) {
+		$classifiedSubModelName = Inflector::classify($subModelName);
+		$tableizedSubModelName = Inflector::tableize($subModelName);
+
+		$recordsToProcess[$tableizedSubModelName] = $subModelData[$subModelName];
+
+		$Serialization = $this->returnSerializationInstance($classifiedSubModelName, $recordsToProcess);
+		$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelName, $recordsToProcess);
+
+		$deserializedData = $alreadyDeserializedData + $subModelDeserializedData;
+
+		return $deserializedData;
+	}
+
+	/**
+	 * return a Serialization instance given a model name and the data for the model
+	 *
+	 * @param string $modelName   the name of the model to create a Serialization instance
+	 * @param multi $dataForModel the data of the model to create a Serialization instance
+	 * @return Serialization      a new Serialization instance
+	 */
+	private function returnSerializationInstance($modelName, $dataForModel) {
+		return new Serialization($modelName, $dataForModel);
+	}
+
+	/**
+	 * return the deserialize method name
+	 *
+	 * @param string $keyName the key name to generate a method name based on
+	 * @return string
+	 */
+	private function returnDeserializeMethodName($keyName) {
+		return "deserialize_{$keyName}";
+	}
+
+	/**
+	 * return the serialize method name
+	 *
+	 * @param string $keyName the key name to generate a method name based on
+	 * @return string
+	 */
+	private function returnSerializeMethodName($keyName) {
+		return "serialize_{$keyName}";
+	}
+
+	/**
+	 * validate that required attributes for a record are present
+	 *
+	 * @param  array $record the data for a record
+	 * @return void
+	 * @throws SerializerMissingRequiredException If a required attribute is
+	 * missing from the record
+	 */
+	private function validateSerializedRequiredAttributes($record) {
+		$keysInRecord = array_keys($record);
+		$requiredCheck = array_diff($this->required, $keysInRecord);
+		if (!empty($requiredCheck)) {
+			$missing = join(', ', $requiredCheck);
+			$msg = "The following keys were missing from $this->rootKey: $missing";
+			throw new SerializerMissingRequiredException($msg);
+		}
 	}
 
 }

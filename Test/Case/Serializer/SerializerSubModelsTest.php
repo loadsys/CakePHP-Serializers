@@ -1,263 +1,22 @@
 <?php
 /**
- * Class to test the serialization methods
+ * Class to test the serialization methods on sub model records
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
-require_once( dirname(__FILE__) . '/serializer_test_classes.php');
+require_once dirname(__FILE__) . '/serializer_test_classes.php';
 
 /**
- * SerializerTest
+ * SerializerSubModelsTest
  */
-class SerializerTest extends CakeTestCase {
-
-	public function testSerializerUsesAttributesInAttributesArray() {
-		$data = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => 'Doe'
-			)
-		);
-		$serializer = new TestUserSerializer();
-		$expected = array(
-			'test_user' => array(
-				'first_name' => 'John',
-				'last_name' => 'Doe'
-			)
-		);
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializerUsesNoDataPassedToTheSerializerArray() {
-		$data = array(
-		);
-		$serializer = new TestUserSerializer();
-		$expected = array(
-			'test_users' => array(),
-		);
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializerUsesEmptyDataPassedToTheSerializerArray() {
-		$data = array(
-			'TestUser' => array()
-		);
-		$serializer = new TestUserSerializer();
-		$expected = array('test_user' => array(
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializerAfterSerializeCallback() {
-		$serializer = new TestCallbackSerializer();
-		$data = array(array("TestCallback" => array()));
-		$expected = "after serialize";
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testMissingRequiredAttribute() {
-		$data = array(
-			'TestUser' => array(
-				'first_name' => 'John'
-			)
-		);
-		$serializer = new TestUserSerializer();
-		$this->setExpectedException(
-			'SerializerMissingRequiredException',
-			"The following keys were missing from TestUser: last_name"
-		);
-		$serializer->serialize($data);
-	}
+class SerializerSubModelsTest extends CakeTestCase {
 
 	/**
-	 * test that a null required attribute does not throw the
-	 * SerializerMissingRequiredException and serializes correctly
+	 * test sub serialization when a method should be called and override the
+	 * call to the sub serializer
 	 *
 	 * @return void
 	 */
-	public function testNullRequiredAttribute() {
-		$userData = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => null,
-			)
-		);
-		$expectedResult = array(
-			'test_user' => array(
-				'first_name' => 'John',
-				'last_name' => null,
-			),
-		);
-		$TestUserSerializer = new TestUserSerializer();
-		$result = $TestUserSerializer->serialize($userData);
-		$this->assertEquals(
-			$expectedResult,
-			$result,
-			"The result from serialize did not match the expected result"
-		);
-	}
-
-	/**
-	 * test that a empty string required attribute does not throw the
-	 * SerializerMissingRequiredException and serializes correctly
-	 *
-	 * @return void
-	 */
-	public function testEmptyStringRequiredAttribute() {
-		$userData = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => '',
-			)
-		);
-		$expectedResult = array(
-			'test_user' => array(
-				'first_name' => 'John',
-				'last_name' => '',
-			),
-		);
-		$TestUserSerializer = new TestUserSerializer();
-		$result = $TestUserSerializer->serialize($userData);
-		$this->assertEquals(
-			$expectedResult,
-			$result,
-			"The result from serialize did not match the expected result"
-		);
-	}
-
-	/**
-	 * test that a zero int required attribute does not throw the
-	 * SerializerMissingRequiredException and serializes correctly
-	 *
-	 * @return void
-	 */
-	public function testZeroIntRequiredAttribute() {
-		$userData = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => 0,
-			)
-		);
-		$expectedResult = array(
-			'test_user' => array(
-				'first_name' => 'John',
-				'last_name' => 0,
-			),
-		);
-		$TestUserSerializer = new TestUserSerializer();
-		$result = $TestUserSerializer->serialize($userData);
-		$this->assertEquals(
-			$expectedResult,
-			$result,
-			"The result from serialize did not match the expected result"
-		);
-	}
-
-	/**
-	 * test that a false required attribute does not throw the
-	 * SerializerMissingRequiredException and serializes correctly
-	 *
-	 * @return void
-	 */
-	public function testFalseRequiredAttribute() {
-		$userData = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => false,
-			)
-		);
-		$expectedResult = array(
-			'test_user' => array(
-				'first_name' => 'John',
-				'last_name' => false,
-			),
-		);
-		$TestUserSerializer = new TestUserSerializer();
-		$result = $TestUserSerializer->serialize($userData);
-		$this->assertEquals(
-			$expectedResult,
-			$result,
-			"The result from serialize did not match the expected result"
-		);
-	}
-
-	public function testBadOptionalAttributes() {
-		$data = array(
-			'TestBadOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-			)
-		);
-		$serializer = new TestBadOptionalSerializer();
-		$expected = array('test_bad_optional' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNoData() {
-		$data = null;
-		$expected = array(
-			'test_root_keys' => array(),
-		);
-
-		$serializer = new TestRootKeySerializer();
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeOptionalIncludedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'summary' => 'Summary',
-				'published' => true
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-			'summary' => 'SUMMARY',
-			'published' => true
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeOptionalExcludedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNonProvidedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-				'tags' => 'tag1,tag2,tag3',
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-			'published' => true
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
 	public function testSubSerializeWithMethodOverride() {
 		$data = array(
 			'TestMethodSubSerialize' => array(
@@ -271,7 +30,6 @@ class SerializerTest extends CakeTestCase {
 				),
 			)
 		);
-		$serializer = new TestMethodSubSerializeSerializer();
 		$expected = array('test_method_sub_serialize' => array(
 			'title' => 'Title',
 			'body' => 'Body',
@@ -282,9 +40,21 @@ class SerializerTest extends CakeTestCase {
 				'd583c827-856b-11e4-ba2d-080027506c76',
 			),
 		));
-		$this->assertEquals($expected, $serializer->serialize($data));
+
+		$TestMethodSubSerializeSerializer = new TestMethodSubSerializeSerializer();
+		$this->assertEquals(
+			$expected,
+			$TestMethodSubSerializeSerializer->serialize($data),
+			'The output of serialize did not match the expected return, the method for a sub property was not called'
+		);
 	}
 
+	/**
+	 * verify SubSerialization methods work correctly with UpperCase attributes, ie
+	 * a sub-model
+	 *
+	 * @return void
+	 */
 	public function testSubSerializeWithUpperCaseMethodOverride() {
 		$data = array(
 			'TestMethodSubSerialize' => array(
@@ -298,7 +68,6 @@ class SerializerTest extends CakeTestCase {
 				),
 			)
 		);
-		$serializer = new TestMethodSubSerializeSerializer();
 		$expected = array('test_method_sub_serialize' => array(
 			'title' => 'Title',
 			'body' => 'Body',
@@ -309,63 +78,51 @@ class SerializerTest extends CakeTestCase {
 				'd583c827-856b-11e4-ba2d-080027506c76',
 			),
 		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
 
-	public function testSerializeAttributesWithMethod() {
-		$data = array(
-			'TestMethodOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-				'tags' => 'tag1,tag2,tag3',
-			)
+		$TestMethodSubSerializeSerializer = new TestMethodSubSerializeSerializer();
+		$this->assertEquals(
+			$expected,
+			$TestMethodSubSerializeSerializer->serialize($data),
+			'The output of serialize did not match the expected return, the method for a sub object was not called'
 		);
-		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optional' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-			'published' => true,
-			'tags' => 'Tags',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNotProvidedDataWithMethodOptionalAttribute() {
-		$data = array(
-			'TestMethodOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-			)
-		);
-		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeIgnoreAttribute() {
-		$data = array(
-			'TestIgnore' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'created' => '2014-07-07',
-			)
-		);
-		$serializer = new TestIgnoreSerializer();
-		$expected = array('test_ignore' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
 	}
 
 	/**
-	 * test serializing SubModel Records
+	 * test serializing SubModel Records in the case of the sub model having no data,
+	 * the model name should be converted to be plural and an array of arrays
+	 *
+	 * @return void
+	 */
+	public function testSerializeSubModelRecordWithNoData() {
+		$inputData = array(
+			'TestUser' => array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'TestSecondLevelUser' => array(
+				),
+			),
+		);
+		$expectedOutput = array(
+			'test_user' =>
+			array(
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'test_second_level_users' => array(
+				),
+			),
+		);
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly'
+		);
+	}
+
+	/**
+	 * test serializing SubModel Records in the basic case, the model name should
+	 * be converted to be plural and an array of arrays
 	 *
 	 * @return void
 	 */
@@ -392,32 +149,20 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly'
+		);
 	}
 
-	public function testSerializeSubModelRecordWithNoData() {
-		$inputData = array(
-			'TestUser' => array(
-				'first_name' => 'John',
-				'last_name' => 'Doe',
-				'TestSecondLevelUser' => array(
-				),
-			),
-		);
-		$expectedOutput = array(
-			'test_user' =>
-			array(
-				'first_name' => 'John',
-				'last_name' => 'Doe',
-				'test_second_level_users' => array(
-				),
-			),
-		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
-	}
-
+	/**
+	 * test serializing sub model records with an attribute method
+	 *
+	 * @return void
+	 */
 	public function testSerializeSubModelRecordsWithAttributeMethod() {
 		$expectedOutput = array(
 			'test_user' =>
@@ -442,10 +187,21 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly, the method on the sub object for the `first_name` property was not called'
+		);
 	}
 
+	/**
+	 * test serializing a related model to verify it is moved to it's proper location
+	 * and keys are converted correctly
+	 *
+	 * @return void
+	 */
 	public function testSerializeRelatedRecordsSingleSecondary() {
 		$inputData = array(
 			'TestUser' => array(
@@ -470,10 +226,19 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the related object did not serialize properly, the related model was not properly moved to its final location in the return array.'
+		);
 	}
 
+	/**
+	 * test serializing a related model with multiple records
+	 *
+	 * @return void
+	 */
 	public function testSerializeRelatedRecordsMultipleSecondary() {
 		$inputData = array(
 			'TestUser' => array(
@@ -507,10 +272,19 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the related object did not serialize properly.'
+		);
 	}
 
+	/**
+	 * test serializing a sub model with two records
+	 *
+	 * @return void
+	 */
 	public function testSerializeTwoSubModelRecords() {
 		$inputData = array(
 			'TestUser' => array(
@@ -528,7 +302,6 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-
 		$expectedOutput = array(
 			'test_user' => array(
 				'first_name' => 'John',
@@ -544,10 +317,19 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly.'
+		);
 	}
 
+	/**
+	 * test serializing a sub model with three records
+	 *
+	 * @return void
+	 */
 	public function testSerializeThreeSubModelRecords() {
 		$inputData = array(
 			'TestUser' => array(
@@ -591,40 +373,20 @@ class SerializerTest extends CakeTestCase {
 			),
 		);
 
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly.'
+		);
 	}
 
-	public function testSerializeMultiplePrimaryRecords() {
-		$expectedOutput = array(
-			'test_users' =>
-			array(
-				0 => array(
-					'first_name' => 'John',
-					'last_name' => 'Doe',
-				),
-				1 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Smith',
-				),
-			),
-		);
-		$inputData = array(
-			'TestUser' => array(
-				0 => array(
-					'first_name' => 'John',
-					'last_name' => 'Doe',
-				),
-				1 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Smith',
-				),
-			),
-		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
-	}
-
+	/**
+	 * test serializing a model with multiple primary records, and at least one
+	 * instance of a sub model
+	 *
+	 * @return void
+	 */
 	public function testSerializeMultiplePrimaryRecordsWithSubRecords() {
 		$expectedOutput = array(
 			'test_users' =>
@@ -661,10 +423,20 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the sub object did not serialize properly.'
+		);
 	}
 
+	/**
+	 * test serializing multiple primary records with multiple sub model records
+	 *
+	 * @return void
+	 */
 	public function testSerializeMultiplePrimaryRecordsWithMultipleSubRecords() {
 		$expectedOutput = array(
 			'test_users' =>
@@ -719,10 +491,20 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
 	}
 
+	/**
+	 * test serializing a single primary record with multiple sub model records
+	 *
+	 * @return void
+	 */
 	public function testSerializeSinglePrimaryRecordsWithMultipleSubRecords() {
 		$expectedOutput = array(
 			'test_user' =>
@@ -765,42 +547,21 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
 	}
 
-	public function testSerializeMultiplePrimaryRecordsAsFromPaginate() {
-		$expectedOutput = array(
-			'test_users' =>
-			array(
-				0 => array(
-					'first_name' => 'John',
-					'last_name' => 'Doe',
-				),
-				1 => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Smith',
-				),
-			),
-		);
-		$inputData = array(
-			0 => array(
-				'TestUser' => array(
-					'first_name' => 'John',
-					'last_name' => 'Doe',
-				)
-			),
-			1 => array(
-				'TestUser' => array(
-					'first_name' => 'Jane',
-					'last_name' => 'Smith',
-				)
-			),
-		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
-	}
-
+	/**
+	 * test serializing multiple primary records with a single secondary record
+	 * that are from a CakePHP pagination call
+	 *
+	 * @return void
+	 */
 	public function testSerializeMultiplePrimaryRecordsWithSubRecordsAsFromPaginate() {
 		$expectedOutput = array(
 			'test_users' =>
@@ -849,10 +610,21 @@ class SerializerTest extends CakeTestCase {
 				)
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
 	}
 
+	/**
+	 * test serializing multiple primary records with multiple secondary records
+	 * that are from a CakePHP pagination call
+	 *
+	 * @return void
+	 */
 	public function testSerializeMultiplePrimaryRecordsWithMultipleTopLevelModelsAsFromPaginate() {
 		$expectedOutput = array(
 			'test_users' => array(
@@ -900,10 +672,21 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
 	}
 
+	/**
+	 * test serializing multiple primary records with multiple secondary records
+	 * attached to each primary model that are from a CakePHP pagination call
+	 *
+	 * @return void
+	 */
 	public function testSerializeMultiplePrimaryRecordsWithMultipleRecords() {
 		$expectedOutput = array(
 			'test_user' => array(
@@ -945,10 +728,20 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
-		$this->assertEquals($expectedOutput, $serializer->serialize($inputData));
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
 	}
 
+	/**
+	 * test serializing secondary model records with a missing required attribute
+	 *
+	 * @return void
+	 */
 	public function testMissingRequiredAttributeOnSecondaryModelRecord() {
 		$inputData = array(
 			'TestUser' => array(
@@ -969,14 +762,20 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
+
+		$TestUserSerializer = new TestUserSerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSecondLevelUser: first_name"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestUserSerializer->serialize($inputData);
 	}
 
+	/**
+	 * test serializing sub model records with a missing required attribute
+	 *
+	 * @return void
+	 */
 	public function testMissingRequiredAttributeOnSubModelRecord() {
 		$inputData = array(
 			'TestUser' => array(
@@ -997,14 +796,21 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
+
+		$TestUserSerializer = new TestUserSerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSecondLevelUser: first_name"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestUserSerializer->serialize($inputData);
 	}
 
+	/**
+	 * test a missing required attribute on a secondary model record with a single
+	 * record
+	 *
+	 * @return void
+	 */
 	public function testMissingRequiredAttributeOnSecondaryModelRecordWithASingleRecord() {
 		$inputData = array(
 			'TestUser' => array(
@@ -1015,14 +821,21 @@ class SerializerTest extends CakeTestCase {
 				'name' => 'Smith',
 			),
 		);
-		$serializer = new TestUserSerializer();
+
+		$TestUserSerializer = new TestUserSerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSecondLevelDifferentClass: id"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestUserSerializer->serialize($inputData);
 	}
 
+	/**
+	 * test a missing required attribute on a sub model record with a single
+	 * record
+	 *
+	 * @return void
+	 */
 	public function testMissingRequiredAttributeOnSubModelRecordWithASingleRecord() {
 		$inputData = array(
 			'TestUser' => array(
@@ -1033,15 +846,78 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestUserSerializer();
+
+		$TestUserSerializer = new TestUserSerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSecondLevelDifferentClass: id"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestUserSerializer->serialize($inputData);
 	}
 
-	public function testMissingRequiredAttributeOnSecondaryModelRecordWithDifferentFieldNames() {
+	/**
+	 * test a missing required attribute on a secondary model records with different
+	 * field names, verifying the required attribute is set properly for a single secondary
+	 * models
+	 *
+	 * @return void
+	 */
+	public function testMissingRequiredAttributeOnSingleSecondaryModelRecordWithDifferentFieldNames() {
+		$inputData = array(
+			'TestPrimary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+			),
+			'TestSubSecondary' => array(
+				'first_name' => 'Jane',
+				'last_name' => 'Text',
+			),
+		);
+
+		$TestPrimarySerializer = new TestPrimarySerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSubSecondary: test_field"
+		);
+		$output = $TestPrimarySerializer->serialize($inputData);
+	}
+
+	/**
+	 * test a missing required attribute on multiple sub model records with different
+	 * field names, verifying the required attribute is set properly for a single sub
+	 * models
+	 *
+	 * @return void
+	 */
+	public function testMissingRequiredAttributeOnSingleSubModelRecordWithDifferentFieldNames() {
+		$inputData = array(
+			'TestPrimary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+				'TestSubSecondary' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Text',
+				),
+			),
+		);
+
+		$TestPrimarySerializer = new TestPrimarySerializer();
+		$this->setExpectedException(
+			'SerializerMissingRequiredException',
+			"The following keys were missing from TestSubSecondary: test_field"
+		);
+		$output = $TestPrimarySerializer->serialize($inputData);
+	}
+
+	/**
+	 * test a missing required attribute on multiple secondary model records with different
+	 * field names, verifying the required attribute is set properly for secondary
+	 * models, as well as verifying that the exception is not only thrown on the first
+	 * record
+	 *
+	 * @return void
+	 */
+	public function testMissingRequiredAttributeOnSecondaryModelRecordsWithDifferentFieldNames() {
 		$inputData = array(
 			'TestPrimary' => array(
 				'id' => '1',
@@ -1061,15 +937,24 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestPrimarySerializer();
+
+		$TestPrimarySerializer = new TestPrimarySerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSubSecondary: test_field"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestPrimarySerializer->serialize($inputData);
 	}
 
-	public function testMissingRequiredAttributeOnSubModelRecordWithDifferentFieldNames() {
+	/**
+	 * test a missing required attribute on multiple sub model records with different
+	 * field names , verifying the required attribute is set properly for sub
+	 * models, as well as verifying that the exception is not only thrown on the first
+	 * record
+	 *
+	 * @return void
+	 */
+	public function testMissingRequiredAttributeOnSubModelRecordsWithDifferentFieldNames() {
 		$inputData = array(
 			'TestPrimary' => array(
 				'id' => '1',
@@ -1089,12 +974,13 @@ class SerializerTest extends CakeTestCase {
 				),
 			),
 		);
-		$serializer = new TestPrimarySerializer();
+
+		$TestPrimarySerializer = new TestPrimarySerializer();
 		$this->setExpectedException(
 			'SerializerMissingRequiredException',
 			"The following keys were missing from TestSubSecondary: test_field"
 		);
-		$serializer->serialize($inputData);
+		$output = $TestPrimarySerializer->serialize($inputData);
 	}
 
 }
