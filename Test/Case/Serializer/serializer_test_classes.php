@@ -2,6 +2,10 @@
 
 class TestRootKeySerializer extends Serializer {}
 
+class TestChangedRootKeySerializer extends Serializer {
+	public $rootKey = "changed-root-key";
+}
+
 class TestUserSerializer extends Serializer {
 	public $required = array('first_name', 'last_name');
 }

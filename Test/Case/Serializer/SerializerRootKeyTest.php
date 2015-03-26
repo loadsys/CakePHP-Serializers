@@ -4,7 +4,7 @@
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
-require_once( dirname(__FILE__) . '/serializer_test_classes.php');
+require_once dirname(__FILE__) . '/serializer_test_classes.php';
 
 /**
  * SerializerRootKeyTest
@@ -17,11 +17,26 @@ class SerializerRootKeyTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testRootKeyGeneration() {
-		$Serializer = new TestRootKeySerializer();
+		$TestRootKeySerializer = new TestRootKeySerializer();
 		$this->assertEquals(
 			'TestRootKey',
-			$Serializer->rootKey,
+			$TestRootKeySerializer->rootKey,
 			"The Generated RootKey does not equal the name of the Class"
+		);
+	}
+
+	/**
+	 * test the RootKey is overridden correctly with a Serialize class that
+	 * sets it's own rootKey value
+	 *
+	 * @return void
+	 */
+	public function testRootKeyGenerationWithAnOverriddenRootKey() {
+		$TestChangedRootKeySerializer = new TestChangedRootKeySerializer();
+		$this->assertEquals(
+			'changed-root-key',
+			$TestChangedRootKeySerializer->rootKey,
+			"The RootKey does not equal what the overridden class variable"
 		);
 	}
 
