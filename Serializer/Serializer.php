@@ -34,8 +34,7 @@ class Serializer extends Object {
 	/**
 	 * The key name used to find data on the supplied data array
 	 *
-	 * @access public
-	 * @var String $rootKey
+	 * @var string $rootKey
 	 */
 	public $rootKey = false;
 
@@ -43,8 +42,7 @@ class Serializer extends Object {
 	 * List of required required for this model to be serialized into the
 	 * array.
 	 *
-	 * @access public
-	 * @var Array $required
+	 * @var array $required
 	 */
 	public $required = array();
 
@@ -52,15 +50,14 @@ class Serializer extends Object {
 	 * List of optional required for this model to be serialized into the
 	 * array.
 	 *
-	 * @access public
 	 * @var Array $required
 	 */
 	public $optional = array();
 
 	/**
-	 * Generate the rootKey if it wasn't assigned in the class definition
+	 * Generate the rootKey if it wasn't assigned in the class definition or if
+	 * the rootKey was not already set in the class creation
 	 *
-	 * @access public
 	 */
 	public function __construct() {
 		if (!$this->rootKey) {
