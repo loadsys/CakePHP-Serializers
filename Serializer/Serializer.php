@@ -381,24 +381,6 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * validate that required attributes for a record are present
-	 *
-	 * @param  array $record the data for a record
-	 * @throws SerializerMissingRequiredException If a required attribute is
-	 * missing from record
-	 * @return void
-	 */
-	private function validateSerializedRequiredAttributes($record) {
-		$keysInRecord = array_keys($record);
-		$requiredCheck = array_diff($this->required, $keysInRecord);
-		if (!empty($requiredCheck)) {
-			$missing = join(', ', $requiredCheck);
-			$msg = "The following keys were missing from $this->rootKey: $missing";
-			throw new SerializerMissingRequiredException($msg);
-		}
-	}
-
-	/**
 	 * from jsonapi format to CakePHP array
 	 *
 	 * @param array $serializedData the serialized data in jsonapi format
@@ -561,6 +543,24 @@ class Serializer extends Object {
 	 */
 	private function returnSerializeMethodName($keyName) {
 		return "serialize_{$keyName}";
+	}
+
+	/**
+	 * validate that required attributes for a record are present
+	 *
+	 * @param  array $record the data for a record
+	 * @return void
+	 * @throws SerializerMissingRequiredException If a required attribute is
+	 * missing from the record
+	 */
+	private function validateSerializedRequiredAttributes($record) {
+		$keysInRecord = array_keys($record);
+		$requiredCheck = array_diff($this->required, $keysInRecord);
+		if (!empty($requiredCheck)) {
+			$missing = join(', ', $requiredCheck);
+			$msg = "The following keys were missing from $this->rootKey: $missing";
+			throw new SerializerMissingRequiredException($msg);
+		}
 	}
 
 }
