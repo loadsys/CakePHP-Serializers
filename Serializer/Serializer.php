@@ -139,8 +139,7 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * corrects the key name, singularizes when the key does
-	 * not have an array of arrays
+	 * corrects the key name, singularizes when the key is not an array of arrays
 	 *
 	 * @param array $serializedData the serialized data
 	 * @return array
@@ -162,8 +161,7 @@ class Serializer extends Object {
 	}
 
 	/**
-	 * corrects the key name and ensures sub records are always
-	 * arrays of arrays
+	 * corrects the key name and ensures sub records are always arrays of arrays
 	 *
 	 * @param string $modelName the name of the SubModel being serialized
 	 * @param array $subModelSerializedData the serialized data
