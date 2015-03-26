@@ -334,4 +334,87 @@ class SerializerTopLevelTest extends CakeTestCase {
 		);
 	}
 
+	/**
+	 * test serializing a model with multiple primary records
+	 *
+	 * @return void
+	 */
+	public function testSerializeMultiplePrimaryRecords() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$inputData = array(
+			'TestUser' => array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the primary object did not serialize properly.'
+		);
+	}
+
+	/**
+	 * test serializing multiple primary records that are from a CakePHP pagination
+	 * call
+	 *
+	 * @return void
+	 */
+	public function testSerializeMultiplePrimaryRecordsAsFromPaginate() {
+		$expectedOutput = array(
+			'test_users' =>
+			array(
+				0 => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				),
+				1 => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				),
+			),
+		);
+		$inputData = array(
+			0 => array(
+				'TestUser' => array(
+					'first_name' => 'John',
+					'last_name' => 'Doe',
+				)
+			),
+			1 => array(
+				'TestUser' => array(
+					'first_name' => 'Jane',
+					'last_name' => 'Smith',
+				)
+			),
+		);
+
+		$TestUserSerializer = new TestUserSerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestUserSerializer->serialize($inputData),
+			'The output of serialize did not match the expected return, the primary object did not serialize properly.'
+		);
+	}
+
 }
