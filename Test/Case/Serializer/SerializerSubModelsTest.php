@@ -1,92 +1,15 @@
 <?php
 /**
- * Class to test the serialization methods
+ * Class to test the serialization methods on sub model records
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 require_once dirname(__FILE__) . '/serializer_test_classes.php';
 
 /**
- * SerializerTest
+ * SerializerSubModelsTest
  */
-class SerializerTest extends CakeTestCase {
-
-	public function testBadOptionalAttributes() {
-		$data = array(
-			'TestBadOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-			)
-		);
-		$serializer = new TestBadOptionalSerializer();
-		$expected = array('test_bad_optional' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNoData() {
-		$data = null;
-		$expected = array(
-			'test_root_keys' => array(),
-		);
-
-		$serializer = new TestRootKeySerializer();
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeOptionalIncludedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'summary' => 'Summary',
-				'published' => true
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-			'summary' => 'SUMMARY',
-			'published' => true
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeOptionalExcludedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNonProvidedAttributes() {
-		$data = array(
-			'TestOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-				'tags' => 'tag1,tag2,tag3',
-			)
-		);
-		$serializer = new TestOptionalSerializer();
-		$expected = array('test_optional' => array(
-			'title' => 'Title',
-			'body' => 'BODY',
-			'published' => true
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
+class SerializerSubModelsTest extends CakeTestCase {
 
 	public function testSubSerializeWithMethodOverride() {
 		$data = array(
@@ -138,58 +61,6 @@ class SerializerTest extends CakeTestCase {
 				'cf08573d-856b-11e4-ba2d-080027506c76',
 				'd583c827-856b-11e4-ba2d-080027506c76',
 			),
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeAttributesWithMethod() {
-		$data = array(
-			'TestMethodOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-				'tags' => 'tag1,tag2,tag3',
-			)
-		);
-		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optional' => array(
-			'title' => 'Title',
-			'body' => 'Body',
-			'published' => true,
-			'tags' => 'Tags',
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeNotProvidedDataWithMethodOptionalAttribute() {
-		$data = array(
-			'TestMethodOptional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-			)
-		);
-		$serializer = new TestMethodOptionalSerializer();
-		$expected = array('test_method_optional' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'published' => true,
-		));
-		$this->assertEquals($expected, $serializer->serialize($data));
-	}
-
-	public function testSerializeIgnoreAttribute() {
-		$data = array(
-			'TestIgnore' => array(
-				'title' => 'Title',
-				'body' => 'Body',
-				'created' => '2014-07-07',
-			)
-		);
-		$serializer = new TestIgnoreSerializer();
-		$expected = array('test_ignore' => array(
-			'title' => 'Title',
-			'body' => 'Body',
 		));
 		$this->assertEquals($expected, $serializer->serialize($data));
 	}
