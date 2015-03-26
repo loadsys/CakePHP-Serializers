@@ -75,7 +75,7 @@ class Serializer extends Object {
 	 * @return array
 	 */
 	public function serializeModel($modelName, $dataForModel) {
-		$methodName = "serialize_{$modelName}";
+		$methodName = $this->returnSerializeMethodName($modelName);
 
 		if (method_exists($this, $methodName)) {
 			try {
@@ -84,8 +84,8 @@ class Serializer extends Object {
 				// if we throw this exception catch it and don't set any data for that record
 			}
 		} else {
-			$Serialization = new Serialization($modelName, $dataForModel);
-			$subSerializedData = $Serialization->serialize($modelName, $dataForModel);
+			$SubModelSerializer = $this->returnSerializationInstance($modelName, $dataForModel);
+			$subSerializedData = $SubModelSerializer->serialize($modelName, $dataForModel);
 			$subSerializedData = $this->correctSubSerializedModels($modelName, $subSerializedData);
 			return $subSerializedData;
 		}
@@ -351,7 +351,7 @@ class Serializer extends Object {
 			// if the array key exists, serialize it, so even if there is null
 			// data it will still be serialized
 			if (array_key_exists($key, $data)) {
-				$methodName = "serialize_{$key}";
+				$methodName = $this->returnSerializeMethodName($key);
 
 				if (method_exists($this, $methodName)) {
 					try {
@@ -459,10 +459,11 @@ class Serializer extends Object {
 		$deserializedData = array();
 
 		foreach ($currentRecord as $key => $data) {
+			// if the key is an int, then this is an array of arrays
 			if (is_int($key)) {
 				$deserializedData[] = $this->deserializeRecord($currentClassName, $data);
 			} else {
-				$methodName = "deserialize_{$key}";
+				$methodName = $this->returnDeserializeMethodName($key);
 
 				if (method_exists($this, $methodName)) {
 					// if there exists a method for the current key process it
@@ -472,12 +473,7 @@ class Serializer extends Object {
 						// if we throw this exception catch it and don't set any data for that record
 					}
 				} elseif (is_array($data)) {
-					$classifiedSubModelKey = Inflector::classify($key);
-					$tableizedName = Inflector::tableize($key);
-					$recordsToProcess[$tableizedName] = $currentRecord[$key];
-					$Serialization = new Serialization($classifiedSubModelKey, $recordsToProcess);
-					$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelKey, $recordsToProcess);
-					$deserializedData = $deserializedData + $subModelDeserializedData;
+					$deserializedData = $this->deserializeSubModelRecords($key, $currentRecord, $deserializedData);
 				} else {
 					$deserializedData[$key] = $data;
 				}
@@ -485,6 +481,86 @@ class Serializer extends Object {
 		}
 
 		return $deserializedData;
+	}
+
+	/**
+	 * deserialize data for a single key in a record, if it is an array, call a
+	 * sub deserializer
+	 *
+	 * @param string $key              [description]
+	 * @param multi $dataForKey       [description]
+	 * @param array $deserializedData [description]
+	 * @param array $currentRecord    [description]
+	 * @return array
+	 */
+	protected function deserializeDataForKey($key, $dataForKey, $deserializedData, array $currentRecord) {
+		$methodName = $this->returnDeserializeMethodName($key);
+
+		if (method_exists($this, $methodName)) {
+			// if there exists a method for the current key process it
+			try {
+				$deserializedData[$key] = $this->{$methodName}($deserializedData, $currentRecord);
+			} catch (DeserializerIgnoreException $e) {
+				// if we throw this exception catch it and don't set any data for that record
+			}
+		} elseif (is_array($dataForKey)) {
+			$deserializedData = $this->deserializeSubModelRecords($key, $currentRecord, $deserializedData);
+		} else {
+			$deserializedData[$key] = $dataForKey;
+		}
+	}
+
+	/**
+	 * deserialize a sub model record
+	 *
+	 * @param string $subModelName           the name of the sub model
+	 * @param array $subModelData            the data for the sub model
+	 * @param array $alreadyDeserializedData the data that has already been deserialized
+	 * @return array
+	 */
+	protected function deserializeSubModelRecords($subModelName, $subModelData, $alreadyDeserializedData) {
+		$classifiedSubModelName = Inflector::classify($subModelName);
+		$tableizedSubModelName = Inflector::tableize($subModelName);
+
+		$recordsToProcess[$tableizedSubModelName] = $subModelData[$subModelName];
+
+		$Serialization = $this->returnSerializationInstance($classifiedSubModelName, $recordsToProcess);
+		$subModelDeserializedData = $Serialization->deserialize($classifiedSubModelName, $recordsToProcess);
+
+		$deserializedData = $alreadyDeserializedData + $subModelDeserializedData;
+
+		return $deserializedData;
+	}
+
+	/**
+	 * return a Serialization instance given a model name and the data for the model
+	 *
+	 * @param string $modelName   the name of the model to create a Serialization instance
+	 * @param multi $dataForModel the data of the model to create a Serialization instance
+	 * @return Serialization      a new Serialization instance
+	 */
+	private function returnSerializationInstance($modelName, $dataForModel) {
+		return new Serialization($modelName, $dataForModel);
+	}
+
+	/**
+	 * return the deserialize method name
+	 *
+	 * @param string $keyName the key name to generate a method name based on
+	 * @return string
+	 */
+	private function returnDeserializeMethodName($keyName) {
+		return "deserialize_{$keyName}";
+	}
+
+	/**
+	 * return the serialize method name
+	 *
+	 * @param string $keyName the key name to generate a method name based on
+	 * @return string
+	 */
+	private function returnSerializeMethodName($keyName) {
+		return "serialize_{$keyName}";
 	}
 
 }
