@@ -34,11 +34,11 @@
  *
  * @param	string $id the primary key for the <?php echo $currentModelName; ?>
  * @return void
- * @throws NotFoundException If the passed id record does not exist
+ * @throws NotFoundJsonApiException If the passed id record does not exist
  */
 	public function <?php echo $admin ?>view($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
-			throw new NotFoundException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
+			throw new NotFoundJsonApiException(__('Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
 		$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $id));
 		$<?php echo $singularName; ?> = $this-><?php echo $currentModelName; ?>->find('first', $options);
