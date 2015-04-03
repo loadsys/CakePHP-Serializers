@@ -1,5 +1,6 @@
 # CakePHP-Serializers #
 
+[![Latest Version](https://img.shields.io/github/release/loadsys/CakePHP-Serializers.svg?style=flat-square)](https://github.com/loadsys/CakePHP-Serializers/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master&style=flat-square)](https://travis-ci.org/loadsys/CakePHP-Serializers)
 [![Total Downloads](https://img.shields.io/packagist/dt/loadsys/cakephp_serializers.svg?style=flat-square)](https://packagist.org/packages/loadsys/cakephp_serializers)
@@ -123,7 +124,7 @@ $this->request->data = array(
 * Run this shell command
 
 ```bash
-php composer.phar require loadsys/cakephp_serializers "dev-master"
+$ composer require loadsys/cakephp_serializers:dev-master
 ```
 
 ### Git ###
