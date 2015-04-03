@@ -53,8 +53,8 @@ class CakeSerializerView extends View {
 	/**
 	 * converts view data to serialized data
 	 *
-	 * @param  string $name the model name to serialize
-	 * @param  array  $data the data to serialize
+	 * @param string $name the model name to serialize
+	 * @param array  $data the data to serialize
 	 * @return array
 	 */
 	protected function toJSON($name, $data) {

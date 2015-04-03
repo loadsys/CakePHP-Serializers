@@ -2,7 +2,7 @@
 /**
  * Serializers and Deserializes data to and from jsonapi format
  *
- * @package  Serializers.Serializer
+ * @package Serializers.Serializer
  */
 App::uses('Object', 'Core');
 App::uses('Inflector', 'Utility');
@@ -70,8 +70,8 @@ class Serializer extends Object {
 	 * instance that a method exists for the name of the model, this calls that
 	 * method instead, in this way a serialize_{name} will always override
 	 *
-	 * @param  string $modelName   the name of the model to serialize
-	 * @param  array $dataForModel the array of data for the model to serialize
+	 * @param string $modelName the name of the model to serialize
+	 * @param array $dataForModel the array of data for the model to serialize
 	 * @return array
 	 */
 	public function serializeModel($modelName, $dataForModel) {
@@ -202,9 +202,9 @@ class Serializer extends Object {
 	/**
 	 * Convert data from a find('all') style query by converting each indexed result.
 	 *
-	 * @param  string $modelName The Model->alias name on which the find was performed.
-	 * @param  array $data       Numerically indexed results from a find('all') query.
-	 * @return array             Transformed data in an array that can conforms to JSON API.
+	 * @param string $modelName The Model->alias name on which the find was performed.
+	 * @param array $data Numerically indexed results from a find('all') query.
+	 * @return array Transformed data in an array that can conforms to JSON API.
 	 */
 	protected function convertMany($modelName, $data) {
 		$jsonData = array();
@@ -258,9 +258,9 @@ class Serializer extends Object {
 	 * 		),
 	 * 	);
 	 *
-	 * @param	string $primaryModel The primary model name for the top level model
-	 * @param	array $data		       the associated data being serialized
-	 * @return array				       Transformed data in an array that can conforms to JSON API.
+	 * @param string $primaryModel The primary model name for the top level model
+	 * @param array $data the associated data being serialized
+	 * @return array Transformed data in an array that can conforms to JSON API.
 	 */
 	protected function convertAssociated($primaryModel, $data) {
 		// Prime the record with the primary model's data.
@@ -312,9 +312,9 @@ class Serializer extends Object {
 	 * 			),
 	 * 	);
 	 *
-	 * @param	string	$modelName	The Model->alias name on which the find was performed.
-	 * @param	array	$data		A record as produced by a find('first') query.
-	 * @return	array				Transformed data in an array that can conforms to JSON API.
+	 * @param string $modelName The Model->alias name on which the find was performed.
+	 * @param array $data A record as produced by a find('first') query.
+	 * @return array Transformed data in an array that can conforms to JSON API.
 	 */
 	protected function convertSingle($modelName, $data) {
 		$jsonData = $this->convertFields($data);
@@ -338,7 +338,7 @@ class Serializer extends Object {
 	 * convert fields for a single model record, both calls methods for a property
 	 * as well as validates that required attributes are present
 	 *
-	 * @param  array $data a single record row for a CakePHP Model array
+	 * @param array $data a single record row for a CakePHP Model array
 	 * @return array
 	 */
 	protected function convertFields($data) {
@@ -539,7 +539,7 @@ class Serializer extends Object {
 	/**
 	 * validate that required attributes for a record are present
 	 *
-	 * @param  array $record the data for a record
+	 * @param array $record the data for a record
 	 * @return void
 	 * @throws SerializerMissingRequiredException If a required attribute is
 	 * missing from the record

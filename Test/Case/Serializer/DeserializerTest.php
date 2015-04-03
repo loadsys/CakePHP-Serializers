@@ -1,12 +1,18 @@
 <?php
 /**
  * Class to test the deserialization methods
+ *
+ * @package Serializers.Test.Case.Serializer
  */
 App::uses('Serializer', 'Serializers.Serializer');
 App::uses('Controller', 'Controller');
 require_once dirname(__FILE__) . '/serializer_test_classes.php';
 
+/**
+ * DeserializerTest
+ */
 class DeserializerTest extends CakeTestCase {
+
 	public function testRootKeyGeneration() {
 		$serializer = new TestRootKeySerializer();
 		$this->assertEquals('TestRootKey', $serializer->rootKey);

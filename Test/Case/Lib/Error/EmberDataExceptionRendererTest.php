@@ -1,4 +1,9 @@
 <?php
+/**
+ * Tests the EmberDataExceptionRender Class
+ *
+ * @package Serializers.Test.Case.Lib.Error
+ */
 App::uses('Controller', 'Controller');
 App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
@@ -9,21 +14,33 @@ App::uses('ConnectionManager', 'Model');
  * TestEmberDataExceptionRenderer
  *
  * Exposes protected methods for more direct testing.
- *
  */
 class TestEmberDataExceptionRenderer extends EmberDataExceptionRenderer {
+
+	/**
+	 * exposes _getController
+	 *
+	 * @param Exception $exception
+	 * @return Controller
+	 */
 	public function _getController($exception) {
 		return parent::_getController($exception);
 	}
+
+	/**
+	 * exposes _getErrorData
+	 *
+	 * @return array
+	 */
 	public function _getErrorData() {
 		return parent::_getErrorData();
 	}
+
 }
 
 
 /**
  * EmberDataExceptionRendererTest
- *
  */
 class EmberDataExceptionRendererTest extends CakeTestCase {
 
@@ -192,7 +209,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'CakeException',
 					'status' => 500,
-					'title' =>'Hello World',
+					'title' => 'Hello World',
 					'detail' => null,
 				),
 			),
@@ -250,7 +267,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'CakeException',
 					'status' => 500,
-					'title' =>'Hello World',
+					'title' => 'Hello World',
 					'detail' => null,
 				),
 			),
@@ -308,7 +325,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'CakeException',
 					'status' => 500,
-					'title' =>'Hello World',
+					'title' => 'Hello World',
 					'detail' => null,
 				),
 			),
@@ -370,7 +387,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'Not Found Error',
 					'status' => 400,
-					'title' =>'Not Found Error',
+					'title' => 'Not Found Error',
 					'detail' => null,
 				),
 			),
@@ -430,7 +447,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'InternalServerError',
 					'status' => 500,
-					'title' =>'Internal Server Error',
+					'title' => 'Internal Server Error',
 					'detail' => null,
 				),
 			),
@@ -492,7 +509,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 				array(
 					'code' => 'InternalServerError',
 					'status' => 500,
-					'title' =>'Internal Server Error',
+					'title' => 'Internal Server Error',
 					'detail' => null,
 				),
 			),

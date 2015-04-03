@@ -1,8 +1,19 @@
 <?php
-/*
+/**
  * Custom test suite to execute all Serializers Plugin tests.
+ *
+ * @package Serializers.Test.Case
+ */
+
+/**
+ * AllSerializersTest
  */
 class AllSerializersTest extends PHPUnit_Framework_TestSuite {
+
+	/**
+	 * the suites to load
+	 * @var array
+	 */
 	public static $suites = array(
 		// Lib Folder
 		'AllSerializersErrorsTest.php',
@@ -18,6 +29,11 @@ class AllSerializersTest extends PHPUnit_Framework_TestSuite {
 		'AllSerializersViewsTest.php',
 	);
 
+	/**
+	 * load the suites
+	 *
+	 * @return CakeTestSuite
+	 */
 	public static function suite() {
 		$path = dirname(__FILE__) . '/';
 		$suite = new CakeTestSuite('All Tests');
@@ -27,7 +43,7 @@ class AllSerializersTest extends PHPUnit_Framework_TestSuite {
 				$suite->addTestFile($path . $file);
 			}
 		}
-
 		return $suite;
 	}
+
 }
