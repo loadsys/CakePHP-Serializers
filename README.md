@@ -124,7 +124,7 @@ $this->request->data = array(
 * Run this shell command
 
 ```bash
-php composer.phar require loadsys/cakephp_serializers "dev-master"
+$ composer require loadsys/cakephp_serializers:dev-master
 ```
 
 ### Git ###
