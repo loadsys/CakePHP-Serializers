@@ -6,8 +6,11 @@ App::build(array(
 	'Serializer' => array('%s' . 'Serializer' . DS)
 ), App::REGISTER);
 
-// Load CakePHP Serializers Exceptions
+// Load JSON API Exceptions
 App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
+
+// Load Serializer Exceptions
+App::import('Lib/Error', 'Serializers.SerializerExceptions');
 
 // Load the EmberDataError Class
 App::uses('EmberDataError', 'Serializers.Error');
