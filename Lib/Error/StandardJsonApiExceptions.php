@@ -1,6 +1,8 @@
 <?php
 /**
  * Custom Exceptions for the CakePHP Serializers Class
+ *
+ * @package Serializers.Lib.Error
  */
 
 /**
@@ -88,7 +90,6 @@ class StandardJsonApiExceptions extends CakeException {
 		$href = null,
 		$id = null
 	) {
-
 		// Set the passed in properties to the properties of the Object
 		$this->title = $title;
 		$this->detail = $detail;
@@ -160,6 +161,7 @@ class NotFoundJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -185,6 +187,7 @@ class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -211,6 +214,7 @@ class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -238,6 +242,7 @@ class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -265,6 +270,7 @@ class ModelSaveFailedJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -292,6 +298,7 @@ class InvalidPassedDataJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -319,6 +326,7 @@ class ModelDeleteFailedJsonApiException extends StandardJsonApiExceptions {
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 
 /**
@@ -347,5 +355,6 @@ class ModelDeleteFailedValidationJsonApiException extends StandardJsonApiExcepti
 	) {
 		parent::__construct($title, $detail, $code, $href, $id);
 	}
+
 }
 

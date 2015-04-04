@@ -47,9 +47,9 @@ class DeserializerFilter extends DispatcherFilter {
 	/**
 	 * call out to the Serializer as needed
 	 *
-	 * @param  string $key  the name of the model being serialized
-	 * @param  array  $data the request data
-	 * @return array        the deserialized data
+	 * @param string $key the name of the model being serialized
+	 * @param array $data the request data
+	 * @return array the deserialized data
 	 */
 	protected function deserializePostData($key, $data) {
 		$Serialization = new Serialization(Inflector::classify($key), $data);

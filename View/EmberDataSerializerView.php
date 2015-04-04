@@ -17,8 +17,8 @@ class EmberDataSerializerView extends CakeSerializerView {
 	 * converts view data to serialized data, adds some customizations to handle
 	 * EmberData
 	 *
-	 * @param  string $name the model name to serialize
-	 * @param  array  $data the data to serialize
+	 * @param string $name the model name to serialize
+	 * @param array $data the data to serialize
 	 * @return array
 	 */
 	protected function toJSON($name, $data) {
