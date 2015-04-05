@@ -3,6 +3,7 @@
 [![Latest Version](https://img.shields.io/github/release/loadsys/CakePHP-Serializers.svg?style=flat-square)](https://github.com/loadsys/CakePHP-Serializers/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://travis-ci.org/loadsys/CakePHP-Serializers.svg?branch=master&style=flat-square)](https://travis-ci.org/loadsys/CakePHP-Serializers)
+[![Coverage Status](https://coveralls.io/repos/loadsys/CakePHP-Serializers/badge.svg)](https://coveralls.io/r/loadsys/CakePHP-Serializers)
 [![Total Downloads](https://img.shields.io/packagist/dt/loadsys/cakephp_serializers.svg?style=flat-square)](https://packagist.org/packages/loadsys/cakephp_serializers)
 
 A solution to serialize CakePHP response to JSON and correspondingly deserialize JSON into CakePHP data arrays, designed primarily around building REST APIs with Ember and Ember Data.
