@@ -1,3 +1,5 @@
+sudo: false
+
 language: php
 
 php:
@@ -36,6 +38,11 @@ matrix:
       - DB=mysql
       - CAKE_VERSION=2.6
       - PHPCS=1
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
 
 before_install:
   - composer self-update
