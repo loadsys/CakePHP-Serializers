@@ -40,10 +40,11 @@ matrix:
       - CAKE_VERSION=2.6
       - PHPCS=1
 
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
+# Caching disabled for coveralls issues
+# cache:
+#   directories:
+#     - vendor
+#     - $HOME/.composer/cache
 
 install:
   - composer config -g github-oauth.github.com $GITHUB_TOKEN
