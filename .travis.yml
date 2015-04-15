@@ -1,3 +1,5 @@
+sudo: false
+
 language: php
 
 php:
@@ -10,6 +12,7 @@ env:
     - PLUGIN_NAME=Serializers
     - REQUIRE=""
     - PHPCS_ARGS="-p --extensions=php --standard=vendor/loadsys/loadsys_codesniffer/Loadsys --ignore=vendor/ ."
+    - secure: "gosy3etCdsMhQJnXD7zpfakja1FdRWjUY81G/7CNZte3hlC7JqRQM/mGRPWuP1MsWPySP5YiXVdiaYBJGXascCy19F6mXAuY/bmoRzigVpM0eDr5miokvXtev5UWqFgnJyg/CAwsat6uotOawxjKjwy1M4eyc0YFN4kQX7FDMds="
 
   matrix:
     - DB=mysql CAKE_VERSION=2.3
@@ -37,13 +40,20 @@ matrix:
       - CAKE_VERSION=2.6
       - PHPCS=1
 
-before_install:
-  - composer self-update
+# Caching disabled for coveralls issues
+# cache:
+#   directories:
+#     - vendor
+#     - $HOME/.composer/cache
+
+install:
+  - composer config -g github-oauth.github.com $GITHUB_TOKEN
+  - git clone -b master https://github.com/FriendsOfCake/travis.git --depth 1 ../travis
+  - 'sed -i'''' ''s|curl |curl -H "Authorization: token \$GITHUB_TOKEN" |g'' ../travis/before_script.sh'
 
 before_script:
-  - git clone -b master https://github.com/FriendsOfCake/travis.git --depth 1 ../travis
   - ../travis/before_script.sh
-  - composer require --dev --no-interaction --prefer-source loadsys/loadsys_codesniffer=*
+  - composer require --no-interaction loadsys/loadsys_codesniffer:*
 
 script:
   - ../travis/script.sh
