@@ -6,6 +6,7 @@ provided via an HTTP Response Body into CakePHP Request Data arrays.
 1. [Basic Controller Setup - Deserializing](#basic-controller-setup---deserializing)
 1. [Advanced Setup - Deserializing](#advanced-setup---deserializing)
   1. [Setup of Deserializer Class](#setup-of-deserializer-class)
+  1. [Custom AppSerializer Class](#custom-appserializer-class)
   1. [Custom Deserialize Methods](#custom-deserialize-methods)
   1. [Custom Deserializer AfterDeserialize Callback](#custom-deserializer-afterdeserialize-callback)
 
@@ -41,6 +42,27 @@ While serializing data uses the `$required` and `$optional` properties of the
 `UserSerializer` class, deserializing does not. All data passed to the Deserializer
 will be passed through to the CakePHP Controller.
 
+## Custom AppSerializer Class ##
+
+Following the pattern of AppModel, AppController, etc in CakePHP,
+you can create an AppSerializer class that can extend the base Serializer class
+for custom methods that are accessible to all of your Serializer classes.
+
+To use this you can copy the file `app/Plugin/Serializers/Serializer/AppSerializer.php`
+and move to `app/Serializer/AppSerializer.php`
+
+All future Serializer Classes can then instead follow this pattern:
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('AppSerializer', 'Serializer');
+
+class UserSerializer extends AppSerializer {
+}
+```
+
+All future documentation in the README will follow this pattern for consistency.
+
 ## Custom Deserialize Methods ##
 
 If you need to do any formatting or data manipulation when deserializing data,
@@ -48,9 +70,9 @@ create a method named after a field with the prefix `deserialize_`. For example:
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	/**
 	 * On Deserializing the data, modify the first_name value by converting to 
@@ -85,9 +107,9 @@ not include that property in the CakePHP data array, you can throw a
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	/**
 	 * On Deserializing the data, only return the created timestamp if the id === 
@@ -127,9 +149,9 @@ post processing after all the data has been deserialized.
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	/**
 	 * Callback method called after automatic deserialization. Whatever is returned
