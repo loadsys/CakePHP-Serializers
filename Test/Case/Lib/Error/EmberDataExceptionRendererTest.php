@@ -28,12 +28,12 @@ class TestEmberDataExceptionRenderer extends EmberDataExceptionRenderer {
 	}
 
 	/**
-	 * exposes _getErrorData
+	 * exposes getErrorData
 	 *
 	 * @return array
 	 */
-	public function _getErrorData() {
-		return parent::_getErrorData();
+	public function getErrorData() {
+		return parent::getErrorData();
 	}
 
 }
@@ -107,7 +107,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 	}
 
 	/**
-	 * Test the guts of _getErrorData() when the Exception is an instance
+	 * Test the guts of getErrorData() when the Exception is an instance
 	 * of JsonApiException.
 	 *
 	 * @return void
@@ -131,7 +131,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 		$renderer = new TestEmberDataExceptionRenderer($e);
 		$renderer->controller->viewVars = array('error' => $e);
 
-		$result = $renderer->_getErrorData();
+		$result = $renderer->getErrorData();
 
 		foreach ($expected as $k => $v) {
 			$this->assertEquals(
@@ -143,7 +143,7 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 	}
 
 	/**
-	 * Test the guts of _getErrorData() when the Exception is an instance
+	 * Test the guts of getErrorData() when the Exception is an instance
 	 * of ValidationFailedJsonApiException.
 	 *
 	 * @return void
@@ -153,23 +153,141 @@ class EmberDataExceptionRendererTest extends CakeTestCase {
 		$detail = array(
 			'name' => array(
 				0 => 'Name must not be empty.',
-				1 => 'Name must not be empty.'
+				1 => 'Name must not be empty - second message.',
 			)
 		);
-		$expected = array(
-			'name' => 'Name must not be empty.',
+
+		$requestData = array(
+			'User' => array(
+				'name' => '',
+				'field1' => 'value',
+				'field2' => 'other-value'
+			),
 		);
 
-		$e = new ValidationFailedJsonApiException($title, $detail);
+		$expected = array(
+			'name' => array(
+				0 => 'Name must not be empty.',
+				1 => 'Name must not be empty - second message.',
+			)
+		);
+
+		$e = new ValidationFailedJsonApiException($title, $detail, $requestData);
 		$renderer = new TestEmberDataExceptionRenderer($e);
 		$renderer->controller->viewVars = array('error' => $e);
 
-		$result = $renderer->_getErrorData();
+		$result = $renderer->getErrorData();
 
 		$this->assertEquals(
 			$expected,
 			$result,
-			"The result for the _getErrorData call did not match the expected result"
+			"The result for the getErrorData call did not match the expected result"
+		);
+	}
+
+	/**
+	 * Test the guts of getErrorData() when the Exception is an instance
+	 * of ValidationFailedJsonApiException.
+	 *
+	 * @return void
+	 */
+	public function testGetErrorDataForValidationFailedJsonApiExceptionSubObjectErrors() {
+		$title = 'Something failed validation';
+		$detail = array(
+			'name' => array(
+				0 => 'Name must not be empty.',
+				1 => 'Name must not be empty - second message.',
+			),
+			'Comments' => array(
+				0 => array(
+					'detail' => array(
+						0 => 'Detail must not be empty',
+					),
+				),
+				1 => array(
+					'public' => array(
+						0 => 'Public must not be empty',
+						1 => 'Public must be a valid boolean',
+					),
+				),
+				2 => array(
+					'time' => array(
+						0 => 'Time must not be empty',
+						1 => 'Time must be a valid timestampe',
+					),
+				),
+				3 => array(
+				),
+			),
+		);
+
+		$requestData = array(
+			'User' => array(
+				'name' => '',
+				'field1' => 'value',
+				'field2' => 'other-value',
+				'Comment' => array(
+					array(
+						'time' => 'sometime',
+						'detail' => '',
+						'public' => false,
+					),
+					array(
+						'time' => 'asdfasdf',
+						'detail' => 'asdfasdf',
+						'public' => null,
+					),
+					array(
+						'time' => '',
+						'detail' => 'asdfasdfasd',
+						'public' => false,
+					),
+					array(
+						'time' => 'asdfasdf',
+						'detail' => 'asdfasdfasd',
+						'public' => false,
+					),
+				),
+			),
+		);
+
+		$expected = array(
+			'name' => array(
+				0 => 'Name must not be empty.',
+				1 => 'Name must not be empty - second message.',
+			),
+			'comments' => array(
+				0 => array(
+					'detail' => array(
+						0 => 'Detail must not be empty',
+					),
+				),
+				1 => array(
+					'public' => array(
+						0 => 'Public must not be empty',
+						1 => 'Public must be a valid boolean',
+					),
+				),
+				2 => array(
+					'time' => array(
+						0 => 'Time must not be empty',
+						1 => 'Time must be a valid timestampe',
+					),
+				),
+				3 => new stdClass(),
+			),
+		);
+
+		$e = new ValidationFailedJsonApiException($title, $detail, $requestData);
+		$renderer = new TestEmberDataExceptionRenderer($e);
+		$renderer->controller->viewVars = array('error' => $e);
+
+		$result = $renderer->getErrorData();
+
+		$this->assertEquals(
+			$expected,
+			$result,
+			"The result for the getErrorData call did not match the expected result"
 		);
 	}
 

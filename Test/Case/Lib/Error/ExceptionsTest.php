@@ -158,30 +158,6 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 			),
 
 			array(
-				'ValidationFailedJsonApiException',
-				array(
-					'title' => 'Validation Failed',
-					'detail' => array(
-						'name' => 'invalid name',
-						'boolean' => 'invalid boolean field',
-					),
-					'code' => 422,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Validation Failed',
-					'getDetail' => array(
-						'name' => 'invalid name',
-						'boolean' => 'invalid boolean field',
-					),
-					'getCode' => 422,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
 				'ModelSaveFailedJsonApiException',
 				array(
 					'title' => 'Model Save Failed',
@@ -325,6 +301,7 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 				array(
 					'getTitle' => 'Validation Failed',
 					'getDetail' => array(),
+					'getRequestData' => array(),
 					'getCode' => 422,
 					'getHref' => null,
 					'getId' => null,
@@ -361,6 +338,85 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 					'getCode' => 502,
 					'getHref' => null,
 					'getId' => null,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Confirm that all Exception constructors set provided args into the
+	 * correct properties. As a side-effect, also tests the getter methods
+	 * for all properties.
+	 *
+	 * @param string $class The Exception class name to instantiate.
+	 * @param	array	$args An array of args to pass to the constructor method.
+	 * @param array $expected The expected properties of the Exception class
+	 * @param string $msg Optional PHPUnit error message when the assertion fails.
+	 * @return void
+	 * @dataProvider provideTestValidationConstructorsArgs
+	 */
+	public function testValidationExceptionConstructor($class, $args, $expected, $msg = 'The method ::%1$s() is expected to return the value `%2$s`.') {
+		extract($args);
+
+		$e = new $class($title, $detail, $requestData, $code, $href, $id);
+		foreach ($expected as $method => $value) {
+
+			if (is_array($value)) {
+				$this->assertEquals(
+					$value,
+					$e->{$method}()
+				);
+			} else {
+				$this->assertEquals(
+					$value,
+					$e->{$method}(),
+					sprintf($msg, $method, $value)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Provide sets of [exception class name, constructor args, expected, msg] sets
+	 * to testValidationExceptionConstructor();
+	 *
+	 * @return array data inputs to testValidationExceptionConstructor
+	 */
+	public function provideTestValidationConstructorsArgs() {
+		return array(
+			array(
+				'ValidationFailedJsonApiException',
+				array(
+					'title' => 'Validation Failed',
+					'detail' => array(
+						'name' => 'invalid name',
+						'boolean' => 'invalid boolean field',
+					),
+					'requestData' => array(
+						'User' => array(
+							'name' => 'invalid name',
+							'boolean' => 'invalid boolean field',
+						),
+					),
+					'code' => 422,
+					'href' => '/right/here/right/now',
+					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
+				),
+				array(
+					'getTitle' => 'Validation Failed',
+					'getDetail' => array(
+						'name' => 'invalid name',
+						'boolean' => 'invalid boolean field',
+					),
+					'getRequestData' => array(
+						'User' => array(
+							'name' => 'invalid name',
+							'boolean' => 'invalid boolean field',
+						),
+					),
+					'getCode' => 422,
+					'getHref' => '/right/here/right/now',
+					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
 				),
 			),
 		);

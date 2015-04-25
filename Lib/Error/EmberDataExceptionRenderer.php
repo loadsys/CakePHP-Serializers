@@ -29,7 +29,7 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 		$this->controller->response->type('json');
 		try {
 			if (Configure::read('debug') > 0) {
-				$this->controller->set('errors', $this->_getErrorData());
+				$this->controller->set('errors', $this->getErrorData());
 				$this->controller->set('_serialize', array('errors'));
 				$this->controller->render($template);
 				$this->controller->afterFilter();
@@ -93,9 +93,16 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 		$this->controller->response->send();
 	}
 
+	/**
+	 * process validation error messages that occur
+	 *
+	 * @param array $requestData the request data from the controller
+	 * @param array $errorData the validation error messages from the model
+	 * @param string $modelName the name of the model
+	 * @return array
+	 */
 	public function processErrors($requestData, $errorData, $modelName) {
 		$errorOutputData = array();
-		//debug(compact('requestData', 'errorData', 'topLevelModel'));
 
 		foreach ($requestData[$modelName] as $index => $value) {
 			if (
@@ -117,16 +124,15 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 				$errorOutputData[$index] = array();
 				// this is looping through a secondary model
 				foreach ($errorData[$modelName] as $keyWithError => $errorsForObjectAtKey) {
-					foreach($errorsForObjectAtKey as $fieldWithError => $errorMessages) {
+					foreach ($errorsForObjectAtKey as $fieldWithError => $errorMessages) {
 						// spec can't handle multiple failures per field, so only return the first found.
-						$errorOutputData[$index][$fieldWithError] = reset($errorMessages);
+						$errorOutputData[$index][$fieldWithError] = $errorMessages;
 					}
 				}
 			} elseif (
 				array_key_exists($index, $errorData)
 			) {
-				 // spec can't handle multiple failures per field, so only return the first found.
-				$errorOutputData[$index] = reset($errorData[$index]);
+				$errorOutputData[$index] = $errorData[$index];
 			} else {
 				// this field for a top level model doesn't have errors
 			}
@@ -140,7 +146,7 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 	 *
 	 * @return array debugging data
 	 */
-	protected function _getErrorData() {
+	protected function getErrorData() {
 		$data = array();
 
 		$viewVars = $this->controller->viewVars;
@@ -154,9 +160,6 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 			if (!empty($viewVars['error'])) {
 				$errorData = $viewVars['error']->getDetail();
 				$requestData = $viewVars['error']->getRequestData();
-
-				//debug($errorData);
-				//debug($requestData);
 
 				$topLevelModel = key($requestData);
 				$errorOutputData = $this->processErrors($requestData, $errorData, $topLevelModel);
@@ -180,7 +183,6 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 						// we need to populated an empty object at each and every
 						// instance of the secondary model that exists on the data passed
 						// to the save method
-
 						$errorOutputData[$secondaryModelName] = array_fill(0, $finalKey, new stdClass());
 
 						foreach ($errorMessages as $indexOfError => $fieldErrors) {
@@ -188,11 +190,11 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 								if ($errorOutputData[$secondaryModelName][$indexOfError] instanceof stdClass) {
 									$errorOutputData[$secondaryModelName][$indexOfError] = array();
 								}
-								$errorOutputData[$secondaryModelName][$indexOfError][$fieldName] = Hash::get($errorMessages, "0");
+								$errorOutputData[$secondaryModelName][$indexOfError][$fieldName] = $errorMessages;
 							}
 						}
 					} else {
-						$errorOutputData[$fieldWithError] = $firstErrorMessage;
+						$errorOutputData[$fieldWithError] = $errorMessages;
 					}
 				}
 
@@ -259,4 +261,5 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 		$controller->viewPath = 'Errors';
 		return $controller;
 	}
+
 }
