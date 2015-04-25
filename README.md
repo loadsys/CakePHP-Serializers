@@ -195,6 +195,7 @@ This does two things:
 
 * Errors and Exceptions get output as correctly formatted JSON
 * Allows the use of Custom Exceptions that match Ember Data exceptions for error cases
+* The error format for validation errors follows the format suggested by [DS.Errors](http://emberjs.com/api/data/classes/DS.Errors.html)
 
 ## Custom Bake Templates ##
 
