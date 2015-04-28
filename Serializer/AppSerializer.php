@@ -5,7 +5,7 @@
  *
  * @package Serializers.Serializer
  */
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('Serializer', 'Serializer');
 
 /**
  * AppSerializer
