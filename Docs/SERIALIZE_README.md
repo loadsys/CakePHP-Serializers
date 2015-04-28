@@ -72,9 +72,9 @@ For example, if we have a `User` model with fields `id`, `first_name`,
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 }
 ```
 
@@ -87,7 +87,8 @@ for custom methods that are accessible to all of your Serializer classes.
 To use this you can copy the file `app/Plugin/Serializers/Serializer/AppSerializer.php`
 and move to `app/Serializer/AppSerializer.php`
 
-All future Serializer Classes can then instead follow this pattern:
+Any properties or methods you add to your AppSerializers class will be accessible
+in your sub-Serializer classes.
 
 ``` php
 // Serializer/UserSerializer.php
@@ -96,8 +97,6 @@ App::uses('AppSerializer', 'Serializer');
 class UserSerializer extends AppSerializer {
 }
 ```
-
-All future documentation in the README will follow this pattern for consistency.
 
 ## Required Property of Serializer Class ##
 
