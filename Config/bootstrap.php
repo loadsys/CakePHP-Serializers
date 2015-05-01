@@ -7,6 +7,9 @@ App::build(array(
 	'Serializer' => array('%s' . 'Plugin' . DS . 'Serializers' . DS . 'Serializer' . DS),
 ), App::REGISTER);
 
+// Ensure we loaded the SerializersErrors Plugin
+CakePlugin::load('SerializersErrors', array('bootstrap' => true));
+
 // Load CakePHP Serializers Exceptions
 App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
 
