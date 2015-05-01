@@ -20,6 +20,35 @@ deserilization to work.
 
 # Advanced Setup - Deserializing #
 
+## AppSerializer Class ##
+
+Following the pattern of AppModel, AppController, etc in CakePHP,
+you should create an AppSerializer class that can extend the base Serializer class
+for custom methods that are accessible to all of your Serializer classes.
+
+Any properties or methods you add to your AppSerializers class will be accessible
+in your sub-Serializer classes.
+
+This `AppSerializer` should be located at `app/Serializer/AppSerializer.php`
+
+All future documentation in the README assumes this is created.
+
+``` php
+/**
+ * AppSerializer extends the base Serializer Object enables the use of custom
+ * methods at the app level when serializing
+ *
+ * @package Serializers.Serializer
+ */
+App::uses('Serializer', 'Serializer');
+
+/**
+ * AppSerializer
+ */
+class AppSerializer extends Serializer {
+}
+```
+
 ## Setup of Deserializer Class ##
 
 To do anything advanced with deserializing data requires a custom Serializer class:
@@ -41,26 +70,6 @@ This is the same `Serializer` class that is also used for serializing data.
 While serializing data uses the `$required` and `$optional` properties of the 
 `UserSerializer` class, deserializing does not. All data passed to the Deserializer
 will be passed through to the CakePHP Controller.
-
-## Custom AppSerializer Class ##
-
-Following the pattern of AppModel, AppController, etc in CakePHP,
-you can create an AppSerializer class that can extend the base Serializer class
-for custom methods that are accessible to all of your Serializer classes.
-
-To use this you can copy the file `app/Plugin/Serializers/Serializer/AppSerializer.php`
-and move to `app/Serializer/AppSerializer.php`
-
-Any properties or methods you add to your AppSerializers class will be accessible
-in your sub-Serializer classes.
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('AppSerializer', 'Serializer');
-
-class UserSerializer extends AppSerializer {
-}
-```
 
 ## Custom Deserialize Methods ##
 
