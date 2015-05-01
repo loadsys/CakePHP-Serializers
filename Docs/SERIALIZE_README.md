@@ -61,6 +61,35 @@ JSON at the view layer.
 
 # Advanced Setup - Serializing #
 
+## AppSerializer Class ##
+
+Following the pattern of AppModel, AppController, etc in CakePHP,
+you should create an AppSerializer class that can extend the base Serializer class
+for custom methods that are accessible to all of your Serializer classes.
+
+Any properties or methods you add to your AppSerializers class will be accessible
+in your sub-Serializer classes.
+
+This `AppSerializer` should be located at `app/Serializer/AppSerializer.php`
+
+All future documentation in the README assumes this is created.
+
+``` php
+/**
+ * AppSerializer extends the base Serializer Object enables the use of custom
+ * methods at the app level when serializing
+ *
+ * @package Serializers.Serializer
+ */
+App::uses('Serializer', 'Serializer');
+
+/**
+ * AppSerializer
+ */
+class AppSerializer extends Serializer {
+}
+```
+
 ## Setup of Serializer Class ##
 
 To do anything advanced with serializing data requires a custom Serializer class:
@@ -69,26 +98,6 @@ Create a new directory at the `APP` level (Controller, Model, etc.) named `Seria
 This directory will contain your specific Model serialization classes.
 For example, if we have a `User` model with fields `id`, `first_name`,
 `last_name`, `created` and `modified` create the file `Serializer/UserSerializer.php`:
-
-``` php
-// Serializer/UserSerializer.php
-App::uses('AppSerializer', 'Serializer');
-
-class UserSerializer extends AppSerializer {
-}
-```
-
-## Custom AppSerializer Class ##
-
-Following the pattern of AppModel, AppController, etc in CakePHP,
-you can create an AppSerializer class that can extend the base Serializer class
-for custom methods that are accessible to all of your Serializer classes.
-
-To use this you can copy the file `app/Plugin/Serializers/Serializer/AppSerializer.php`
-and move to `app/Serializer/AppSerializer.php`
-
-Any properties or methods you add to your AppSerializers class will be accessible
-in your sub-Serializer classes.
 
 ``` php
 // Serializer/UserSerializer.php
