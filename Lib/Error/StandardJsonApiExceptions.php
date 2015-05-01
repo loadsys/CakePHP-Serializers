@@ -1,165 +1,37 @@
 <?php
 /**
- * Custom Exceptions for the CakePHP Serializers Class
+ * Custom Exceptions for the CakePHP Serializers Object
  *
  * @package Serializers.Lib.Error
  */
-
-/**
- * StandardJsonApiExceptions
- *
- * a generic JSON API Exception
- */
-class StandardJsonApiExceptions extends CakeException {
-
-	/**
-	 * A short, human-readable summary of the problem. It SHOULD NOT change from
-	 * occurrence to occurrence of the problem, except for purposes of
-	 * localization.
-	 *
-	 * @var null
-	 */
-	public $title = 'JSON API Exception';
-
-	/**
-	 * A human-readable explanation specific to this occurrence of the problem.
-	 *
-	 * @var null
-	 */
-	public $detail = 'JSON API Exception';
-
-	/**
-	 * An application-specific error code, expressed as a string value.
-	 *
-	 * @var null
-	 */
-	public $code = 400;
-
-	/**
-	 * A URI that MAY yield further details about this particular occurrence
-	 * of the problem.
-	 *
-	 * @var null
-	 */
-	public $href = null;
-
-	/**
-	 * A unique identifier for this particular occurrence of the problem.
-	 *
-	 * @var null
-	 */
-	public $id = null;
-
-	/**
-	 * The HTTP status code applicable to this problem, expressed as a string
-	 * value.
-	 *
-	 * @var null
-	 */
-	public $status = null;
-
-	/**
-	 * Associated resources which can be dereferenced from the request document.
-	 *
-	 * @var null
-	 */
-	public $links = null;
-
-	/**
-	 * The relative path to the relevant attribute within the associated
-	 * resource(s). Only appropriate for problems that apply to a single
-	 * resource or type of resource.
-	 *
-	 * @var null
-	 */
-	public $path = null;
-
-	/**
-	 * Constructs a new instance of the base JsonApiException
-	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
-	 * @param string $id A unique identifier for this particular occurrence of the problem.
-	 */
-	public function __construct(
-		$title = 'JSON API Exception',
-		$detail = 'JSON API Exception',
-		$code = 400,
-		$href = null,
-		$id = null
-	) {
-		// Set the passed in properties to the properties of the Object
-		$this->title = $title;
-		$this->detail = $detail;
-		$this->code = $code;
-		$this->href = $href;
-		$this->id = $id;
-
-		parent::__construct($this->title, $code);
-	}
-
-	/**
-	 * return the title for this Exception
-	 *
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
-
-	/**
-	 * return the detail for this Exception
-	 *
-	 * @return string
-	 */
-	public function getDetail() {
-		return $this->detail;
-	}
-
-	/**
-	 * return the href for this Exception
-	 *
-	 * @return string
-	 */
-	public function getHref() {
-		return $this->href;
-	}
-
-	/**
-	 * return the id for this Exception
-	 *
-	 * @return string
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-}
+App::uses('BaseSerializerException', 'SerializersErrors.Error');
 
 /**
  * Used when an Not Found Exception occurs
  */
-class NotFoundJsonApiException extends StandardJsonApiExceptions {
+class NotFoundJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the NotFoundJsonApiException
+	 * Constructs a new instance of the base NotFoundJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Resource Not Found',
 		$detail = 'Resource Not Found',
-		$code = 404,
+		$status = 404,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -167,25 +39,29 @@ class NotFoundJsonApiException extends StandardJsonApiExceptions {
 /**
  * Used when an HTTP_AUTHORIZATON header token is not set, expired, or invalid.
  */
-class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
+class UnauthorizedJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the UnauthorizedJsonApiException
+	 * Constructs a new instance of the base UnauthorizedJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Unauthorized Access',
 		$detail = 'Unauthorized Access',
-		$code = 401,
+		$status = 401,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -194,25 +70,29 @@ class UnauthorizedJsonApiException extends StandardJsonApiExceptions {
  * Used when a User's Permissions forbid access to the requested section of
  * the app.
  */
-class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
+class ForbiddenByPermissionsException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the ForbiddenByPermissionsException
+	 * Constructs a new instance of the base ForbiddenByPermissionsException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Unauthorized Access',
 		$detail = 'Access to the requested resource is denied by the Permissions on your account.',
-		$code = 403,
+		$status = 403,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -222,25 +102,29 @@ class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
  *
  * a generic JSON API Exception when validation fails
  */
-class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
+class ValidationFailedJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the ValidationFailedJsonApiException
+	 * Constructs a new instance of the base ValidationFailedJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Validation Failed',
 		array $detail = array(),
-		$code = 422,
+		$status = 422,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -250,25 +134,29 @@ class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
  *
  * a generic JSON API Exception when model save fails
  */
-class ModelSaveFailedJsonApiException extends StandardJsonApiExceptions {
+class ModelSaveFailedJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the ModelSaveFailedJsonApiException
+	 * Constructs a new instance of the base ModelSaveFailedJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Model Save Failed',
 		$detail = 'Model Save Failed',
-		$code = 400,
+		$status = 400,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -278,25 +166,29 @@ class ModelSaveFailedJsonApiException extends StandardJsonApiExceptions {
  *
  * a generic JSON API Exception when invalid data passed to the controller
  */
-class InvalidPassedDataJsonApiException extends StandardJsonApiExceptions {
+class InvalidPassedDataJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the InvalidPassedDataJsonApiException
+	 * Constructs a new instance of the base InvalidPassedDataJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Invalid Data Passed',
 		$detail = 'Invalid Data Passed',
-		$code = 400,
+		$status = 400,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -306,25 +198,29 @@ class InvalidPassedDataJsonApiException extends StandardJsonApiExceptions {
  *
  * a generic JSON API Exception when the Model->delete method fails
  */
-class ModelDeleteFailedJsonApiException extends StandardJsonApiExceptions {
+class ModelDeleteFailedJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the ModelDeleteFailedJsonApiException
+	 * Constructs a new instance of the base ModelDeleteFailedJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Model Delete Failed',
 		$detail = 'Model Delete Failed',
-		$code = 502,
+		$status = 502,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -335,25 +231,29 @@ class ModelDeleteFailedJsonApiException extends StandardJsonApiExceptions {
  * a generic JSON API Exception when the Model->delete method fails with a
  * validation error
  */
-class ModelDeleteFailedValidationJsonApiException extends StandardJsonApiExceptions {
+class ModelDeleteFailedValidationJsonApiException extends BaseSerializerException {
 
 	/**
-	 * Constructs a new instance of the ModelDeleteFailedJsonApiException
+	 * Constructs a new instance of the base ModelDeleteFailedValidationJsonApiException
 	 *
-	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
-	 * @param int $code The http status code of the error.
-	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param string $title The title of the exception, passed to parent CakeException::__construct
+	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
+	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
+	 * @param array $links An array of JSON Pointers [RFC6901] to the associated resource(s) within the request document [e.g. ["/data"] for a primary data object].
+	 * @param array $paths An array of JSON Pointers to the relevant attribute(s) within the associated resource(s) in the request document. Each path MUST be relative to the resource path(s) expressed in the error object's "links" member [e.g. ["/first-name", "/last-name"] to reference a couple attributes].
 	 */
 	public function __construct(
 		$title = 'Model Delete Failed Due to Validation Issue',
 		$detail = 'Model Delete Failed Due to Validation Issue',
-		$code = 502,
+		$status = 502,
+		$id = null,
 		$href = null,
-		$id = null
+		$links = null,
+		$paths = null
 	) {
-		parent::__construct($title, $detail, $code, $href, $id);
+		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
 
 }
