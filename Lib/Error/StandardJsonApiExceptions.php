@@ -225,10 +225,18 @@ class ForbiddenByPermissionsException extends StandardJsonApiExceptions {
 class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
 
 	/**
+	 * The request data passed to the model save method
+	 *
+	 * @var array
+	 */
+	public $requestData = array();
+
+	/**
 	 * Constructs a new instance of the ValidationFailedJsonApiException
 	 *
 	 * @param string $title The title of the exception.
-	 * @param string $detail A detailed human readable message.
+	 * @param array $detail The validation errors returned from $this->ModelName->invalidFields().
+	 * @param array $requestData The request data passed to the controller, ie. $this->request->data
 	 * @param int $code The http status code of the error.
 	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
@@ -236,11 +244,22 @@ class ValidationFailedJsonApiException extends StandardJsonApiExceptions {
 	public function __construct(
 		$title = 'Validation Failed',
 		array $detail = array(),
+		array $requestData = array(),
 		$code = 422,
 		$href = null,
 		$id = null
 	) {
+		$this->requestData = $requestData;
 		parent::__construct($title, $detail, $code, $href, $id);
+	}
+
+	/**
+	 * return the id for this Exception
+	 *
+	 * @return string
+	 */
+	public function getRequestData() {
+		return $this->requestData;
 	}
 
 }

@@ -3,6 +3,8 @@
  * Ensures that all fatal errors are rendered as JSON.
  */
 App::uses('ExceptionRenderer', 'Error');
+App::uses('Inflector', 'Utility');
+App::uses('Hash', 'Utility');
 
 /**
  * EmberDataExceptionRenderer
@@ -27,7 +29,7 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 		$this->controller->response->type('json');
 		try {
 			if (Configure::read('debug') > 0) {
-				$this->controller->set('errors', $this->_getErrorData());
+				$this->controller->set('errors', $this->getErrorData());
 				$this->controller->set('_serialize', array('errors'));
 				$this->controller->render($template);
 				$this->controller->afterFilter();
@@ -92,11 +94,59 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 	}
 
 	/**
+	 * process validation error messages that occur
+	 *
+	 * @param array $requestData the request data from the controller
+	 * @param array $errorData the validation error messages from the model
+	 * @param string $modelName the name of the model
+	 * @return array
+	 */
+	public function processErrors($requestData, $errorData, $modelName) {
+		$errorOutputData = array();
+
+		foreach ($requestData[$modelName] as $index => $value) {
+			if (
+				is_array($value)
+				&& !is_int($index)
+				&& array_key_exists($index, $errorData)
+			) {
+				// this is a secondary-model
+				$secondaryModelName = $index;
+				$secondaryModelJsonKey = Inflector::tableize($index);
+				$secondaryModelData[$secondaryModelName] = $value;
+				$secondaryModelError[$secondaryModelName] = $errorData[$secondaryModelName];
+				$secondaryModelErrorOutput = $this->processErrors($secondaryModelData, $secondaryModelError, $secondaryModelName);
+
+				$errorOutputData[$secondaryModelJsonKey] = $secondaryModelErrorOutput;
+			} elseif (
+				is_int($index)
+			) {
+				$errorOutputData[$index] = array();
+				// this is looping through a secondary model
+				foreach ($errorData[$modelName] as $keyWithError => $errorsForObjectAtKey) {
+					foreach ($errorsForObjectAtKey as $fieldWithError => $errorMessages) {
+						// spec can't handle multiple failures per field, so only return the first found.
+						$errorOutputData[$index][$fieldWithError] = $errorMessages;
+					}
+				}
+			} elseif (
+				array_key_exists($index, $errorData)
+			) {
+				$errorOutputData[$index] = $errorData[$index];
+			} else {
+				// this field for a top level model doesn't have errors
+			}
+		}
+
+		return $errorOutputData;
+	}
+
+	/**
 	 * Helper method used to generate extra debugging data into the error template
 	 *
 	 * @return array debugging data
 	 */
-	protected function _getErrorData() {
+	protected function getErrorData() {
 		$data = array();
 
 		$viewVars = $this->controller->viewVars;
@@ -108,11 +158,47 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 
 		if ($viewVars['error'] instanceof ValidationFailedJsonApiException) {
 			if (!empty($viewVars['error'])) {
-				$data = $viewVars['error']->getDetail();
-				foreach ($data as $errorVar => $errorDescrptions) {
-					$data[$errorVar] = $errorDescrptions[0];
+				$errorData = $viewVars['error']->getDetail();
+				$requestData = $viewVars['error']->getRequestData();
+
+				$topLevelModel = key($requestData);
+				$errorOutputData = $this->processErrors($requestData, $errorData, $topLevelModel);
+
+				foreach ($errorData as $fieldWithError => $errorMessages) {
+					$firstErrorMessage = reset($errorMessages);
+					// this is an error of a sub model attempted to be saved at the same
+					// time as the primary model if error messages is an array of arrays
+					if (is_array($firstErrorMessage)) {
+						$secondaryModelName = Inflector::tableize($fieldWithError);
+
+						// // if the number of models fialed
+						$numberOfModelsFailedValidation = count($errorMessages);
+						end($errorMessages);
+						$finalKey = (key($errorMessages) + 1);
+
+						reset($errorMessages);
+
+						// if the final key in our array of error messages is different
+						// from the number of models that failed validation
+						// we need to populated an empty object at each and every
+						// instance of the secondary model that exists on the data passed
+						// to the save method
+						$errorOutputData[$secondaryModelName] = array_fill(0, $finalKey, new stdClass());
+
+						foreach ($errorMessages as $indexOfError => $fieldErrors) {
+							foreach ($fieldErrors as $fieldName => $errorMessages) {
+								if ($errorOutputData[$secondaryModelName][$indexOfError] instanceof stdClass) {
+									$errorOutputData[$secondaryModelName][$indexOfError] = array();
+								}
+								$errorOutputData[$secondaryModelName][$indexOfError][$fieldName] = $errorMessages;
+							}
+						}
+					} else {
+						$errorOutputData[$fieldWithError] = $errorMessages;
+					}
 				}
-				return $data;
+
+				return $errorOutputData;
 			}
 		} elseif ($viewVars['error'] instanceof StandardJsonApiExceptions) {
 			if (!empty($viewVars['error'])) {
@@ -175,4 +261,5 @@ class EmberDataExceptionRenderer extends ExceptionRenderer {
 		$controller->viewPath = 'Errors';
 		return $controller;
 	}
+
 }
