@@ -54,6 +54,7 @@ install:
 before_script:
   - ../travis/before_script.sh
   - composer require --no-interaction loadsys/loadsys_codesniffer:*
+  - composer require --no-interaction loadsys/cakephp-serializers-errors:dev-master
 
 script:
   - ../travis/script.sh
