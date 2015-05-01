@@ -6,6 +6,7 @@ into JSON and rendering it to the front end.
 1. [Basic Controller Setup - Serializing](#basic-controller-setup---serializing)
 1. [Advanced Setup - Serializing](#advanced-setup---serializing)
   1. [Setup of Serializer Class](#setup-of-serializer-class)
+  1. [Custom AppSerializer Class](#custom-appserializer-class)
   1. [Required Property of Serializer Class](#required-property-of-serializer-class)
   1. [Optional Property of Serializer Class](#optional-property-of-serializer-class)
   1. [Custom Serialize Methods](#custom-serialize-methods)
@@ -71,9 +72,29 @@ For example, if we have a `User` model with fields `id`, `first_name`,
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
+}
+```
+
+## Custom AppSerializer Class ##
+
+Following the pattern of AppModel, AppController, etc in CakePHP,
+you can create an AppSerializer class that can extend the base Serializer class
+for custom methods that are accessible to all of your Serializer classes.
+
+To use this you can copy the file `app/Plugin/Serializers/Serializer/AppSerializer.php`
+and move to `app/Serializer/AppSerializer.php`
+
+Any properties or methods you add to your AppSerializers class will be accessible
+in your sub-Serializer classes.
+
+``` php
+// Serializer/UserSerializer.php
+App::uses('AppSerializer', 'Serializer');
+
+class UserSerializer extends AppSerializer {
 }
 ```
 
@@ -84,7 +105,7 @@ adding a `$required` property.
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
 class UserSerializer extends Serializer {
 	public $required = array(
@@ -109,7 +130,7 @@ an array of optional properties.
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
 class UserSerializer extends Serializer {
 
@@ -135,9 +156,9 @@ create a method named after a field with the prefix `serialize_`. For example:
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	public $required = array(
 		'id',
@@ -172,9 +193,9 @@ and the optional property will be ignored.
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	public $required = array(
 		'id',
@@ -222,9 +243,9 @@ post processing after all the data has been serialized.
 
 ``` php
 // Serializer/UserSerializer.php
-App::uses('Serializer', 'Serializers.Serializer');
+App::uses('AppSerializer', 'Serializer');
 
-class UserSerializer extends Serializer {
+class UserSerializer extends AppSerializer {
 
 	public $required = array(
 		'id',

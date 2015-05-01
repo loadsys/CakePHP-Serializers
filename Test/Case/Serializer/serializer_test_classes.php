@@ -83,6 +83,7 @@ class TestSecondLevelUserWithMethodSerializer extends Serializer {
 	public function serialize_first_name($data, $record) {
 		return 'FIRST';
 	}
+
 }
 
 /**
@@ -103,13 +104,29 @@ class TestSecondLevelDifferentClassSerializer extends Serializer {
  * TestCallbackSerializer
  */
 class TestCallbackSerializer extends Serializer {
+
+	/**
+	 * after serialize callback
+	 *
+	 * @param array $serializedData the current serialized data
+	 * @param array $unserializedData the unserialized data
+	 * @return multi
+	 */
 	public function afterSerialize($serializedData, $unserializedData) {
 		return "after serialize";
 	}
 
+	/**
+	 * after deserialize callback
+	 *
+	 * @param array $deserializedData the current deserialized data
+	 * @param array $serializedData the serialized data
+	 * @return multi
+	 */
 	public function afterDeserialize($deserializedData, $serializedData) {
 		return "after deserialize";
 	}
+
 }
 
 /**
@@ -123,7 +140,14 @@ class TestBadOptionalSerializer extends Serializer {
 	 * @var array
 	 */
 	public $required = array('title', 'body');
+
+	/**
+	 * optional properties
+	 *
+	 * @var string
+	 */
 	public $optional = 'notanarray';
+
 }
 
 /**
