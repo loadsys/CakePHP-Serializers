@@ -11,7 +11,7 @@ App::build(array(
 CakePlugin::load('SerializersErrors', array('bootstrap' => true));
 
 // Load CakePHP Serializers Exceptions
-App::uses('StandardJsonApiExceptions', 'Serializers.Error');
+App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
 
 // Load the EmberDataError Class
 App::uses('EmberDataError', 'Serializers.Error');
