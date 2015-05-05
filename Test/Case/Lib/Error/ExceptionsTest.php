@@ -1,10 +1,14 @@
 <?php
-// Load CakePHP Serializers Exceptions
-App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
+/**
+ * Tests the StandardJsonApiExceptions Classes to ensure it matches the expected
+ * format
+ *
+ * @package Serializers.Test.Case.Lib.Error
+ */
+App::uses('Lib/Error', 'Serializers.StandardJsonApiExceptions');
 
 /**
- * Exceptions tests
- *
+ * StandardJsonApiExceptionsTest
  */
 class StandardJsonApiExceptionsTest extends CakeTestCase {
 
@@ -27,342 +31,522 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 	}
 
 	/**
-	 * Confirm that all Exception constructors set provided args into the
-	 * correct properties. As a side-effect, also tests the getter methods
-	 * for all properties.
+	 * Confirm that the construct sets our values properly
 	 *
-	 * @param  string $class The Exception class name to instantiate.
-	 * @param	array	$args An array of args to pass to the constructor method.
-	 * @param  array $expected The expected properties of the Exception class
-	 * @param  string $msg Optional PHPUnit error message when the assertion fails.
 	 * @return void
-	 * @dataProvider	provideTestConstructorsArgs
 	 */
-	public function testExceptionConstructors($class, $args, $expected, $msg = 'The method ::%1$s() is expected to return the value `%2$s`.') {
-		extract($args);
-		$e = new $class($title, $detail, $code, $href, $id);
-		foreach ($expected as $method => $value) {
-			if (is_array($value)) {
-				$this->assertEquals(
-					$value,
-					$e->{$method}(),
-					sprintf($msg, $method, implode($value, ", "))
-				);
-			} else {
-				$this->assertEquals(
-					$value,
-					$e->{$method}(),
-					sprintf($msg, $method, $value)
-				);
-			}
-		}
-	}
+	public function testNotFoundJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
 
-	/**
-	 * Provide sets of [exception class name, constructor args, expected, msg] sets
-	 * to testExceptionConstructors();
-	 *
-	 * @return array data inputs to testExceptionConstructors
-	 */
-	public function provideTestConstructorsArgs() {
-		return array(
-			array(
-				'StandardJsonApiExceptions', // Exception class to instantiate.
-				array( // Args to pass to constructor.
-					'title' => 'JSON API Exception',
-					'detail' => 'JSON API Exception',
-					'code' => 400,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array( // Getter methods to run and expected values.
-					'getTitle' => 'JSON API Exception',
-					'getDetail' => 'JSON API Exception',
-					'getCode' => 400,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				// optional phpunit assertion failed message here
-			),
+		$exception = new NotFoundJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
 
-			array(
-				'StandardJsonApiExceptions',
-				array(
-					'title' => 'a title',
-					'detail' => 'some detail',
-					'code' => 444,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'a title',
-					'getDetail' => 'some detail',
-					'getCode' => 444,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
+		$this->assertInstanceOf('NotFoundJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
 
-			array(
-				'NotFoundJsonApiException',
-				array(
-					'title' => 'Resource Not Found',
-					'detail' => 'Resource Not Found',
-					'code' => 404,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Resource Not Found',
-					'getDetail' => 'Resource Not Found',
-					'getCode' => 404,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'UnauthorizedJsonApiException',
-				array(
-					'title' => 'Unauthorized Access',
-					'detail' => 'Unauthorized Access',
-					'code' => 401,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Unauthorized Access',
-					'getDetail' => 'Unauthorized Access',
-					'getCode' => 401,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'ForbiddenByPermissionsException',
-				array(
-					'title' => 'Unauthorized Access',
-					'detail' => 'Access to the requested resource is denied by the Permissions on your account.',
-					'code' => 403,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Unauthorized Access',
-					'getDetail' => 'Access to the requested resource is denied by the Permissions on your account.',
-					'getCode' => 403,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'ValidationFailedJsonApiException',
-				array(
-					'title' => 'Validation Failed',
-					'detail' => array(
-						'name' => 'invalid name',
-						'boolean' => 'invalid boolean field',
-					),
-					'code' => 422,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Validation Failed',
-					'getDetail' => array(
-						'name' => 'invalid name',
-						'boolean' => 'invalid boolean field',
-					),
-					'getCode' => 422,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'ModelSaveFailedJsonApiException',
-				array(
-					'title' => 'Model Save Failed',
-					'detail' => 'Model Save Failed',
-					'code' => 400,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Model Save Failed',
-					'getDetail' => 'Model Save Failed',
-					'getCode' => 400,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'InvalidPassedDataJsonApiException',
-				array(
-					'title' => 'Invalid Data Passed',
-					'detail' => 'Invalid Data Passed',
-					'code' => 400,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Invalid Data Passed',
-					'getDetail' => 'Invalid Data Passed',
-					'getCode' => 400,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
-
-			array(
-				'ModelDeleteFailedJsonApiException',
-				array(
-					'title' => 'Model Delete Failed',
-					'detail' => 'Model Delete Failed',
-					'code' => 502,
-					'href' => '/right/here/right/now',
-					'id' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-				array(
-					'getTitle' => 'Model Delete Failed',
-					'getDetail' => 'Model Delete Failed',
-					'getCode' => 502,
-					'getHref' => '/right/here/right/now',
-					'getId' => 'a14d2c0c-c9d1-11e4-ba2d-080027506c76',
-				),
-			),
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
 		);
 	}
 
 	/**
-	 * Confirm that all Exception constructors set default args into the
-	 * correct properties. As a side-effect, also tests the getter methods
-	 * for all properties.
+	 * Confirm that the construct sets our values properly
 	 *
-	 * @param  string $class The Exception class name to instantiate.
-	 * @param  array $expected The expected properties of the Exception class
-	 * @param  string $msg Optional PHPUnit error message when the assertion fails.
 	 * @return void
-	 * @dataProvider	provideTestConstructorsDefaultValues
 	 */
-	public function testExceptionConstructorsDefaultValues($class, $expected, $msg = 'The method ::%1$s() is expected to return the value `%2$s`.') {
-		$e = new $class();
-		foreach ($expected as $method => $value) {
-			if (is_array($value)) {
-				$this->assertEquals(
-					$value,
-					$e->{$method}(),
-					sprintf($msg, $method, implode($value, ", "))
-				);
-			} else {
-				$this->assertEquals(
-					$value,
-					$e->{$method}(),
-					sprintf($msg, $method, $value)
-				);
-			}
-		}
+	public function testUnauthorizedJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new UnauthorizedJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('UnauthorizedJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
 	}
 
 	/**
-	 * Provide sets of [exception class name, expected, msg] sets
-	 * to testExceptionConstructorsDefaultValues();
+	 * Confirm that the construct sets our values properly
 	 *
-	 * @return array data inputs to testExceptionConstructorsDefaultValues
+	 * @return void
 	 */
-	public function provideTestConstructorsDefaultValues() {
-		return array(
-			array(
-				'StandardJsonApiExceptions', // Exception class to instantiate.
-				array( // Getter methods to run and expected values.
-					'getTitle' => 'JSON API Exception',
-					'getDetail' => 'JSON API Exception',
-					'getCode' => 400,
-					'getHref' => null,
-					'getId' => null,
-				),
-				// optional phpunit assertion failed message here
-			),
+	public function testForbiddenByPermissionsExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
 
-			array(
-				'NotFoundJsonApiException',
-				array(
-					'getTitle' => 'Resource Not Found',
-					'getDetail' => 'Resource Not Found',
-					'getCode' => 404,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$exception = new ForbiddenByPermissionsException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
 
-			array(
-				'UnauthorizedJsonApiException',
-				array(
-					'getTitle' => 'Unauthorized Access',
-					'getDetail' => 'Unauthorized Access',
-					'getCode' => 401,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$this->assertInstanceOf('ForbiddenByPermissionsException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
 
-			array(
-				'ForbiddenByPermissionsException',
-				array(
-					'getTitle' => 'Unauthorized Access',
-					'getDetail' => 'Access to the requested resource is denied by the Permissions on your account.',
-					'getCode' => 403,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
 
-			array(
-				'ValidationFailedJsonApiException',
-				array(
-					'getTitle' => 'Validation Failed',
-					'getDetail' => array(),
-					'getCode' => 422,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testValidationFailedJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = array("something" => "Custom detail message");
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
 
-			array(
-				'ModelSaveFailedJsonApiException',
-				array(
-					'getTitle' => 'Model Save Failed',
-					'getDetail' => 'Model Save Failed',
-					'getCode' => 400,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$exception = new ValidationFailedJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
 
-			array(
-				'InvalidPassedDataJsonApiException',
-				array(
-					'getTitle' => 'Invalid Data Passed',
-					'getDetail' => 'Invalid Data Passed',
-					'getCode' => 400,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$this->assertInstanceOf('ValidationFailedJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
 
-			array(
-				'ModelDeleteFailedJsonApiException',
-				array(
-					'getTitle' => 'Model Delete Failed',
-					'getDetail' => 'Model Delete Failed',
-					'getCode' => 502,
-					'getHref' => null,
-					'getId' => null,
-				),
-			),
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"The exception `detail` property does not match what we passed"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testModelSaveFailedJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new ModelSaveFailedJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('ModelSaveFailedJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testInvalidPassedDataJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new InvalidPassedDataJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('InvalidPassedDataJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testModelDeleteFailedJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new ModelDeleteFailedJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('ModelDeleteFailedJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testModelDeleteFailedValidationJsonApiExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 406;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new ModelDeleteFailedValidationJsonApiException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('ModelDeleteFailedValidationJsonApiException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
 		);
 	}
 

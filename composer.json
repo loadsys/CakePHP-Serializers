@@ -32,8 +32,9 @@
   },
   "require": {
     "php": ">=5.4.0",
+    "ext-json": "*",
     "composer/installers": "~1.0",
-    "ext-json": "*"
+    "loadsys/cakephp-serializers-errors": "dev-master"
   },
   "extra": {
     "installer-name": "Serializers"

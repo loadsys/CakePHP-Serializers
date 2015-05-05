@@ -173,28 +173,26 @@ with CakePHP and this feature.
 
 ## Error and Exception Handling Setup ##
 
-Errors and Exceptions can also be handled with this plugin.
+Errors and Exceptions are handled via a separate CakePHP plugin, 
+included via Composer: [SerializersErrors](https://github.com/loadsys/CakePHP-Serializers-Errors)
+
+Please read the documentation there for more information on the specifics.
 
 Modify your `app/Config/core.php` file to use the Custom Exceptions/Error
-handling in this plugin with this code:
+handling in SerializersErrors.
 
 ``` php
-Configure::write('Error', array(
-	'handler' => 'EmberDataError::handleError',
-	'level' => E_ALL & ~E_DEPRECATED,
-	'trace' => true
-));
-
 Configure::write('Exception', array(
-	'handler' => 'EmberDataError::handleException',
-	'renderer' => 'Serializers.EmberDataExceptionRenderer',
-	'log' => true
+	'handler' => 'ErrorHandler::handleException',
+	'renderer' => 'SerializersErrors.SerializerExceptionRenderer',
+	'log' => true,
 ));
 ```
 
 This does two things:
 
-* Errors and Exceptions get output as correctly formatted JSON
+* Errors and Exceptions get output as correctly formatted JSON API, JSON or HTML 
+depending on the request type
 * Allows the use of Custom Exceptions that match Ember Data exceptions for error cases
 
 ## Custom Bake Templates ##
