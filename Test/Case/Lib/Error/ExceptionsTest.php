@@ -5,7 +5,7 @@
  *
  * @package Serializers.Test.Case.Lib.Error
  */
-App::uses('Lib/Error', 'Serializers.StandardJsonApiExceptions');
+App::uses('StandardJsonApiExceptions', 'Serializers.Error');
 
 /**
  * StandardJsonApiExceptionsTest
