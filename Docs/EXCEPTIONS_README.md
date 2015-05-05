@@ -1,9 +1,11 @@
 # Exceptions #
 
 There are custom exception classes used in this plugin to provide for responses
-that when formated using the `EmberDataError` and `EmberDataExceptionRender` Classes,
-look like:
+that when formated using the `SerializersErrors` Plugin, look like:
 
+
+* For JSON API Requests, identified using 
+`Accepts: application/vnd.api+json`
 ```javascript
 {
 	"errors": [
@@ -11,14 +13,31 @@ look like:
 			"id": "1234353",
 			"href": "/url/for/more/information",
 			"status": 5xx,
-			"code": "SomethingWentWrongException",
+			"code": "5xx",
 			"title": "Something went wrong and now this is displayed.",
 			"detail": "A detailed response, could be an object/array as well",
-			"current_url": "/url/attempted/to/reach"
+			"links": "",
+			"paths": ""
 		}
 	]
 }
 ```
+
+* For JSON Requests, identified using 
+`Accepts: application/json`
+```javascript
+{
+    "id": "1234353",
+    "href": "/url/for/more/information",
+    "status": "404",
+    "code": "5xx",
+    "detail": "Something went wrong and now this is displayed.",
+    "links": "",
+    "paths": ""
+}
+```
+
+* For all other, render as Standard HTML exceptions.
 
 The custom Exception classes are also used to return Validation Errors in a
 manner that EmberData expects, like so:
@@ -34,7 +53,6 @@ manner that EmberData expects, like so:
 
 This README is split into the following sections.
 
-1. [StandardJsonApiExceptions](#standardjsonapiexceptions)
 1. [NotFoundJsonApiException](#notfoundjsonapiexception)
 1. [UnauthorizedJsonApiException](#unauthorizedjsonapiexception)
 1. [ForbiddenByPermissionsException](#forbiddenbypermissionsexception)
@@ -47,43 +65,7 @@ This README is split into the following sections.
 1. [SerializerIgnoreException](#serializerignoreexception)
 1. [DeserializerIgnoreException](#deserializerignoreexception)
 
-## StandardJsonApiExceptions ##
-
-This the base Exception Class for all other Exceptions expect for `SerializerMissingRequiredException`,
-`SerializerIgnoreException` and `DeserializerIgnoreException`
-
-The construct method is updated to:
-
-```php
-__construct(
-	$title = 'JSON API Exception',
-	$detail = 'JSON API Exception',
-	$code = 400,
-	$href = null,
-	$id = null
-)
-```
-
-The `EmberDataExceptionRender` class will render this exception to the front end
-as a JSON Array following this pattern:
-
-```javascript
-{
-	"errors": [
-		{
-			"id": Exception->id,
-			"href": Exception->href,
-			"status": Exception->code,
-			"code": get_class(Exception),
-			"title": Exception->title,
-			"detail": Exception->detail,
-			"current_url": $this->controller->request->here
-		}
-	]
-}
-```
-
-## NotFoundJsonApiException ##
+## NotFoundJsonApiException
 
 Used when a resource can not be found for an endpoint.
 
@@ -94,13 +76,15 @@ NotFoundException.
 __construct(
 	$title = 'Resource Not Found',
 	$detail = 'Resource Not Found',
-	$code = 404,
+	$status = 404,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## UnauthorizedJsonApiException ##
+## UnauthorizedJsonApiException
 
 Used when an HTTP_AUTHORIZATON header token is not set, expired, or invalid.
 
@@ -111,13 +95,15 @@ solution with your API, this Exception class is designed around dealing with AUT
 __construct(
 	$title = 'Unauthorized Access',
 	$detail = 'Unauthorized Access',
-	$code = 401,
+	$status = 401,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## ForbiddenByPermissionsException ##
+## ForbiddenByPermissionsException
 
 Used when a User does not have permission to access that url.
 
@@ -128,13 +114,15 @@ solution with your API, this Exception class is designed around dealing with ACL
 __construct(
 	$title = 'Unauthorized Access',
 	$detail = 'Access to the requested resource is denied by the Permissions on your account.',
-	$code = 403,
+	$status = 403,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## ValidationFailedJsonApiException ##
+## ValidationFailedJsonApiException
 
 Used when a Model save fails due to validation issues.
 
@@ -148,16 +136,18 @@ throw new ValidationFailedJsonApiException(__('ModelName create failed.'), $this
 __construct(
 	$title = 'Validation Failed',
 	array $detail = array(),
-	$code = 422,
+	$status = 422,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
 The `detail` property of this exception is required to be an array, typically the
 results of `$this->Model->invalidFields()` method call.
 
-## ModelSaveFailedJsonApiException ##
+## ModelSaveFailedJsonApiException
 
 Used when a `$this->Model->save` returns false for reasons other than Validation Errors.
 
@@ -167,13 +157,15 @@ This Exception class is used by the bake templates.
 __construct(
 	$title = 'Model Save Failed',
 	$detail = 'Model Save Failed',
-	$code = 400,
+	$status = 400,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## InvalidPassedDataJsonApiException ##
+## InvalidPassedDataJsonApiException
 
 Used when the HTTP Request includes invalid data.
 
@@ -183,13 +175,15 @@ This Exception class is not used by the bake templates.
 __construct(
 	$title = 'Invalid Data Passed',
 	$detail = 'Invalid Data Passed',
-	$code = 400,
+	$status = 400,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## ModelDeleteFailedJsonApiException ##
+## ModelDeleteFailedJsonApiException
 
 Used when the `$this->Model->delete` returns false.
 
@@ -199,13 +193,15 @@ This Exception class is used by the bake templates.
 __construct(
 	$title = 'Model Delete Failed',
 	$detail = 'Model Delete Failed',
-	$code = 502,
+	$status = 502,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## ModelDeleteFailedValidationJsonApiException ##
+## ModelDeleteFailedValidationJsonApiException
 
 Used when the `$this->Model->delete` fails due to a Validation issue.
 
@@ -219,20 +215,22 @@ first. It does not provide any of the custom error response handling that the
 __construct(
 	$title = 'Model Delete Failed Due to Validation Issue',
 	$detail = 'Model Delete Failed Due to Validation Issue',
-	$code = 502,
+	$status = 502,
+	$id = null,
 	$href = null,
-	$id = null
+	$links = null,
+	$paths = null
 )
 ```
 
-## SerializerMissingRequiredException ##
+## SerializerMissingRequiredException
 
 Used when the Serializer is missing a required property.
 
 This Exception does not currently extend the `StandardJsonApiExceptions` class, it
 extends PHP's base Exception Class.
 
-## SerializerIgnoreException ##
+## SerializerIgnoreException
 
 Used when you create a custom `serialize_{property_name}` method, if you wish
 to not set any data for that property when serializing the Model. This Exception
@@ -241,7 +239,7 @@ is caught and will not stop the request from completing.
 This Exception does not currently extend the `StandardJsonApiExceptions` class, it
 extends PHP's base Exception Class.
 
-## DeserializerIgnoreException ##
+## DeserializerIgnoreException
 
 Used when you create a custom `deserialize_{property_name}` method, if you wish
 to not set any data for that property when deserializing the Model. This Exception
