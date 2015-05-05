@@ -1,7 +1,7 @@
 # Exceptions #
 
 There are custom exception classes used in this plugin to provide for responses
-that when formated using the `SerializersErrors` Plugin, look like:
+that when formatted using the `SerializersErrors` Plugin, look like:
 
 
 * For JSON API Requests, identified using 
