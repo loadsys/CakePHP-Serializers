@@ -59,37 +59,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -124,37 +124,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -189,37 +189,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -231,7 +231,7 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 	 */
 	public function testValidationFailedJsonApiExceptionConstructor() {
 		$title = "New Title";
-		$detail = array("something" => "Custom detail message");
+		$validationErrors = array("something" => "Custom detail message");
 		$status = 406;
 		$id = "13242134-456657-asdfasdf";
 		$href = 'https://www.asdfasdfasdf.com/';
@@ -240,7 +240,7 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$exception = new ValidationFailedJsonApiException(
 			$title,
-			$detail,
+			$validationErrors,
 			$status,
 			$id,
 			$href,
@@ -249,42 +249,43 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 		);
 
 		$this->assertInstanceOf('ValidationFailedJsonApiException', $exception);
+		$this->assertInstanceOf('ValidationBaseSerializerException', $exception);
 		$this->assertInstanceOf('BaseSerializerException', $exception);
 		$this->assertInstanceOf('CakeException', $exception);
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
-			$detail,
-			$exception->detail,
-			"The exception `detail` property does not match what we passed"
+			$validationErrors,
+			$exception->validationErrors(),
+			"ValidationErrors should match what we passed in the constructor"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -319,37 +320,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -384,37 +385,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -449,37 +450,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -491,7 +492,7 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 	 */
 	public function testModelDeleteFailedValidationJsonApiExceptionConstructor() {
 		$title = "New Title";
-		$detail = "Custom detail message";
+		$validationErrors = array("username" => array("Username can't be deleted"));
 		$status = 406;
 		$id = "13242134-456657-asdfasdf";
 		$href = 'https://www.asdfasdfasdf.com/';
@@ -500,7 +501,7 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$exception = new ModelDeleteFailedValidationJsonApiException(
 			$title,
-			$detail,
+			$validationErrors,
 			$status,
 			$id,
 			$href,
@@ -509,42 +510,43 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 		);
 
 		$this->assertInstanceOf('ModelDeleteFailedValidationJsonApiException', $exception);
+		$this->assertInstanceOf('ValidationBaseSerializerException', $exception);
 		$this->assertInstanceOf('BaseSerializerException', $exception);
 		$this->assertInstanceOf('CakeException', $exception);
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
-			$detail,
-			$exception->detail,
-			"Detail does not match {$detail}"
+			$validationErrors,
+			$exception->validationErrors(),
+			"ValidationErrors should match what we passed in the constructor"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
@@ -579,37 +581,37 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 
 		$this->assertEquals(
 			$title,
-			$exception->title,
+			$exception->title(),
 			"Title does not match {$title}"
 		);
 		$this->assertEquals(
 			$detail,
-			$exception->detail,
+			$exception->detail(),
 			"Detail does not match {$detail}"
 		);
 		$this->assertEquals(
 			$status,
-			$exception->status,
+			$exception->status(),
 			"Status does not match {$status}"
 		);
 		$this->assertEquals(
 			$id,
-			$exception->id,
+			$exception->id(),
 			"Id does not match {$id}"
 		);
 		$this->assertEquals(
 			$href,
-			$exception->href,
+			$exception->href(),
 			"Href does not match {$href}"
 		);
 		$this->assertEquals(
 			$links,
-			$exception->links,
+			$exception->links(),
 			"Links does not match our expectation"
 		);
 		$this->assertEquals(
 			$paths,
-			$exception->paths,
+			$exception->paths(),
 			"Paths does not match expectation"
 		);
 	}
