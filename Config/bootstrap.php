@@ -11,4 +11,4 @@ App::build(array(
 CakePlugin::load('SerializersErrors', array('bootstrap' => true));
 
 // Load CakePHP Serializers Exceptions
-App::import('Lib/Error', 'Serializers.StandardJsonApiExceptions');
+App::import('Lib/Error', 'Serializers.SerializersCustomExceptions');
