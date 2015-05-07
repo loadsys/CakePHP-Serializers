@@ -1,55 +1,7 @@
 # Exceptions #
 
 There are custom exception classes used in this plugin to provide for responses
-that when formatted using the `SerializersErrors` Plugin, look like:
-
-
-* For JSON API Requests, identified using 
-`Accepts: application/vnd.api+json`
-```javascript
-{
-	"errors": [
-		{
-			"id": "1234353",
-			"href": "/url/for/more/information",
-			"status": 5xx,
-			"code": "5xx",
-			"title": "Something went wrong and now this is displayed.",
-			"detail": "A detailed response, could be an object/array as well",
-			"links": "",
-			"paths": ""
-		}
-	]
-}
-```
-
-* For JSON Requests, identified using 
-`Accepts: application/json`
-```javascript
-{
-    "id": "1234353",
-    "href": "/url/for/more/information",
-    "status": "404",
-    "code": "5xx",
-    "detail": "Something went wrong and now this is displayed.",
-    "links": "",
-    "paths": ""
-}
-```
-
-* For all other, render as Standard HTML exceptions.
-
-The custom Exception classes are also used to return Validation Errors in a
-manner that EmberData expects, like so:
-
-```javascript
-{
-	"errors": {
-		"name": "Name must not be empty.",
-		"status": "Status? must be true or false.",
-	}
-}
-```
+that are formatted using the [SerializersErrors](https://github.com/loadsys/CakePHP-Serializers-Errors) Plugin.
 
 This README is split into the following sections.
 
@@ -135,7 +87,7 @@ throw new ValidationFailedJsonApiException(__('ModelName create failed.'), $this
 ```php
 __construct(
 	$title = 'Validation Failed',
-	array $detail = array(),
+	array $validationErrors = array(),
 	$status = 422,
 	$id = null,
 	$href = null,
@@ -208,13 +160,17 @@ Used when the `$this->Model->delete` fails due to a Validation issue.
 This Exception class is not used by the bake template, however it is useful if
 you want to fail a delete method and provide a more specific error response
 targeting a validation issue, for instance a related model needs to be deleted
-first. It does not provide any of the custom error response handling that the
+first. It does provide the custom error response handling that the
 `ValidationFailedJsonApiException` class provides.
+
+```php
+throw new ModelDeleteFailedValidationJsonApiException(__('ModelName delete failed.'), $this->ModelName->invalidFields());
+````
 
 ```php
 __construct(
 	$title = 'Model Delete Failed Due to Validation Issue',
-	$detail = 'Model Delete Failed Due to Validation Issue',
+	array $validationErrors = array(),
 	$status = 502,
 	$id = null,
 	$href = null,
@@ -227,8 +183,17 @@ __construct(
 
 Used when the Serializer is missing a required property.
 
-This Exception does not currently extend the `StandardJsonApiExceptions` class, it
-extends PHP's base Exception Class.
+```php
+__construct(
+	$title = 'Serializer Is Missing A Required Attribute',
+	$detail = 'Serialization of a Data Object is missing a required property and failed.',
+	$status = 500,
+	$id = null,
+	$href = "https://github.com/loadsys/CakePHP-Serializers/blob/master/Docs/EXCEPTIONS_README.md#serializermissingrequiredexception",
+	$links = null,
+	$paths = null
+)
+```
 
 ## SerializerIgnoreException
 
@@ -236,7 +201,7 @@ Used when you create a custom `serialize_{property_name}` method, if you wish
 to not set any data for that property when serializing the Model. This Exception
 is caught and will not stop the request from completing.
 
-This Exception does not currently extend the `StandardJsonApiExceptions` class, it
+This Exception does not currently extend the `BaseSerializerException` class, it
 extends PHP's base Exception Class.
 
 ## DeserializerIgnoreException
@@ -245,5 +210,5 @@ Used when you create a custom `deserialize_{property_name}` method, if you wish
 to not set any data for that property when deserializing the Model. This Exception
 is caught and will not stop the request from completing.
 
-This Exception does not currently extend the `StandardJsonApiExceptions` class, it
+This Exception does not currently extend the `BaseSerializerException` class, it
 extends PHP's base Exception Class.
