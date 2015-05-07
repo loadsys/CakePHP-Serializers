@@ -287,6 +287,7 @@ class SerializerMissingRequiredException extends BaseSerializerException {
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
+
 }
 
 /**
