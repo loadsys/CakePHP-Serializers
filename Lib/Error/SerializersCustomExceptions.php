@@ -102,13 +102,13 @@ class ForbiddenByPermissionsException extends BaseSerializerException {
  *
  * a generic JSON API Exception when validation fails
  */
-class ValidationFailedJsonApiException extends BaseSerializerException {
+class ValidationFailedJsonApiException extends ValidationBaseSerializerException {
 
 	/**
 	 * Constructs a new instance of the base ValidationFailedJsonApiException
 	 *
 	 * @param string $title The title of the exception, passed to parent CakeException::__construct
-	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param array $validationErrors A CakePHP Model array of validation errors
 	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
@@ -117,14 +117,14 @@ class ValidationFailedJsonApiException extends BaseSerializerException {
 	 */
 	public function __construct(
 		$title = 'Validation Failed',
-		array $detail = array(),
+		array $validationErrors = array(),
 		$status = 422,
 		$id = null,
 		$href = null,
 		$links = null,
 		$paths = null
 	) {
-		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
+		parent::__construct($title, $validationErrors, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -231,13 +231,13 @@ class ModelDeleteFailedJsonApiException extends BaseSerializerException {
  * a generic JSON API Exception when the Model->delete method fails with a
  * validation error
  */
-class ModelDeleteFailedValidationJsonApiException extends BaseSerializerException {
+class ModelDeleteFailedValidationJsonApiException extends ValidationBaseSerializerException {
 
 	/**
 	 * Constructs a new instance of the base ModelDeleteFailedValidationJsonApiException
 	 *
 	 * @param string $title The title of the exception, passed to parent CakeException::__construct
-	 * @param string $detail A human-readable explanation specific to this occurrence of the problem.
+	 * @param array $validationErrors A CakePHP Model array of validation errors
 	 * @param int $status The http status code of the error, passed to parent CakeException::__construct
 	 * @param string $id A unique identifier for this particular occurrence of the problem.
 	 * @param string $href A URI that MAY yield further details about this particular occurrence of the problem.
@@ -246,14 +246,14 @@ class ModelDeleteFailedValidationJsonApiException extends BaseSerializerExceptio
 	 */
 	public function __construct(
 		$title = 'Model Delete Failed Due to Validation Issue',
-		$detail = 'Model Delete Failed Due to Validation Issue',
+		array $validationErrors = array(),
 		$status = 502,
 		$id = null,
 		$href = null,
 		$links = null,
 		$paths = null
 	) {
-		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
+		parent::__construct($title, $validationErrors, $status, $id, $href, $links, $paths);
 	}
 
 }
@@ -287,6 +287,7 @@ class SerializerMissingRequiredException extends BaseSerializerException {
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
+
 }
 
 /**

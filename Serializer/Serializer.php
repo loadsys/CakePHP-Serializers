@@ -64,6 +64,8 @@ class Serializer extends Object {
 				return $this->{$methodName}(array(), $dataForModel);
 			} catch (SerializerIgnoreException $e) {
 				// if we throw this exception catch it and don't set any data for that record
+				// return an empty array to pass up the chain
+				return array();
 			}
 		} else {
 			$SubModelSerializer = $this->returnSerializationInstance($modelName, $dataForModel);

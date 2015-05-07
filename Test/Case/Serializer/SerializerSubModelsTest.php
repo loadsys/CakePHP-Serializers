@@ -983,4 +983,44 @@ class SerializerSubModelsTest extends CakeTestCase {
 		$output = $TestPrimarySerializer->serialize($inputData);
 	}
 
+	/**
+	 * test throwing a SerializerIgnoreException on a sub model record
+	 *
+	 * @return void
+	 */
+	public function testThrowingSerializerIgnoreExceptionOnSubModelRecords() {
+		$inputData = array(
+			'TestPrimary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+				'IgnoreSubRecord' => array(
+					0 => array(
+						'title' => 'Jane',
+						'body' => 'Smith',
+						'created' => "created date time"
+					),
+					1 => array(
+						'title' => 'Jane',
+						'body' => 'Text',
+						'created' => "created date time"
+					)
+				),
+			),
+		);
+
+		$expectedOutput = array(
+			'test_primary' => array(
+				'id' => '1',
+				'name' => 'Doe',
+			),
+		);
+
+		$TestPrimarySerializer = new TestPrimarySerializer();
+		$this->assertEquals(
+			$expectedOutput,
+			$TestPrimarySerializer->serialize($inputData),
+			"The output of serialize did not match the the expected output"
+		);
+	}
+
 }

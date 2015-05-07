@@ -296,6 +296,19 @@ class TestPrimarySerializer extends Serializer {
 	 * @var array
 	 */
 	public $required = array('id', 'name');
+
+	/**
+	 * serialize IgnoreSubRecord model
+	 *
+	 * @param array $data
+	 * @param array $record
+	 * @return array
+	 * @throws SerializerIgnoreException
+	 */
+	public function serialize_IgnoreSubRecord($data, $record) {
+		throw new SerializerIgnoreException();
+	}
+
 }
 
 /**
