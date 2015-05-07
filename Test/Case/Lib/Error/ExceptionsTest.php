@@ -5,7 +5,6 @@
  *
  * @package Serializers.Test.Case.Lib.Error
  */
-App::uses('Lib/Error', 'Serializers.StandardJsonApiExceptions');
 
 /**
  * StandardJsonApiExceptionsTest
@@ -547,6 +546,115 @@ class StandardJsonApiExceptionsTest extends CakeTestCase {
 			$paths,
 			$exception->paths,
 			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testSerializerMissingRequiredExceptionConstructor() {
+		$title = "New Title";
+		$detail = "Custom detail message";
+		$status = 500;
+		$id = "13242134-456657-asdfasdf";
+		$href = 'https://www.asdfasdfasdf.com/';
+		$links = array('link' => 'link');
+		$paths = array('something' => 'something');
+
+		$exception = new SerializerMissingRequiredException(
+			$title,
+			$detail,
+			$status,
+			$id,
+			$href,
+			$links,
+			$paths
+		);
+
+		$this->assertInstanceOf('SerializerMissingRequiredException', $exception);
+		$this->assertInstanceOf('BaseSerializerException', $exception);
+		$this->assertInstanceOf('CakeException', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->title,
+			"Title does not match {$title}"
+		);
+		$this->assertEquals(
+			$detail,
+			$exception->detail,
+			"Detail does not match {$detail}"
+		);
+		$this->assertEquals(
+			$status,
+			$exception->status,
+			"Status does not match {$status}"
+		);
+		$this->assertEquals(
+			$id,
+			$exception->id,
+			"Id does not match {$id}"
+		);
+		$this->assertEquals(
+			$href,
+			$exception->href,
+			"Href does not match {$href}"
+		);
+		$this->assertEquals(
+			$links,
+			$exception->links,
+			"Links does not match our expectation"
+		);
+		$this->assertEquals(
+			$paths,
+			$exception->paths,
+			"Paths does not match expectation"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testSerializerIgnoreExceptionConstructor() {
+		$title = "New Title";
+
+		$exception = new SerializerIgnoreException(
+			$title
+		);
+
+		$this->assertInstanceOf('SerializerIgnoreException', $exception);
+		$this->assertInstanceOf('Exception', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->getMessage(),
+			"::getMessage() does not match {$title}"
+		);
+	}
+
+	/**
+	 * Confirm that the construct sets our values properly
+	 *
+	 * @return void
+	 */
+	public function testDeserializerIgnoreExceptionConstructor() {
+		$title = "New Title";
+
+		$exception = new DeserializerIgnoreException(
+			$title
+		);
+
+		$this->assertInstanceOf('DeserializerIgnoreException', $exception);
+		$this->assertInstanceOf('Exception', $exception);
+
+		$this->assertEquals(
+			$title,
+			$exception->getMessage(),
+			"::getMessage() does not match {$title}"
 		);
 	}
 
