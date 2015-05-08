@@ -28,8 +28,8 @@ class NotFoundJsonApiException extends BaseSerializerException {
 		$status = 404,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -58,8 +58,8 @@ class UnauthorizedJsonApiException extends BaseSerializerException {
 		$status = 401,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -89,8 +89,8 @@ class ForbiddenByPermissionsException extends BaseSerializerException {
 		$status = 403,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -121,8 +121,8 @@ class ValidationFailedJsonApiException extends ValidationBaseSerializerException
 		$status = 422,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $validationErrors, $status, $id, $href, $links, $paths);
 	}
@@ -153,8 +153,8 @@ class ModelSaveFailedJsonApiException extends BaseSerializerException {
 		$status = 400,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -185,8 +185,8 @@ class InvalidPassedDataJsonApiException extends BaseSerializerException {
 		$status = 400,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -217,8 +217,8 @@ class ModelDeleteFailedJsonApiException extends BaseSerializerException {
 		$status = 502,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
@@ -250,8 +250,8 @@ class ModelDeleteFailedValidationJsonApiException extends ValidationBaseSerializ
 		$status = 502,
 		$id = null,
 		$href = null,
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $validationErrors, $status, $id, $href, $links, $paths);
 	}
@@ -282,8 +282,8 @@ class SerializerMissingRequiredException extends BaseSerializerException {
 		$status = 500,
 		$id = null,
 		$href = "https://github.com/loadsys/CakePHP-Serializers/blob/master/Docs/EXCEPTIONS_README.md#serializermissingrequiredexception",
-		$links = null,
-		$paths = null
+		$links = array(),
+		$paths = array()
 	) {
 		parent::__construct($title, $detail, $status, $id, $href, $links, $paths);
 	}
