@@ -5,7 +5,6 @@
  * @package  Serializers.View
  */
 App::uses('View', 'View');
-App::uses('AnalyzeRequest', 'Serializers.Lib');
 App::uses('Serialization', 'Serializers.Lib');
 
 /**
@@ -32,22 +31,30 @@ class CakeSerializerView extends View {
 	}
 
 	/**
-	 * Render the view, if it can be rendered as JSON do so, else call the parent
-	 * render method
+	 * Render the view, determining the Request type and changing both the response
+	 * headers and the format dependent upon the Accept header
 	 *
 	 * @param mixed $view the view data
 	 * @param string $layout the layout to use
 	 * @return string
 	 */
 	public function render($view = null, $layout = null) {
-		if ($this->renderAsJSON()) {
-			$this->response->type('json');
+		if ($this->isJsonApiRequest()) {
+			// Set the controller to respond as JSON API
+			$this->controller->response->type(array('jsonapi' => 'application/vnd.api+json'));
+			$this->controller->response->type('jsonapi');
+
 			list($name, $data) = $this->parseNameAndData($view);
-			$render = $this->toJSON($name, $data);
-		} else {
-			$render = parent::render($view, $layout);
+			return $this->toJSON($name, $data);
+		} elseif ($this->isJsonRequest()) {
+			// Set the controller to respond as JSON
+			$this->controller->response->type('json');
+
+			list($name, $data) = $this->parseNameAndData($view);
+			return $this->toJSON($name, $data);
 		}
-		return $render;
+
+		return parent::render($view, $layout);
 	}
 
 	/**
@@ -60,39 +67,6 @@ class CakeSerializerView extends View {
 	protected function toJSON($name, $data) {
 		$serialization = new Serialization($name, $data);
 		return json_encode($serialization->serialize());
-	}
-
-	/**
-	 * decides to render the response as json
-	 *
-	 * @return bool
-	 */
-	protected function renderAsJSON() {
-		if ($this->controllerRenderAsPropertyExists()) {
-			return $this->checkControllerRenderAs();
-		} else {
-			$analyzer = new AnalyzeRequest($this->request);
-			return $analyzer->isJSON();
-		}
-	}
-
-	/**
-	 * determines if the renderAs property for the controller exists
-	 *
-	 * @return bool
-	 */
-	protected function controllerRenderAsPropertyExists() {
-		return property_exists($this->controller, 'renderAs');
-	}
-
-	/**
-	 * determines if the renderAs property for the controller is set to json
-	 *
-	 * @param string $type the value of renderAs we wish to ensure is matched
-	 * @return bool
-	 */
-	protected function checkControllerRenderAs($type = 'json') {
-		return strtolower($this->controller->renderAs) === $type;
 	}
 
 	/**
@@ -128,4 +102,22 @@ class CakeSerializerView extends View {
 		}
 		return array($this->controller->name, $data);
 	}
+
+	/**
+	 * is this request a JsonApi style request
+	 *
+	 * @return bool returns true if JsonApi media request, false otherwise
+	 */
+	protected function isJsonApiRequest() {
+		return $this->controller->request->accepts('application/vnd.api+json');
+	}
+	/**
+	 * is this request for Json
+	 *
+	 * @return bool returns true if Json media request, false otherwise
+	 */
+	protected function isJsonRequest() {
+		return $this->controller->request->accepts('application/json');
+	}
+
 }
